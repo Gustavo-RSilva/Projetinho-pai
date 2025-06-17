@@ -238,7 +238,8 @@
   margin-left: 9REM;
 }
 .destaque{
-  color: ;
+  color: rgb(184, 214, 12);
+ 
 }
 /* fim do texto */
 /* Pesquisa */
@@ -316,4 +317,17 @@
     padding: 0.75rem;
     font-size: 1.1rem;
   }
+}
+/* fim botão nav */
+/* inicio carroceu */
+.owl-nav {
+  display: none; /* Oculta as setas de navegação */
+}
+.card {
+  width: 18rem;
+  margin: 10px;
+}
+.owl-carousel .item {
+  display: flex;
+  justify-content: center;
 }
