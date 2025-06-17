@@ -320,14 +320,19 @@
 }
 /* fim botão nav */
 /* inicio carroceu */
-.owl-nav {
-  display: none; /* Oculta as setas de navegação */
-}
+
 .card {
-  width: 18rem;
+  width: 160rem;
   margin: 10px;
+  height: 14rem;
 }
 .owl-carousel .item {
   display: flex;
   justify-content: center;
+}
+.card-footer {
+  border-top: none; /* Remove a borda superior do footer, se necessário */
+}
+.card-body {
+    padding: 1rem; /* Ajuste o preenchimento conforme necessário */
 }
