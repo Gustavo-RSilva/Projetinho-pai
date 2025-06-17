@@ -231,6 +231,16 @@
       color: white;
       outline: none;
     }
+/* texto em cima da pesquisa */
+.texto-p{
+  position: absolute;
+  top: 15rem;
+  margin-left: 9REM;
+}
+.destaque{
+  color: ;
+}
+/* fim do texto */
 /* Pesquisa */
 .search-bar {
   background: #ffffff;
