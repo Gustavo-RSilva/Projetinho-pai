@@ -234,7 +234,7 @@
 /* texto em cima da pesquisa */
 .texto-p{
   position: absolute;
-  top: 37vh;
+  top: 15rem;
   margin-left: 9REM;
 }
 .destaque{
@@ -255,7 +255,7 @@
   gap: 1rem;
   box-sizing: border-box;;
   position: absolute;
-    top: 45vh;
+    top: 18rem;
   margin-left: 1rem;
 }
 .search-section {
@@ -354,17 +354,6 @@
 
 /* fim carroceu */
 
-/* segundo carroceu */
-.tamanho-card2{
-  width: 20rem;
-  height: 7rem;
-}
-.centralizar{
-  position: absolute;
-  top: 0.90rem;
-}
-/* fim segundo carroceu */
-
 /* inicio footer */
 
 .site-footer {
@@ -372,8 +361,6 @@
   color: white;
   padding: 3rem 1rem 1rem;
   font-family: "Poppins", sans-serif;
-  top: 2rem;
-position: relative;
 }
 
 .footer-container {
@@ -462,43 +449,3 @@ position: relative;
   margin-left: 6rem;
 }
 
-/* pag vagas */
-
-/* listas das vagas */
-.list-group-item {
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-}
-
-.list-group-item:hover {
-  background-color: #f1f5f9;
-}
-
-.card-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--brand-color);
-}
-
-#jobList .list-group-item {
-  transition: background-color 0.2s ease;
-  border: none;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0.75rem 1rem;
-}
-
-#jobList .list-group-item:hover {
-  background-color: #f9fafb;
-}
-
-#jobList img {
-  object-fit: cover;
-  border-radius: 8px;
-}
-@media (min-width: 768px) {
-  .sticky-card {
-    position: sticky;
-    top: 90px;
-  }
-}
