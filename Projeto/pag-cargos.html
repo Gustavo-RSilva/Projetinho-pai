@@ -10,7 +10,7 @@
       <!-- Google Material Icons -->
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
       <link rel="stylesheet" href="css/style.css">
-      <link rel="stylesheet" href="css/pag-candidatura.css">
+      <link rel="stylesheet" href="css/cargos.css">
       <link rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
             integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=="
@@ -26,7 +26,7 @@
 <body>
       <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
             <div class="navbar-container">
-                  <a href="Index.html" class="navbar-brand" aria-label="Página inicial Job Search"><img style="width: 90px;"
+                  <a href="#" class="navbar-brand" aria-label="Página inicial Job Search"><img style="width: 90px;"
                               src="img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png"
                               alt=""></a>
 
@@ -83,73 +83,24 @@
       </nav>
       <!-- fim nav bar -->
 
-      <div class="container my-5">
-        <!-- Barra de pesquisa -->
-        <div class="row mb-4">
-          <div class="col-12">
-            <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Buscar por vaga ou empresa" aria-label="Buscar">
-              <button class="btn btn-primary" type="submit">Buscar</button>
-            </form>
-          </div>
-        </div>
-      
-        <div class="row">
-          <!-- Filtro lateral esquerdo -->
-          <div class="col-md-3 mb-4">
-            <div class="p-3 bg-white rounded shadow-sm">
-              <h5 class="mb-3">Filtrar por status</h5>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="analise">
-                <label class="form-check-label" for="analise">Em análise</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="aprovado">
-                <label class="form-check-label" for="aprovado">Aprovado</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="rejeitado">
-                <label class="form-check-label" for="rejeitado">Rejeitado</label>
-              </div>
-            </div>
-          </div>
-      
-          <!-- Lista de Candidaturas -->
-          <div class="col-md-9">
-            <div class="p-3 bg-white rounded shadow-sm mb-3">
-              <div class="d-flex justify-content-between align-items-start flex-wrap">
-                <div>
-                  <h5>Desenvolvedor Front-end</h5>
-                  <p class="mb-1 text-muted">Empresa: TechNova</p>
-                  <span class="badge bg-warning text-dark">Em análise</span>
-                  <p class="mb-0 mt-1"><small>Data: 20/06/2025</small></p>
-                </div>
-                <div>
-                  <button class="btn btn-outline-primary btn-sm me-2">Ver detalhes</button>
-                  <button class="btn btn-outline-danger btn-sm">Cancelar</button>
-                </div>
-              </div>
-            </div>
-      
-            <div class="p-3 bg-white rounded shadow-sm mb-3">
-              <div class="d-flex justify-content-between align-items-start flex-wrap">
-                <div>
-                  <h5>Analista de Dados</h5>
-                  <p class="mb-1 text-muted">Empresa: DataWise</p>
-                  <span class="badge bg-success">Aprovado</span>
-                  <p class="mb-0 mt-1"><small>Data: 15/06/2025</small></p>
-                </div>
-                <div>
-                  <button class="btn btn-outline-primary btn-sm me-2">Ver detalhes</button>
-                  <button class="btn btn-outline-danger btn-sm">Cancelar</button>
-                </div>
-              </div>
-            </div>
-      
-            <!-- Adicione mais cards dinamicamente aqui -->
-          </div>
-        </div>
-      </div>
+      <main class="container my-5">
+        <section class="pesquisa">
+            <h2 class="mb-3">Consulte o salário de um cargo</h2>
+            <form id="formPesquisa" class="d-flex mb-4 position-relative">
+                <input type="text" id="inputCargo" class="form-control me-2" placeholder="Digite o cargo..." autocomplete="off" required />
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
+                <ul id="sugestoesLista" class="list-group position-absolute w-100" style="z-index: 1000;"></ul>
+            </form>          
+            <div id="resultadoBusca" class="fw-bold"></div>
+        </section>
+        
+        <section class="sugestoes mt-5">
+            <h3 class="mb-3">Cargos Populares</h3>
+            <div id="cardsContainer" class="row g-3"></div>
+        </section>
+    </main>
+    
+    
       
 
       <!-- footer -->
@@ -191,6 +142,7 @@
             </div>
       </footer>
 
+      <script src="js/salarios.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
             integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
