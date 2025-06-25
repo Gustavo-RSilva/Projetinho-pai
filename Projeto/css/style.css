@@ -448,3 +448,11 @@
 .rightredes{
   margin-left: 6rem;
 }
+.card-widght{
+  width: 20rem;
+  height: 7rem;
+}
+.mid{
+  top: 0.60rem;
+  position: relative;
+}
