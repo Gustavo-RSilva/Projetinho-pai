@@ -1,9 +1,9 @@
 
     :root {
-      --brand-color: #0b7285; /* Trusted muted teal */
+      --brand-color: #144d78; /* Trusted muted teal */
       --brand-hover: #0d90b8;
       --nav-bg: #ffffff;
-      --nav-text: #0b7285;
+      --nav-text: #144d78;
       --nav-text-hover: #07454f;
       --focus-outline: 2px solid #0d90b8;
     }
