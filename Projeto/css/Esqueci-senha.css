@@ -1,0 +1,40 @@
+
+        .password-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 10px rgba(170, 170, 170, 0.1);
+            margin-top: 3rem;
+        }
+        .container{
+            max-width: 500px !important;
+            align-items: center;
+            margin-top: 10%;
+
+        }
+        .container-header {
+            background-color:oklch(0% 0 0);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-top: -5%;
+            font-weight: bold;
+        }
+        .form-labe{
+            font-size: 20px;
+        }
+        .form-control{
+            border: 1px solid #000000 !important;
+          }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+    .btn{
+        margin-top: 5%;
+    }
+
+
