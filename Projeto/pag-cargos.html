@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Job Search Navbar with Always Visible Hamburger and Animations</title>
+      <!-- Bootstrap 5 CSS CDN -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+      <!-- Google Material Icons -->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+      <link rel="stylesheet" href="css/style.css">
+      <link rel="stylesheet" href="css/cargos.css">
+      <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+            integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"
+            integrity="sha512-sMXtMNL1zRzolHYKEujM2AqCLUR9F2C4/05cdbxjjLSRvMQIciEPCQZo++nk7go3BtSuK9kfa/s+a4f4i5pLkw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+      <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
+            <div class="navbar-container">
+                  <a href="Index.html" class="navbar-brand" aria-label="Página inicial Job Search"><img style="width: 90px;"
+                              src="img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png"
+                              alt=""></a>
+
+                  <div class="nav-always-visible">
+                        <a href="Pagina-vagas.html" class="nav-link" tabindex="0">
+                              <span class="material-icons" aria-hidden="true">list_alt</span>
+                              Vagas Ativas
+                        </a>
+                        <a href="pag-cargos.html" class="nav-link" tabindex="0">
+                              <span class="material-icons" aria-hidden="true">next_week</span>
+                              Cargos/Salarios
+                        </a>
+                  </div>
+
+                  <!-- User status container -->
+                  <div class="user-status" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
+                        <span class="material-icons" aria-hidden="true">account_circle</span>
+                        Olá, Usuário
+                  </div>
+
+                  <button class="custom-toggle" type="button" aria-label="Abrir menu de navegação"
+                        data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
+                        aria-expanded="false">
+                        <span class="material-icons" aria-hidden="true">menu</span>
+                  </button>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-expand-collapse" id="mainNav">
+                  <ul class="navbar-nav ms-auto align-items-center" role="menu">
+                        <li class="nav-item" role="none">
+                              <a href="pag-minha-conta.html" class="nav-link" tabindex="0" role="menuitem">
+                                    <span class="material-icons" aria-hidden="true">account_circle</span>
+                                    Minha Conta
+                              </a>
+                        </li>
+                        <li class="nav-item" role="none">
+                              <a href="Meu-curriculo.html" class="nav-link" tabindex="0" role="menuitem">
+                                    <span class="material-icons" aria-hidden="true">description</span>
+                                    Meu Currículo
+                              </a>
+                        </li>
+                        <li class="nav-item" role="none">
+                              <a href="pag-candidaturas.html" class="nav-link" tabindex="0" role="menuitem">
+                                    <span class="material-icons" aria-hidden="true">work_outline</span>
+                                    Minhas Candidaturas
+                              </a>
+                        </li>
+                  </ul>
+                  <div class="auth-buttons">
+                        <a href="Login.html">
+                        <button type="button" class="btn btn-entrar" tabindex="0">Entrar</button>
+                        </a>
+                        <a href="Crie-conta.html">
+                        <button type="button" class="btn btn-cadastrar" tabindex="0">Cadastrar</button>
+                        </a>
+                  </div>
+            </div>
+      </nav>
+      <!-- fim nav bar -->
+
+      <main class="container my-5">
+        <section class="pesquisa">
+            <h2 class="mb-3">Consulte o salário de um cargo</h2>
+            <form id="formPesquisa" class="d-flex mb-4 position-relative">
+                <input type="text" id="inputCargo" class="form-control me-2" placeholder="Digite o cargo..." autocomplete="off" required />
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
+                <ul id="sugestoesLista" class="list-group position-absolute w-100" style="z-index: 1000;"></ul>
+            </form>          
+            <div id="resultadoBusca" class="fw-bold"></div>
+        </section>
+        
+        <section class="sugestoes mt-5">
+            <h3 class="mb-3">Cargos Populares</h3>
+            <div id="cardsContainer" class="row g-3"></div>
+        </section>
+    </main>
+    
+    
+      
+
+      <!-- footer -->
+      <footer class="site-footer">
+            <div class="footer-container">
+                  <div class="footer-section">
+                        <h4 class="footer-title">Sobre Nós</h4>
+                        <p class="footer-text">Conectamos talentos às melhores oportunidades. Nosso compromisso é
+                              facilitar o acesso ao mercado de trabalho com simplicidade e eficiência.</p>
+                  </div>
+
+                  <div class="footer-section rightlinks">
+                        <h4 class="footer-title">Links Rápidos</h4>
+                        <ul class="footer-links">
+                              <li><a href="#">Início</a></li>
+                              <li><a href="#">Vagas</a></li>
+                              <li><a href="#">Cadastrar Currículo</a></li>
+                              <li><a href="#">Contato</a></li>
+                        </ul>
+                  </div>
+
+                  <div class="footer-section rightredes">
+                        <h4 class="footer-title">Redes Sociais</h4>
+                        <div class="social-buttons">
+                              <a href="#" class="social-btn facebook" aria-label="Facebook"><i
+                                          class="fab fa-facebook-f"></i></a>
+                              <a href="#" class="social-btn instagram" aria-label="Instagram"><i
+                                          class="fab fa-instagram"></i></a>
+                              <a href="#" class="social-btn linkedin" aria-label="LinkedIn"><i
+                                          class="fab fa-linkedin-in"></i></a>
+                              <a href="#" class="social-btn whatsapp" aria-label="WhatsApp"><i
+                                          class="fab fa-whatsapp"></i></a>
+                        </div>
+                  </div>
+            </div>
+
+            <div class="footer-bottom">
+                  <p>&copy; 2025 SuaEmpresa. Todos os direitos reservados.</p>
+            </div>
+      </footer>
+
+      <script src="js/salarios.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+            integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <!-- Bootstrap 5 JS Bundle (Popper + Bootstrap JS) -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"
+            integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <script>
+            $(document).ready(function () {
+                  $('.owl-carousel').owlCarousel({
+                        loop: true,
+                        margin: 10,
+                        nav: false, // Desativa as setas de navegação
+                        dots: true, // Mantém os indicadores (bolinhas)
+                        responsive: {
+                              0: {
+                                    items: 1
+                              },
+                              600: {
+                                    items: 3
+                              },
+                              1000: {
+                                    items: 4
+                              }
+                        }
+                  });
+            });
+      </script>
+</body>
+
+
+</html>

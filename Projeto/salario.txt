@@ -1,0 +1,177 @@
+Desenvolvedor Front-end;4500
+Desenvolvedor Back-end;5000
+Designer UX/UI;4200
+Analista de Dados;5300
+Gerente de Projetos;7000
+Administrador de Redes;4800
+Engenheiro de Software;6200
+Cientista de Dados;7500
+Analista de Suporte Técnico;3500
+Arquiteto de Soluções;8000
+Desenvolvedor Mobile;5200
+Product Owner;6900
+Tester / QA Analyst;4000
+Scrum Master;6300
+Analista de BI;5400
+Especialista em DevOps;7200
+Administrador de Banco de Dados;5800
+Especialista em Segurança da Informação;6700
+Analista de Infraestrutura;4600
+Desenvolvedor Full Stack;6000
+Web Designer;3900
+Analista de SEO;4100
+Redator Técnico;3700
+Consultor de TI;7100
+Engenheiro de Machine Learning;7800
+Especialista em Cloud Computing;7400
+Analista de Marketing Digital;4500
+Administrador de Sistemas;4700
+Engenheiro de Dados;7600
+Desenvolvedor Front-end Júnior;3200
+Desenvolvedor Back-end Sênior;7500
+Consultor de Negócios em TI;6800
+Especialista em Inteligência Artificial;8100
+Analista Funcional;5200
+Designer Gráfico;3800
+Líder Técnico (Tech Lead);7900
+Analista de ERP;5000
+Desenvolvedor de Games;4400
+Analista de Redes Sociais;3900
+Engenheiro de Testes;4800
+Gerente de Produto (Product Manager);8500
+Desenvolvedor WordPress;3500
+Especialista em Acessibilidade Web;4600
+Engenheiro de Segurança de Redes;6900
+Desenvolvedor Python;5800
+Desenvolvedor Java;6100
+Desenvolvedor .NET;5700
+Desenvolvedor React;6200
+Desenvolvedor Angular;6000
+Designer de Produto (Product Designer);5500
+Analista de Métricas e Dados;4900
+Especialista em RPA (Automação de Processos);5600
+Webmaster;4000
+Cientista de Computação;7000
+Especialista em Suporte Nível 3;5300
+Analista de Qualidade de Software;4600
+Especialista em UX Writing;4900
+Arquiteto de Software;8200
+Gerente de TI;8800
+Coordenador de Projetos de TI;6700
+Desenvolvedor iOS;6200
+Desenvolvedor Android;6100
+Engenheiro de Front-end;6400
+Engenheiro de Back-end;6800
+Engenheiro Full Stack;7000
+Tech Recruiter;4400
+Engenheiro de Cloud;7500
+Consultor SAP;8000
+Especialista em Banco de Dados Oracle;7200
+Engenheiro de Dados Sênior;8200
+Analista de Negócios;5300
+Desenvolvedor Ruby on Rails;6000
+Engenheiro de Automação de Testes;5700
+Gerente de Segurança da Informação;9000
+Consultor de Infraestrutura;6600
+Engenheiro de Firmware;6400
+Analista de Governança de TI;5800
+Analista de Riscos de Tecnologia;6000
+Especialista em Business Intelligence;6900
+Gerente de Produtos Digitais;8700
+Desenvolvedor C++;6300
+Desenvolvedor PHP;5700
+Especialista em Kubernetes;7400
+Especialista em Docker;6800
+Programador COBOL;5200
+Analista de Sistemas ERP;5300
+Analista de Middleware;6000
+Desenvolvedor Salesforce;7100
+Especialista em CRM Dynamics;7200
+Desenvolvedor Power BI;5900
+Desenvolvedor Tableau;6000
+Consultor de Cibersegurança;7800
+Gerente de Infraestrutura;8500
+Especialista em Hadoop;7300
+Analista de DevSecOps;7500
+Especialista em API Gateway;6800
+Engenheiro de Observabilidade;7400
+Líder de Inovação em TI;7900
+Coordenador de UX;6600
+UX Researcher;5200
+Desenvolvedor JavaScript;5700
+Especialista em Testes Automatizados;5600
+Especialista em Integração Contínua;6100
+Analista de Performance Web;5300
+Engenheiro de Integrações;6400
+Desenvolvedor de Aplicativos Híbridos;5900
+Especialista em Blockchain;8300
+Engenheiro de Robótica;8700
+Especialista em IoT;7500
+Desenvolvedor Flutter;5800
+Desenvolvedor React Native;6100
+Analista de Crowd Testing;4700
+Gerente de Transformação Digital;8800
+Arquiteto de Dados;8100
+Especialista em Data Governance;7700
+Designer de Interação;4800
+Desenvolvedor Node.js;6100
+Analista de Testes Manuais;4200
+Consultor de Business Agility;7100
+Especialista em Monitoramento de Aplicações;5600
+Instrutor de Tecnologia;4400
+Desenvolvedor Xamarin;5900
+Especialista em ElasticSearch;6700
+Desenvolvedor CMS;5200
+Arquiteto de Infraestrutura;8000
+Consultor de Cloud AWS;7600
+Especialista em FinOps;7000
+Desenvolvedor Go (Golang);6600
+Especialista em SEO Técnico;5100
+Desenvolvedor Vue.js;6000
+Desenvolvedor de Chatbots;5700
+Analista de Documentação Técnica;4500
+Programador Shell Script;4900
+Especialista em LGPD;7300
+Desenvolvedor SAP ABAP;6800
+Desenvolvedor Magento;5600
+Gerente de Plataformas Digitais;8600
+Especialista em Firebase;6200
+Engenheiro de Confiabilidade de Sites (SRE);7900
+Consultor de Salesforce Marketing Cloud;7400
+Analista de Analytics Web;5300
+Designer de Design System;5000
+Programador Delphi;4800
+Analista de Projetos Ágeis;5500
+Consultor de Jira e Confluence;5200
+Especialista em APIs REST;6000
+Desenvolvedor de Aplicativos PWA;5900
+Especialista em Testes de Carga;5600
+Analista de Logs e Métricas;5400
+Arquiteto de Microsserviços;7900
+Engenheiro de Integração SAP PI/PO;7200
+Especialista em Front-end Performance;5800
+Consultor de UX Estratégico;6600
+Programador Python Júnior;3500
+Programador Java Sênior;7000
+Scrum Master Sênior;7800
+Engenheiro de Requisitos;5400
+Engenheiro de API;6800
+Especialista em Testes de Segurança;6900
+Gerente de Engenharia de Software;9200
+Consultor de Transformação Ágil;8500
+Analista de Business Process Management (BPM);5500
+Desenvolvedor Back-end Node.js;6200
+Especialista em CI/CD;6400
+Arquiteto de Integração;7900
+Designer Motion Graphics;5000
+Consultor de Big Data;7500
+Programador Web Júnior;3300
+Analista de Virtualização;5600
+Especialista em Arquitetura Serverless;7200
+Analista de Sistemas Legados;5000
+Especialista em Análise Preditiva;7100
+Desenvolvedor .NET Core;6100
+Product Designer Sênior;6700
+Consultor de Cloud Azure;7500
+Analista de LGPD e Compliance;6900
+Engenheiro de Automação DevOps;7200

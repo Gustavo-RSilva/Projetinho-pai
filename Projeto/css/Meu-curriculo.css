@@ -176,3 +176,62 @@ body {
         padding: 1rem;
     }
 }
+
+:root {
+    --brand-color: #0b7285;
+    --brand-hover: #0d90b8;
+    --text-dark: #2d3748;
+    --text-light: #f8fafb;
+    --bg-light: #ffffff;
+    --nav-bg: #ffffff;
+}
+
+/* Estilos consistentes com seu site */
+body {
+    font-family: "Poppins", sans-serif;
+    background-color: #f8fafb;
+    color: var(--text-dark);
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: var(--nav-bg);
+    box-shadow: 0 2px 8px rgba(11, 114, 133, 0.15);
+    padding: 0.5rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+.navbar-container {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+}
+
+/* Botão Voltar */
+.nav-back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--brand-color);
+    font-weight: 600;
+    text-decoration: none;
+    margin-right: auto;
+    padding: 0.5rem 0;
+}
+.nav-back-button:hover {
+    color: var(--brand-hover);
+}
+
+/* Logo */
+.navbar-brand {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.navbar-brand img {
+    width: 90px;
+}
