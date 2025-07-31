@@ -1,3 +1,41 @@
+<?php 
+session_start();
+
+$erro ="";
+
+include_once ("db/conexao.php");
+
+$email = isset($_POST["email"])? $_POST["email"] : "";
+$senha = isset($_POST["senha"])? $_POST["senha"] : "";
+
+if ($email != "") {
+    $sql = "SELECT * FROM usuarios WHERE email = ? and senha = MD5(?)";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bind_param("ss", $email, $senha);
+
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    if($result->num_rows > 0) {
+        while ($linha = $result->fetch_object()){
+            $_SESSION["id_usuario"] = $linha->usuario_id;
+            $_SESSION["nome_usuario"] = $linha->nome_usuario;
+            $_SESSION["email_usuario"] = $linha->email;
+            header("Location: ./area-exclusiva/index.php");
+            exit;
+        }   
+    } else {
+     $erro = ("<div class='alert alert-danger'>
+            Usuário ou senha incorretos!</div>");
+    }
+}
+
+?>
+
+
 <!doctype html>
 <html lang="pt-BR">
 
@@ -12,17 +50,16 @@
 
 <body class="paginaLogin">
 
-    <form class="form-container">
+    <form class="form-container" method="POST" action="Login.php">
         <h1 class="text-center entrarcom fw-bold">Entrar com sua conta </h1>
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">E-mail</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+            <input type="email" class="form-control" id="email" name="email" required>
         </div>
         <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">Senha</label>
             <div class="input-with-icon">
-                <input type="password" class="form-control" id="exampleInputPassword1" required>
-                <img src="./img/view.png" class="eye-icon" id="togglePassword" alt="Mostrar senha"
+            <input type="password" class="form-control" id="senha"  name="senha"required>                <img src="./img/view.png" class="eye-icon" id="togglePassword" alt="Mostrar senha"
                     title="Mostrar senha">
             </div>
             <a href="./Esqueci-senha.html" class="forgot-password-link">Esqueceu a senha?</a>
