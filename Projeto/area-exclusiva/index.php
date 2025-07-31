@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+$erro ="";
+
+include_once ("../db/conexao.php");
+
+// Variável para armazenar o nome do usuário
+$nome_usuario = isset($_SESSION["nome_usuario"]) ? $_SESSION["nome_usuario"] : "Usuário";
+
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -5,28 +17,16 @@
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <title>Job Search Navbar with Always Visible Hamburger and Animations</title>
-      <!-- Bootstrap 5 CSS CDN -->
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-      <!-- Google Material Icons -->
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-      <link rel="stylesheet" href="css/style.css">
-      <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
-            integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer" />
-      <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"
-            integrity="sha512-sMXtMNL1zRzolHYKEujM2AqCLUR9F2C4/05cdbxjjLSRvMQIciEPCQZo++nk7go3BtSuK9kfa/s+a4f4i5pLkw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer" />
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+        <?php 
+        include '../model/head.php'
+        ?>
 </head>
 
 <body>
       <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
             <div class="navbar-container">
                   <a href="#" class="navbar-brand" aria-label="Página inicial Job Search"><img style="width: 90px;"
-                              src="img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png"
+                              src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png"
                               alt=""></a>
 
                   <div class="nav-always-visible">
@@ -43,7 +43,7 @@
                   <!-- User status container -->
                   <div class="user-status" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
                         <span class="material-icons" aria-hidden="true">account_circle</span>
-                        Olá, Usuário
+                        Olá, <?php echo $nome_usuario; ?>
                   </div>
 
                   <button class="custom-toggle" type="button" aria-label="Abrir menu de navegação"
@@ -75,11 +75,8 @@
                         </li>
                   </ul>
                   <div class="auth-buttons">
-                        <a href="Login.php">
-                        <button type="button" class="btn btn-entrar" tabindex="0">Entrar</button>
-                        </a>
-                        <a href="Crie-conta.html">
-                        <button type="button" class="btn btn-cadastrar" tabindex="0">Cadastrar</button>
+                        <a href="../index.html">
+                        <button type="button" class="btn btn-danger" tabindex="0">Sair</button>
                         </a>
                   </div>
             </div>
@@ -106,7 +103,7 @@
                         Achar vagas
                   </button>
             </form>
-            <img src="img/imagem banner1.png" alt="" style="width: 75vh; margin-left: 47rem; margin-top: 0.50rem;">
+            <img src="../img/imagem banner1.png" alt="" style="width: 75vh; margin-left: 47rem; margin-top: 0.50rem;">
       </div>
       </div>
       <!--fim do banner -->
