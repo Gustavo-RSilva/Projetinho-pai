@@ -43,7 +43,7 @@ $nome_completo = isset($_SESSION["nome_completo"]) ? $_SESSION["nome_completo"] 
                   <!-- User status container -->
                   <div class="user-status" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
                         <span class="material-icons" aria-hidden="true">account_circle</span>
-                        Olá, <?php echo $nome_usuario; ?>
+                        Olá, <?php echo $nome_completo; ?>
                   </div>
 
                   <button class="custom-toggle" type="button" aria-label="Abrir menu de navegação"
