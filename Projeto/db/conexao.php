@@ -3,7 +3,7 @@
 $host = 'localhost';       // ou IP do servidor MySQL
 $usuario = 'root';  // substitua pelo seu usuário
 $senha = '';      // substitua pela sua senha
-$banco = 'projeto';  // substitua pelo nome do seu banco
+$banco = 'contrata';  // substitua pelo nome do seu banco
 // Criar a conexão
 $conn = new mysqli($host, $usuario, $senha, $banco);
 // Verificar se houve erro na conexão

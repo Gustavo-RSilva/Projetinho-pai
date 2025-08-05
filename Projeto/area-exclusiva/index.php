@@ -6,7 +6,7 @@ $erro ="";
 include_once ("../db/conexao.php");
 
 // Variável para armazenar o nome do usuário
-$nome_usuario = isset($_SESSION["nome_usuario"]) ? $_SESSION["nome_usuario"] : "Usuário";
+$nome_completo = isset($_SESSION["nome_completo"]) ? $_SESSION["nome_completo"] : "Usuário";
 
 ?>
 
@@ -56,7 +56,7 @@ $nome_usuario = isset($_SESSION["nome_usuario"]) ? $_SESSION["nome_usuario"] : "
             <div class="collapse navbar-collapse navbar-expand-collapse" id="mainNav">
                   <ul class="navbar-nav ms-auto align-items-center" role="menu">
                         <li class="nav-item" role="none">
-                              <a href="pag-minha-conta.html" class="nav-link" tabindex="0" role="menuitem">
+                              <a href="pag-minha-conta.php" class="nav-link" tabindex="0" role="menuitem">
                                     <span class="material-icons" aria-hidden="true">account_circle</span>
                                     Minha Conta
                               </a>

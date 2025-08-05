@@ -22,8 +22,8 @@ if ($email != "") {
     if($result->num_rows > 0) {
         while ($linha = $result->fetch_object()){
             $_SESSION["id_usuario"] = $linha->usuario_id;
-            $_SESSION["nome_usuario"] = $linha->nome_usuario;
-            $_SESSION["email_usuario"] = $linha->email;
+            $_SESSION["nome_completo"] = $linha->nome_usuario;
+            $_SESSION["email"] = $linha->email;
             header("Location: ./area-exclusiva/index.php");
             exit;
         }   
