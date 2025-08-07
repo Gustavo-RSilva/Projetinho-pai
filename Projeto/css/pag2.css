@@ -25,9 +25,10 @@
     padding: 0.75rem 1rem;
   }
   
-  #jobList .list-group-item:hover {
-    background-color: #f9fafb;
+  #jobList .list-group-item:not(.active):hover {
+    background-color: #f9fafb44;
   }
+  
   
   #jobList img {
     object-fit: cover;
@@ -64,7 +65,7 @@
     font-size: 1rem;
     width: 100%;
     background: transparent;
-    color: #374151;
+    color: #000000;
   }
   
   .vaga-search-input input::placeholder {
@@ -75,4 +76,9 @@
     font-size: 1.4rem;
     color: #6b7280;
   }
-  
+  /* Garante que o item selecionado continue azul mesmo ao passar o mouse */
+  .list-group-item.active {
+    background-color: #f1f5f9;
+    border-color: var(--brand-color);
+    color: black;
+}

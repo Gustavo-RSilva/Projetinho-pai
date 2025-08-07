@@ -1,5 +1,69 @@
+<?php
+session_start();
+$erro = "";
+
+include_once("../db/conexao.php");
+
+if (!isset($_SESSION['id_usuario'])) {
+    header("Location: Login.html");
+    exit();
+}
+
+$id_usuario = $_SESSION['id_usuario'];
+
+$sql_usuario = "SELECT nome_completo, email, telefone, endereco_cidade, endereco_estado FROM usuarios WHERE id_usuario = ?";
+$stmt_usuario = $conn->prepare($sql_usuario);
+
+if ($stmt_usuario === false) {
+    die('Erro na preparação da consulta: ' . $conn->error);
+}
+
+$stmt_usuario->bind_param("i", $id_usuario);
+$stmt_usuario->execute();
+$result_usuario = $stmt_usuario->get_result();
+
+if ($result_usuario->num_rows > 0) {
+    $usuario = $result_usuario->fetch_assoc();
+    $nome = $usuario['nome_completo'];
+    $email = $usuario['email'];
+    $telefone = $usuario['telefone'];
+    $cidade = $usuario['endereco_cidade'];
+    $estado = $usuario['endereco_estado'];
+} else {
+    $erro = "Usuário não encontrado.";
+}
+
+$sql_candidaturas = "SELECT v.titulo, e.nome AS empresa, v.localizacao AS cidade, 
+                    SUBSTRING_INDEX(v.localizacao, ', ', -1) AS estado, c.data_candidatura 
+                    FROM candidaturas c
+                    JOIN vagas v ON c.id_vaga = v.id_vaga
+                    JOIN empresas e ON v.id_empresa = e.id_empresa
+                    WHERE c.id_usuario = ?";
+$stmt_candidaturas = $conn->prepare($sql_candidaturas);
+
+if ($stmt_candidaturas === false) {
+    die('Erro na preparação da consulta: ' . $conn->error);
+}
+
+$stmt_candidaturas->bind_param("i", $id_usuario);
+$stmt_candidaturas->execute();
+$res_candidaturas = $stmt_candidaturas->get_result();
+
+// Armazenar resultados em array para usar posteriormente
+$candidaturas = [];
+while ($row = $res_candidaturas->fetch_assoc()) {
+    $candidaturas[] = $row;
+}
+
+$stmt_usuario->close();
+$stmt_candidaturas->close();
+$conn->close();
+?>
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,14 +82,14 @@
             --bg-light: #ffffff;
             --nav-bg: #ffffff;
         }
- 
+
         /* Estilos consistentes com seu site */
         body {
             font-family: "Poppins", sans-serif;
             background-color: #f8fafb;
             color: var(--text-dark);
         }
- 
+
         /* Navbar Styles */
         .navbar {
             background-color: var(--nav-bg);
@@ -35,7 +99,7 @@
             top: 0;
             z-index: 1030;
         }
- 
+
         .navbar-container {
             display: flex;
             flex-wrap: nowrap;
@@ -43,7 +107,7 @@
             width: 100%;
             gap: 12px;
         }
- 
+
         /* Botão Voltar */
         .nav-back-button {
             display: flex;
@@ -55,20 +119,22 @@
             margin-right: auto;
             padding: 0.5rem 0;
         }
+
         .nav-back-button:hover {
             color: var(--brand-hover);
         }
- 
+
         /* Logo */
         .navbar-brand {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
         }
+
         .navbar-brand img {
             width: 90px;
         }
- 
+
         /* Botão Hamburguer */
         .custom-toggle {
             background: none;
@@ -79,10 +145,11 @@
             padding: 0.25rem 0.5rem;
             border-radius: 6px;
         }
+
         .custom-toggle:hover {
             background-color: rgba(11, 114, 133, 0.1);
         }
- 
+
         /* Menu Colapsável */
         .navbar-collapse {
             display: none;
@@ -96,17 +163,18 @@
             z-index: 1000;
             padding: 1rem;
         }
+
         .navbar-collapse.show {
             display: block;
         }
- 
+
         /* Conteúdo da Página */
         .account-container {
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
- 
+
         /* Card de perfil */
         .profile-card {
             background: var(--bg-light);
@@ -115,7 +183,7 @@
             padding: 2rem;
             margin-bottom: 2rem;
         }
- 
+
         .profile-avatar {
             width: 100px;
             height: 100px;
@@ -126,19 +194,19 @@
             justify-content: center;
             margin: 0 auto 1rem;
         }
- 
+
         .profile-avatar .material-icons {
             font-size: 60px;
             color: var(--brand-color);
         }
- 
+
         /* Cards de resumo */
         .card {
             border: none;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
- 
+
         /* Abas de navegação */
         .account-tabs .nav-link {
             color: var(--text-dark);
@@ -147,12 +215,12 @@
             padding: 1rem 1.5rem;
             position: relative;
         }
- 
+
         .account-tabs .nav-link.active {
             color: var(--brand-color);
             background: transparent;
         }
- 
+
         .account-tabs .nav-link.active::after {
             content: "";
             position: absolute;
@@ -164,7 +232,7 @@
             background: var(--brand-color);
             border-radius: 3px;
         }
- 
+
         /* Lista de candidaturas */
         .application-card {
             border: none;
@@ -173,240 +241,234 @@
             margin-bottom: 1rem;
             transition: transform 0.2s;
         }
- 
+
         .application-card:hover {
             transform: translateY(-2px);
         }
- 
+
         .status-badge {
             font-size: 0.8rem;
             padding: 0.35rem 0.75rem;
         }
- 
+
         /* Botões */
         .btn-primary {
             background-color: var(--brand-color);
             border: none;
         }
+
         .btn-primary:hover {
             background-color: var(--brand-hover);
         }
- 
+
         .btn-cadastrar {
             background: transparent;
             border: 2px solid var(--brand-color);
             color: var(--brand-color);
         }
+
         .btn-cadastrar:hover {
             background: var(--brand-color);
             color: white;
         }
- 
+
         /* Foco acessível */
-        button:focus, a:focus, input:focus {
+        button:focus,
+        a:focus,
+        input:focus {
             outline: 3px solid var(--brand-hover);
             outline-offset: 2px;
         }
- 
+
         @media (max-width: 768px) {
             .account-tabs .nav-link {
                 padding: 0.75rem;
                 font-size: 0.9rem;
             }
-           
+
             .navbar-brand {
                 position: static;
                 transform: none;
                 order: 1;
                 margin: 0 auto;
             }
-           
+
             .nav-back-button {
                 order: 0;
             }
-           
+
             .custom-toggle {
                 order: 2;
             }
         }
     </style>
 </head>
+
 <body>
-    <!-- Navbar Customizada -->
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
         <div class="navbar-container">
-            <!-- Botão Voltar -->
-            <a href="index.html" class="nav-back-button" aria-label="Voltar para página inicial">
-                <span class="material-icons" aria-hidden="true">arrow_back</span>
+            <a href="index.php" class="nav-back-button">
+                <span class="material-icons">arrow_back</span>
                 Voltar
             </a>
-           
-            <!-- Logo -->
-            <a href="#" class="navbar-brand" aria-label="Página inicial">
-                <img src="img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="JobSearch">
+            <a href="#" class="navbar-brand">
+                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="JobSearch">
             </a>
         </div>
     </nav>
- 
-    <!-- Conteúdo principal -->
+
     <main class="account-container" id="main-content" tabindex="-1">
         <h1 class="mb-4" style="color: var(--brand-color);">Minha Conta</h1>
- 
-        <!-- Seção de perfil -->
-        <section aria-labelledby="profile-heading" class="profile-card">
-            <div class="text-center">
-                <div class="profile-avatar" aria-hidden="true">
-                    <span class="material-icons">account_circle</span>
-                </div>
-                <h2 id="profile-heading">Maria Silva</h2>
-                <p class="text-muted">maria.silva@email.com</p>
-                <button class="btn btn-cadastrar" aria-label="Editar perfil">
-                    <span class="material-icons" aria-hidden="true">edit</span> Editar Perfil
-                </button>
+
+        <?php if (!empty($erro)): ?>
+            <div class="alert alert-danger"><?php echo $erro; ?></div>
+        <?php endif; ?>
+
+        <section class="profile-card text-center">
+            <div class="profile-avatar">
+                <span class="material-icons">account_circle</span>
             </div>
+            <h2><?php echo htmlspecialchars($nome ?? ''); ?></h2>
+            <p class="text-muted"><?php echo htmlspecialchars($email ?? ''); ?></p>
+            <button class="btn btn-cadastrar">
+                <span class="material-icons">edit</span> Editar Perfil
+            </button>
         </section>
- 
-        <!-- Cards de resumo -->
-        <div class="row g-4 mb-4" role="group" aria-label="Resumo da conta">
+
+        <!-- Cards Resumo -->
+        <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;" aria-hidden="true">work_outline</span>
-                        <h3>12</h3>
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;">work_outline</span>
+                        <h3><?php echo count($candidaturas); ?></h3>
                         <p class="mb-3">Candidaturas Ativas</p>
-                        <a href="#candidaturas" class="btn btn-primary" aria-label="Ver minhas candidaturas">Ver Todas</a>
+                        <a href="#candidaturas" class="btn btn-primary">Ver Todas</a>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;" aria-hidden="true">description</span>
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;">description</span>
                         <h3>1</h3>
                         <p class="mb-3">Currículo Cadastrado</p>
-                        <button class="btn btn-primary" aria-label="Gerenciar currículo">Gerenciar</button>
+                        <button class="btn btn-primary">Gerenciar</button>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;" aria-hidden="true">notifications</span>
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;">notifications</span>
                         <h3>5</h3>
                         <p class="mb-3">Alertas Ativos</p>
-                        <button class="btn btn-primary" aria-label="Configurar alertas">Configurar</button>
+                        <button class="btn btn-primary">Configurar</button>
                     </div>
                 </div>
             </div>
         </div>
- 
-        <!-- Abas de navegação -->
+
+        <!-- Abas -->
         <ul class="nav account-tabs mb-4" id="accountTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="dados-tab" data-bs-toggle="tab" data-bs-target="#dados" type="button" role="tab" aria-controls="dados" aria-selected="true">
-                    Dados Pessoais
-                </button>
+            <li class="nav-item">
+                <button class="nav-link active" id="dados-tab" data-bs-toggle="tab" data-bs-target="#dados" type="button">Dados Pessoais</button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="candidaturas-tab" data-bs-toggle="tab" data-bs-target="#candidaturas" type="button" role="tab" aria-controls="candidaturas" aria-selected="false">
-                    Minhas Candidaturas
-                </button>
+            <li class="nav-item">
+                <button class="nav-link" id="candidaturas-tab" data-bs-toggle="tab" data-bs-target="#candidaturas" type="button">Minhas Candidaturas</button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="seguranca-tab" data-bs-toggle="tab" data-bs-target="#seguranca" type="button" role="tab" aria-controls="seguranca" aria-selected="false">
-                    Segurança
-                </button>
+            <li class="nav-item">
+                <button class="nav-link" id="seguranca-tab" data-bs-toggle="tab" data-bs-target="#seguranca" type="button">Segurança</button>
             </li>
         </ul>
- 
-        <!-- Conteúdo das abas -->
-        <div class="tab-content" id="accountTabContent">
-            <!-- Aba: Dados Pessoais -->
-            <div class="tab-pane fade show active" id="dados" role="tabpanel" aria-labelledby="dados-tab">
-                <form aria-labelledby="dados-heading">
-                    <h2 id="dados-heading" class="mb-4">Informações Pessoais</h2>
+
+        <!-- Conteúdo Abas -->
+        <div class="tab-content">
+            <!-- Aba Dados -->
+            <div class="tab-pane fade show active" id="dados">
+                <form method="POST" action="atualizar-dados.php">
+                    <h2 class="mb-4">Informações Pessoais</h2>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="nome" class="form-label">Nome Completo</label>
-                            <input type="text" class="form-control" id="nome" value="Maria Silva" aria-required="true">
+                            <input type="text" class="form-control" id="nome" name="nome" value="<?= htmlspecialchars($nome ?? '') ?>" required>
                         </div>
                         <div class="col-md-6">
                             <label for="email" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="email" value="maria.silva@email.com" aria-required="true">
+                            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email ?? '') ?>" required>
                         </div>
                         <div class="col-md-6">
                             <label for="telefone" class="form-label">Telefone</label>
-                            <input type="tel" class="form-control" id="telefone" value="(11) 98765-4321">
+                            <input type="tel" class="form-control" id="telefone" name="telefone" value="<?= htmlspecialchars($telefone ?? '') ?>">
                         </div>
                         <div class="col-md-6">
                             <label for="localizacao" class="form-label">Localização</label>
-                            <input type="text" class="form-control" id="localizacao" value="São Paulo, SP">
+                            <input type="text" class="form-control" id="localizacao" name="localizacao" value="<?= htmlspecialchars(($cidade ?? '') . ', ' . ($estado ?? '')) ?>">
                         </div>
                         <div class="col-12 mt-3">
-                            <button type="submit" class="btn btn-primary" aria-label="Salvar alterações">Salvar Alterações</button>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                         </div>
                     </div>
                 </form>
             </div>
- 
-            <!-- Aba: Candidaturas -->
-            <div class="tab-pane fade" id="candidaturas" role="tabpanel" aria-labelledby="candidaturas-tab">
+
+            <!-- Aba Candidaturas -->
+            <div class="tab-pane fade" id="candidaturas">
                 <h2 class="mb-4">Minhas Candidaturas</h2>
-                <div class="mb-4">
-                    <div class="application-card card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h3 class="h5 mb-1">Desenvolvedor Front-End</h3>
-                                    <p class="mb-2">TechNova • São Paulo, SP</p>
-                                    <p class="small text-muted">Candidatado em: 10/06/2025</p>
+                <?php if (!empty($candidaturas)): ?>
+                    <?php foreach ($candidaturas as $cand): ?>
+                        <div class="card mb-3 application-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title mb-1"><?= htmlspecialchars($cand['titulo']) ?></h5>
+                                        <p class="card-text mb-1">
+                                            <?= htmlspecialchars($cand['empresa']) ?> – <?= htmlspecialchars($cand['cidade']) ?>, <?= htmlspecialchars($cand['estado']) ?>
+                                        </p>
+                                        <p class="text-muted mb-0">
+                                            Candidatado em: <?= date("d/m/Y", strtotime($cand['data_candidatura'])) ?>
+                                        </p>
+                                    </div>
+                                    <span class="badge bg-success status-badge">Ativa</span>
                                 </div>
-                                <span class="status-badge badge bg-success">Ativa</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <a href="#" class="btn btn-sm btn-outline-primary" aria-label="Ver detalhes da vaga">Detalhes</a>
-                                <button class="btn btn-sm btn-outline-danger" aria-label="Cancelar candidatura">Cancelar</button>
+                                <div class="mt-3 d-flex justify-content-between">
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Ver Detalhes</a>
+                                    <button class="btn btn-sm btn-outline-danger">Cancelar</button>
+                                </div>
                             </div>
                         </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="alert alert-info" role="alert">
+                        Você ainda não se candidatou a nenhuma vaga.
                     </div>
-                    <!-- Mais candidaturas... -->
-                </div>
+                <?php endif; ?>
             </div>
- 
-            <!-- Aba: Segurança -->
-            <div class="tab-pane fade" id="seguranca" role="tabpanel" aria-labelledby="seguranca-tab">
-                <h2 class="mb-4">Segurança da Conta</h2>
-                <form>
-                    <div class="mb-4">
-                        <h3 class="h5 mb-3">Alterar Senha</h3>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="senha-atual" class="form-label">Senha Atual</label>
-                                <input type="password" class="form-control" id="senha-atual" aria-required="true">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="nova-senha" class="form-label">Nova Senha</label>
-                                <input type="password" class="form-control" id="nova-senha" aria-required="true">
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary" aria-label="Atualizar senha">Atualizar Senha</button>
-                            </div>
-                        </div>
+
+            <!-- Aba Segurança -->
+            <div class="tab-pane fade" id="seguranca">
+                <h2 class="mb-4">Configurações de Segurança</h2>
+                <form method="POST" action="atualizar-senha.php">
+                    <div class="mb-3">
+                        <label for="senha_atual" class="form-label">Senha Atual</label>
+                        <input type="password" class="form-control" id="senha_atual" name="senha_atual" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="nova_senha" class="form-label">Nova Senha</label>
+                        <input type="password" class="form-control" id="nova_senha" name="nova_senha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
+                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Alterar Senha</button>
                 </form>
             </div>
         </div>
     </main>
-    <!-- Bootstrap JS -->
+
+    <!-- Scripts Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Foco acessível ao carregar a página
-        document.addEventListener('DOMContentLoaded', function() {
-            const mainContent = document.getElementById('main-content');
-            if (mainContent) {
-                mainContent.focus();
-            }
-        });
-    </script>
 </body>
+
 </html>

@@ -1,361 +1,268 @@
+:root {
+  --brand-color: #144d78; /* Trusted muted teal */
+  --brand-hover: #0d90b8;
+  --nav-bg: #ffffff;
+  --nav-text: #144d78;
+  --nav-text-hover: #07454f;
+  --focus-outline: 2px solid #0d90b8;
+}
 
-    :root {
-      --brand-color: #144d78; /* Trusted muted teal */
-      --brand-hover: #0d90b8;
-      --nav-bg: #ffffff;
-      --nav-text: #144d78;
-      --nav-text-hover: #07454f;
-      --focus-outline: 2px solid #0d90b8;
-    }
- 
-    body {
-      margin: 0;
-      font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-        sans-serif;
-      background-color: #f8fafb;
-    }
- 
-    /* Navbar styling */
-    .navbar {
-      background-color: var(--nav-bg);
-      box-shadow: 0 2px 8px rgb(11 114 133 / 0.15);
-      padding: 0.5rem 1rem;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
-    }
- 
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--brand-color);
-      text-decoration: none;
-      user-select: none;
-    }
- 
-    .navbar-brand:hover,
-    .navbar-brand:focus {
-      color: var(--brand-hover);
-      outline: none;
-      text-decoration: none;
-    }
- 
-    /* Nav links */
-    .nav-link {
-      color: var(--nav-text);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.25s ease;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-    }
- 
-    .nav-link .material-icons {
-      font-size: 20px;
-    }
- 
-    .nav-link:hover,
-    .nav-link:focus {
-      color: var(--nav-text-hover);
-      background-color: rgba(11, 114, 133, 0.1);
-      outline-offset: 2px;
-      outline: none;
-      text-decoration: none;
-    }
- 
-    .nav-link:focus-visible {
-      outline: var(--focus-outline);
-      outline-offset: 2px;
-      background-color: rgba(11, 114, 133, 0.15);
-    }
- 
-    /* Toggle button styling */
-    .custom-toggle {
-      background: none;
-      border: none;
-      font-size: 28px;
-      color: var(--brand-color);
-      cursor: pointer;
-      transition: color 0.25s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
-      flex-shrink: 0;
-    }
- 
-    .custom-toggle:hover,
-    .custom-toggle:focus {
-      color: var(--brand-hover);
-      outline-offset: 2px;
-      outline: none;
-    }
- 
-    .custom-toggle:focus-visible {
-      outline: var(--focus-outline);
-      outline-offset: 2px;
-    }
- 
-    /* Nav container holding always visible links */
-    .nav-always-visible {
-      display: flex;
-      gap: 8px;
-    }
- 
-    /* Responsive layout and arrangement */
-    /* On all screens, navbar flex justify content space-between */
-    .navbar-container {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      width: 100%;
-      gap: 12px;
-      justify-content: space-between;
-    }
- 
-    /* Group holding the always visible nav items */
-    .nav-always-visible {
-      flex-grow: 1;
-      justify-content: flex-start;
-      gap: 6px;
-      display: flex;
-      align-items: center;
-    }
- 
-    /* User status container */
-    .user-status {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 600;
-      color: var(--brand-color);
-      cursor: default;
-      padding: 0.5rem 0.75rem;
-      border-radius: 8px;
-      user-select: none;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
- 
-    .user-status .material-icons {
-      font-size: 28px;
-    }
- 
-    /* On smaller screens, smaller padding for items */
-    @media (max-width: 767.98px) {
-      .nav-link {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.91rem;
-      }
-      /* User status smaller font */
-      .user-status {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.5rem;
-      }
-    }
- 
-    /* Navbar collapse stays collapsed on all screen sizes */
-    .navbar-expand-md .navbar-collapse {
-      display: none !important;
-      opacity: 0;
-      transform-origin: top right;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      position: absolute;
-      top: 100%;
-      right: 1rem;
-      background: white;
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
-      width: 280px;
-      flex-direction: column;
-      padding: 1rem;
-      z-index: 1050;
-    }
-    .navbar-expand-md .navbar-collapse.show {
-      display: flex !important;
-      opacity: 1;
-      transform: scale(1);
-    }
-    .navbar-expand-md .navbar-nav {
-      flex-direction: column;
-      width: 100%;
-      gap: 0.5rem;
-    }
- 
-    /* Buttons styling inside collapse */
-    .auth-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(0,0,0,0.05);
-      margin-top: 1rem;
-    }
- 
-    .auth-buttons .btn {
-      width: 100%;
-      font-weight: 600;
-      font-size: 0.95rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      border: none;
-      cursor: pointer;
-    }
- 
-    .btn-entrar {
-      background: var(--brand-color);
-      color: white;
-      border: none;
-    }
-    .btn-entrar:hover,
-    .btn-entrar:focus {
-      background: var(--brand-hover);
-      color: white;
-      outline: none;
-    }
- 
-    .btn-cadastrar {
-      background: transparent;
-      border: 2px solid var(--brand-color);
-      color: var(--brand-color);
-    }
-    .btn-cadastrar:hover,
-    .btn-cadastrar:focus {
-      background: var(--brand-color);
-      color: white;
-      outline: none;
-    }
-/* texto em cima da pesquisa */
-.texto-p{
-  position: absolute;
-  top: 15rem;
-  margin-left: 9REM;
+body {
+  margin: 0;
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif;
+  background-color: #f8fafb;
 }
-.destaque{
-  color: rgb(184, 214, 12);
- 
-}
-/* fim do texto */
-/* Pesquisa */
-.search-bar {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  display: flex;
-  align-items: center;
-  max-width: 720px;
-  width: 100%;
+
+/* Navbar styling */
+.navbar {
+  background-color: var(--nav-bg);
+  box-shadow: 0 2px 8px rgb(11 114 133 / 0.15);
   padding: 0.5rem 1rem;
-  gap: 1rem;
-  box-sizing: border-box;;
-  position: absolute;
-    top: 18rem;
-  margin-left: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
 }
-.search-section {
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--brand-color);
+  text-decoration: none;
+  user-select: none;
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus {
+  color: var(--brand-hover);
+  outline: none;
+  text-decoration: none;
+}
+
+/* Nav links */
+.nav-link {
+  color: var(--nav-text);
+  font-weight: 600;
   display: flex;
   align-items: center;
-  flex: 1;
-  gap: 0.75rem;
+  gap: 6px;
+  transition: color 0.25s ease;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
 }
-.search-section.separator {
-  border-left: 1px solid #d1d5db;
-  padding-left: 1rem;
+
+.nav-link .material-icons {
+  font-size: 20px;
 }
-.search-section input {
-  border: none;
+
+.nav-link:hover,
+.nav-link:focus {
+  color: var(--nav-text-hover);
+  background-color: rgba(11, 114, 133, 0.1);
+  outline-offset: 2px;
   outline: none;
-  font-size: 1rem;
-  color: #4b5563;
-  width: 100%;
-  background: transparent;
+  text-decoration: none;
 }
-.search-section input::placeholder {
-  color: #9ca3af;
+
+.nav-link:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+  background-color: rgba(11, 114, 133, 0.15);
 }
-.material-icons {
-  color: #6b7280;
-  font-size: 1.5rem;
-}
-.btn-search {
-  background-color: #2563eb;
-  color: #ffffff;
-  border-radius: 12px;
-  padding: 0.5rem 1.75rem;
-  font-weight: 600;
-  font-size: 1rem;
+
+/* Toggle button styling */
+.custom-toggle {
+  background: none;
   border: none;
-  white-space: nowrap;
-  transition: background-color 0.3s ease;
-  
-}
-.btn-search:hover,
-.btn-search:focus {
-  background-color: #1e40af;
-  color: #ffffff;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
-}
-@media (max-width: 640px) {
-  .search-bar {
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1rem;
-  }
-  .search-section.separator {
-    border-left: none;
-    padding-left: 0;
-    width: 100%;
-  }
-  .btn-search {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1.1rem;
-  }
-}
-/* fim pesquisa nav */
-/* inicio carroceu */
-.owl-carousel .item {
+  font-size: 28px;
+  color: var(--brand-color);
+  cursor: pointer;
+  transition: color 0.25s ease;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: stretch;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 
-.card {
+.custom-toggle:hover,
+.custom-toggle:focus {
+  color: var(--brand-hover);
+  outline-offset: 2px;
+  outline: none;
+}
+
+.custom-toggle:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+}
+
+/* Nav container holding always visible links */
+.nav-always-visible {
   display: flex;
-  flex-direction: column;
+  gap: 8px;
+}
+
+/* Responsive layout and arrangement */
+.navbar-container {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
   justify-content: space-between;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  margin: 10px;
 }
-.tamanho-card{
-  height: 15rem;
-  max-width: 300px;
-  width: 38rem;
+
+.nav-always-visible {
+  flex-grow: 1;
+  justify-content: flex-start;
+  gap: 6px;
+  display: flex;
+  align-items: center;
 }
-.card-body {
+
+/* User status container */
+.user-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--brand-color);
+  cursor: default;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.user-status .material-icons {
+  font-size: 28px;
+}
+
+/* On smaller screens, smaller padding for items */
+@media (max-width: 767.98px) {
+  .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.91rem;
+  }
+  .user-status {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.5rem;
+  }
+}
+
+/* Navbar collapse stays collapsed on all screen sizes */
+.navbar-expand-md .navbar-collapse {
+  display: none !important;
+  opacity: 0;
+  transform-origin: top right;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: absolute;
+  top: 100%;
+  right: 1rem;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
+  width: 280px;
+  flex-direction: column;
+  padding: 1rem;
+  z-index: 1050;
+}
+.navbar-expand-md .navbar-collapse.show {
+  display: flex !important;
+  opacity: 1;
+  transform: scale(1);
+}
+.navbar-expand-md .navbar-nav {
+  flex-direction: column;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+/* Buttons styling inside collapse */
+.auth-buttons {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  padding: 1rem;
+  gap: 12px;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  margin-top: 1rem;
 }
 
-.card-body .btn {
-  margin-top: auto; /* botão sempre na parte inferior */
+.auth-buttons .btn {
+  width: 100%;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
-/* fim carroceu */
+.btn-entrar {
+  background: var(--brand-color);
+  color: white;
+  border: none;
+}
+.btn-entrar:hover,
+.btn-entrar:focus {
+  background: var(--brand-hover);
+  color: white;
+  outline: none;
+}
 
-/* inicio footer */
+.btn-cadastrar {
+  background: transparent;
+  border: 2px solid var(--brand-color);
+  color: var(--brand-color);
+}
+.btn-cadastrar:hover,
+.btn-cadastrar:focus {
+  background: var(--brand-color);
+  color: white;
+  outline: none;
+}
 
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #144d78 0%, #0d90b8 100%);
+  color: white;
+  padding: 4rem 0;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.destaque {
+  color: rgb(184, 214, 12);
+}
+
+
+/* Footer */
 .site-footer {
   background-color: #144d78;
   color: white;
@@ -405,54 +312,4 @@
 .footer-links a:hover {
   color: white;
   text-decoration: underline;
-}
-
-/* Botões sociais */
-.social-buttons {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.social-btn {
-  background-color: white;
-  color: #144d78;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.social-btn:hover {
-  background-color: #144d78;
-  color: white;
-  transform: scale(1.1);
-}
-
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin-top: 2rem;
-  text-align: center;
-  padding-top: 1rem;
-  font-size: 0.9rem;
-  color: #ffffffaa;
-}
-.rightlinks{
-  margin-left: 14rem;
-}
-.rightredes{
-  margin-left: 6rem;
-}
-.card-widght{
-  width: 20rem;
-  height: 7rem;
-}
-.mid{
-  top: 0.60rem;
-  position: relative;
 }
