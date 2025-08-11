@@ -68,14 +68,17 @@ if ($email != "") {
 
         <div class="dividir">Ou entrar com</div>
 
-        <p><a class="link-opacity-100-hover" href="#"></a></p>
+        
         <div class="social2-button">
-            <button type="submit" class="btn btnicon btn-outline-danger"><img src="./img/icons8-google-logo-48.png"
-                    width="18" height="18">Google</button>
-
-                    <button type="submit" class="btn btnicon btn-outline-primary">
-                        <img src="./img/linkedin.png"
-                        width="18" height="18">LinkedIn</button>
+            <a href="login-google.php" class="btn social-btn btn-outline-danger">
+                <img src="./img/icons8-google-logo-48.png" width="20" height="20" alt="Google">
+                Google
+            </a>
+            <a href="#" class="btn social-btn btn-outline-primary">
+                <img src="./img/linkedin.png" width="20" height="20" alt="LinkedIn">
+                LinkedIn
+            </a>
+        </div>
     
         </div>
         <div class="naotemconta">Não tem uma conta?
