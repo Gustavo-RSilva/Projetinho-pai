@@ -5,6 +5,9 @@ include_once("../db/conexao.php");
 // Verifica se o usuário está logado
 $usuarioLogado = isset($_SESSION['id_usuario']);
 
+$email = $_SESSION['email'];
+
+
 // Função para buscar vagas em destaque
 function buscarVagasDestaque($conn) {
     $sql = "SELECT v.*, e.nome as empresa_nome, e.url_logo 
@@ -41,8 +44,8 @@ $areasProfissionais = buscarAreasProfissionais($conn);
 <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>Job Search Navbar with Always Visible Hamburger and Animations</title>
-      
+      <title>Contrata</title>
+       <link rel="icon" href="../img/icon/icone-pag.png" />
         <?php 
         include '../model/head.php'
         ?>

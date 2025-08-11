@@ -38,7 +38,18 @@ if (isset($_GET['code'])) {
         $_SESSION['email'] = $email;
         $_SESSION['foto_perfil'] = $foto;
 
-        header("Location: area-protec.php");
+        $stmt=  $conn->prepare("SELECT id_usuario FROM usuarios WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+               $result= $stmt->get_result();
+               if($result->num_rows > 0) {
+                while ($linha = $result->fetch_object()){
+                    $_SESSION["id_usuario"] = $linha->id_usuario;
+                    $usuarioLogado  = $linha->id_usuario;
+                }
+               }
+
+        header("Location: ./area-protec.php");
         exit;
     } catch (Exception $e) {
         echo "Erro durante o login com o Google: " . $e->getMessage();

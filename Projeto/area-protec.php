@@ -6,5 +6,5 @@ if (!isset($_SESSION['nome_completo'])) {
     exit;
 }
 
-echo "Bem-vindo, " . htmlspecialchars($_SESSION['nome_completo'] . header("Location: teste.php"));
+echo "Bem-vindo, " . htmlspecialchars($_SESSION['nome_completo'] . header("Location: ./area-exclusiva/index.php"));
 // Aqui você pode adicionar o conteúdo da área protegida

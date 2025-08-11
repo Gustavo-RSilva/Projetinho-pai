@@ -54,9 +54,10 @@ $cargosPopulares = cargosPopulares($conn);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cargos e Salários | JobSearch</title>
+    <title>Cargos e Salários</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="icon" href="../img/icon/icone-pag.png" />
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/cargos.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
