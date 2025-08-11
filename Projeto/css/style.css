@@ -313,3 +313,55 @@ body {
   color: white;
   text-decoration: underline;
 }
+
+/* Botões sociais */
+.social-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.social-btn {
+  background-color: white;
+  color: #144d78;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.social-btn:hover {
+  background-color: #144d78;
+  color: white;
+  transform: scale(1.1);
+  border: 1px solid white;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 2rem;
+  text-align: center;
+  padding-top: 1rem;
+  font-size: 0.9rem;
+  color: #ffffffaa;
+}
+
+.rightlinks {
+  margin-left: 14rem;
+}
+
+.rightredes {
+  margin-left: 6rem;
+}
+
+/* Responsividade */
+@media (max-width: 1199.98px) {
+  .rightlinks, .rightredes {
+    margin-left: 0;
+  }
+}

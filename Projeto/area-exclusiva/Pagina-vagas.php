@@ -148,7 +148,7 @@ if (isset($_GET['id_vaga'])) {
             </ul>
             <div class="auth-buttons">
                 <?php if($usuarioLogado): ?>
-                    <a href="../logout.php">
+                    <a href="../logout2.php">
                         <button type="button" class="btn btn-entrar" tabindex="0">Sair</button>
                     </a>
                 <?php else: ?>
