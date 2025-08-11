@@ -327,7 +327,9 @@ $conn->close();
 
         <section class="profile-card text-center">
             <div class="profile-avatar">
-                <span class="material-icons">account_circle</span>
+                <img src="<?php echo htmlspecialchars($_SESSION['foto_perfil'] ?? 'default-profile.png'); ?>
+                    " alt="Foto de perfil"
+                    class="img-fluid rounded-circle">
             </div>
             <h2><?php echo htmlspecialchars($nome ?? ''); ?></h2>
             <p class="text-muted"><?php echo htmlspecialchars($email ?? ''); ?></p>
