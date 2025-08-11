@@ -29,25 +29,35 @@ font-size: 20px
 
           /* Caixas de texto tamanho e largura iguais */
           .mb-3 {
-              height: 100px;
+              height: 88px;
           }
 
   
           /* Container dos botões sociais lado a lado */
           .social2-button {
-              display: flex;
-              margin-top: 25%;
-              gap: 20px;
-              background-color: transparent ;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            position: relative;
+            top: 150px;
+            background-color: transparent;
           }
+          
           /* Botões sociais tamanho aumentado, mesma altura, largura proporcional */
-          .social2-button button {
-              flex: 1;
-              height: 50px;
-              font-size: 1.1rem;
-              font-weight: 600;
-              border-radius: 8px;
-              margin-bottom: 2%;
+          .social2-button .social-btn {  
+            flex: 1;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            gap: 8px;
+            /* espaço entre ícone e texto */
+            width: 100%;
+            /* igualar tamanho */
           }
           .text-sec{
             position: relative;
@@ -63,7 +73,7 @@ font-size: 20px
             font-size: 290%;
             position: static;
             text-align: center;
-            margin-bottom: 15%;
+            margin-bottom: 10%;
     
           }
 
@@ -119,9 +129,9 @@ font-size: 20px
     align-items: center;
     margin: 20px 0;
     color: #a0aec0;
-    font-size: 20px;
+    font-size: 20px;  
     position: relative;
-    top: 9%;
+    top: 130px;
 
   }
   .dividir::before,
@@ -134,12 +144,10 @@ font-size: 20px
 
           }
 
-/* button criar conta  */
-
 
 .naotemconta{
 text-align: center;
-margin-top: 30%;
+margin-top: 56%;
 font-size: 20px;
 }
 
@@ -153,4 +161,5 @@ font-size: 20px;
 .cor{
 background-color: #144d78 !important;
 color: white !important;
+font-size: 16px !important;
 }
