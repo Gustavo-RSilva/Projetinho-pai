@@ -1,12 +1,12 @@
-<?php 
+<?php
 session_start();
 
-$erro ="";
+$erro = "";
 
-include_once ("db/conexao.php");
+include_once("db/conexao.php");
 
-$email = isset($_POST["email"])? $_POST["email"] : "";
-$senha = isset($_POST["senha"])? $_POST["senha"] : "";
+$email = isset($_POST["email"]) ? $_POST["email"] : "";
+$senha = isset($_POST["senha"]) ? $_POST["senha"] : "";
 
 if ($email != "") {
     $sql = "SELECT * FROM usuarios WHERE email = ? and senha = MD5(?)";
@@ -19,16 +19,16 @@ if ($email != "") {
 
     $result = $stmt->get_result();
 
-    if($result->num_rows > 0) {
-        while ($linha = $result->fetch_object()){
+    if ($result->num_rows > 0) {
+        while ($linha = $result->fetch_object()) {
             $_SESSION["id_usuario"] = $linha->id_usuario;
             $_SESSION["nome_completo"] = $linha->nome_completo;
             $_SESSION["email"] = $linha->email;
             header("Location: ./area-exclusiva/index.php");
             exit;
-        }   
+        }
     } else {
-     $erro = ("<div class='alert alert-danger'>
+        $erro = ("<div class='alert alert-danger'>
             Usuário ou senha incorretos!</div>");
     }
 }
@@ -57,29 +57,29 @@ if ($email != "") {
             <input type="email" class="form-control" id="email" name="email" required>
         </div>
         <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Senha</label>
+            <label for="senha" class="form-label">Senha</label>
             <div class="input-with-icon">
-            <input type="password" class="form-control" id="senha"  name="senha"required>                <img src="./img/view.png" class="eye-icon" id="togglePassword" alt="Mostrar senha"
+                <input type="password" class="form-control" id="senha" name="senha" required> <img src="./img/view.png" class="eye-icon" id="togglePassword" alt="Mostrar senha"
                     title="Mostrar senha">
             </div>
-            <a href="./Esqueci-senha.html" class="forgot-password-link">Esqueceu a senha?</a>
+            <a href="./Esqueci-senha.html" class="forgot-password-link m-3">Esqueceu a senha?</a>
+
+            <button type="submit" class="btn cor w-100 py-3  rounded-5 ">Entrar</button>
         </div>
-        <button type="submit" class="btn cor w-100 py-3 rounded-5">Entrar</button>
-
-        <div class="dividir">Ou entrar com</div>
-
+        <div class="dividir ">Ou entrar com</div>
         
-        <div class="social2-button">
-            <a href="login-google.php" class="btn social-btn btn-outline-danger">
-                <img src="./img/icons8-google-logo-48.png" width="20" height="20" alt="Google">
-                Google
-            </a>
-            <a href="#" class="btn social-btn btn-outline-primary">
-                <img src="./img/linkedin.png" width="20" height="20" alt="LinkedIn">
-                LinkedIn
-            </a>
-        </div>
-    
+
+                <div class="social2-button">
+                    <a href="login-google.php" class="btn social-btn btn-outline-danger">
+                        <img src="./img/icons8-google-logo-48.png" width="20" height="20" alt="Google">
+                        Google
+                    </a>
+                    <a href="#" class="btn social-btn btn-outline-primary">
+                        <img src="./img/linkedin.png" width="20" height="20" alt="LinkedIn">
+                        LinkedIn
+                    </a>
+                </div>
+
         </div>
         <div class="naotemconta">Não tem uma conta?
             <a href="./Criar-conta.html" class="btn criarc btn-outline-secondary w-100 ">Criar Conta </a></button>
@@ -92,13 +92,13 @@ if ($email != "") {
     integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
     crossorigin="anonymous"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('exampleInputPassword1');
+        const passwordInput = document.getElementById('senha');
 
         // Verifica se os elementos existem
         if (togglePassword && passwordInput) {
-            togglePassword.addEventListener('click', function () {
+            togglePassword.addEventListener('click', function() {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
 
@@ -115,7 +115,6 @@ if ($email != "") {
             });
         }
     });
-
 </script>
 
 </html>
