@@ -1,33 +1,53 @@
 <?php
 session_start();
-include("db/conexao.php"); // conexão MySQLi
+include("db/conexao.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = $_POST['nome'];
     $email = $_POST['email'];
-    $senha = md5($_POST['senha']); // Pode trocar para password_hash()
+    $senha = md5($_POST['senha']);
     $foto = null;
 
     if (!empty($_FILES['foto']['name'])) {
-        $pasta = "uploads/";
-        if (!is_dir($pasta)) mkdir($pasta, 0777, true);
-
-        $nomeFoto = uniqid() . "-" . basename($_FILES['foto']['name']);
-        $caminho = $pasta . $nomeFoto;
-
-        if (move_uploaded_file($_FILES['foto']['tmp_name'], $caminho)) {
-            $foto = $caminho;
+        // Configurações do upload
+        $pastaBase = "img/foto-perfil/";
+        $tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
+        $tamanhoMaximo = 2 * 1024 * 1024; // 2MB
+        
+        // Verifica tipo e tamanho do arquivo
+        if (in_array($_FILES['foto']['type'], $tiposPermitidos) && 
+            $_FILES['foto']['size'] <= $tamanhoMaximo) {
+            
+            // Cria a pasta base se não existir
+            if (!is_dir($pastaBase)) mkdir($pastaBase, 0777, true);
+            
+            // Gera um ID único para a pasta do usuário
+            $pastaUsuario = $pastaBase . uniqid() . '/';
+            mkdir($pastaUsuario, 0777, true);
+            
+            // Gera nome seguro para o arquivo
+            $extensao = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+            $nomeFoto = 'perfil.' . $extensao;
+            $caminhoCompleto = $pastaUsuario . $nomeFoto;
+            
+            if (move_uploaded_file($_FILES['foto']['tmp_name'], $caminhoCompleto)) {
+                $foto = $caminhoCompleto;
+            }
         }
     }
-    // Salva na sessão para já logar o usuário
-    $_SESSION['id_usuario'] = $novo_id;
-    $_SESSION['nome_completo'] = $nome;
     
+    // Restante do código de inserção no banco de dados
     $sql = "INSERT INTO usuarios (nome_completo, email, senha, foto_perfil) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssss", $nome, $email, $senha, $foto);
+    
     if ($stmt->execute()) {
+        // Armazena todos os dados na sessão
         $_SESSION['id_usuario'] = $stmt->insert_id;
+        $_SESSION['email'] = $email;
+        $_SESSION['nome_completo'] = $nome;
+        $_SESSION['foto_perfil'] = $foto ? $foto : 'img/default-profile.png';
+        
         header("Location: ./area-exclusiva/index.php");
         exit();
     } else {
@@ -35,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-BR">
