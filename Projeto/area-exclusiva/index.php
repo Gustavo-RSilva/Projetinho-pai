@@ -159,7 +159,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                     <a href="../Login.php">
                         <button type="button" class="btn btn-entrar" tabindex="0">Entrar</button>
                     </a>
-                    <a href="Crie-conta.php">
+                    <a href="../Crie-conta.php">
                         <button type="button" class="btn btn-cadastrar" tabindex="0">Cadastrar</button>
                     </a>
                 <?php endif; ?>
