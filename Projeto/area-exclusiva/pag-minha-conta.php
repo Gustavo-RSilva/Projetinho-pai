@@ -8,8 +8,18 @@ if (!isset($_SESSION['id_usuario'])) {
     header("Location: Login.html");
     exit();
 }
+$usuarioLogado = isset($_SESSION['id_usuario']) && !empty($_SESSION['email']);
+$usuario = [];
 
-$id_usuario = $_SESSION['id_usuario'];
+if ($usuarioLogado) {
+    $id_usuario = $_SESSION['id_usuario'];
+    $query = "SELECT * FROM usuarios WHERE id_usuario = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $usuario = $resultado->fetch_assoc();  // <-- Agora você tem acesso à foto
+}
 
 $sql_usuario = "SELECT nome_completo, email, telefone, endereco_cidade, endereco_estado FROM usuarios WHERE id_usuario = ?";
 $stmt_usuario = $conn->prepare($sql_usuario);
@@ -327,9 +337,17 @@ $conn->close();
 
         <section class="profile-card text-center">
             <div class="profile-avatar">
-                <img src="<?php echo htmlspecialchars($_SESSION['foto_perfil'] ?? 'default-profile.png'); ?>
-                    " alt="Foto de perfil"
-                    class="img-fluid rounded-circle">
+                <?php
+                $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
+
+                if (preg_match('/^https?:\/\//', $foto)) {
+                    $foto_url = $foto;
+                } else {
+                    $foto_url = '../' . $foto;  // Caminho relativo ajustado
+                }
+                
+                ?>
+
             </div>
             <h2><?php echo htmlspecialchars($nome ?? ''); ?></h2>
             <p class="text-muted"><?php echo htmlspecialchars($email ?? ''); ?></p>

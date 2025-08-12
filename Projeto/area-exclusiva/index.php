@@ -2,11 +2,18 @@
 session_start();
 include_once("../db/conexao.php");
 
-// Verifica se o usuário está logado
 $usuarioLogado = isset($_SESSION['id_usuario']) && !empty($_SESSION['email']);
-// $email = $_SESSION['email'];
+$usuario = [];
 
-
+if ($usuarioLogado) {
+    $id_usuario = $_SESSION['id_usuario'];
+    $query = "SELECT * FROM usuarios WHERE id_usuario = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $usuario = $resultado->fetch_assoc();  // <-- Agora você tem acesso à foto
+}
 // Função para buscar vagas em destaque
 function buscarVagasDestaque($conn)
 {
@@ -74,7 +81,6 @@ $areasProfissionais = buscarAreasProfissionais($conn);
 
             <div class="user-status" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
 
-
                 <!-- Css da foto de perfil do usuario-->
                 <style>
                     .material-icon-avatar {
@@ -106,20 +112,25 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                 </style>
                 <!-- Exibe foto de perfil se o usuário estiver logado -->
                 <?php if ($usuarioLogado): ?>
-                    <span class="material-icons material-icon-avatar ">
-                        <img src="<?php echo htmlspecialchars($_SESSION['foto_perfil'] ?? 'default-profile.png'); ?>
-                    " alt="Foto de perfil"
-                            class="profile-icon">
+                    <span class="material-icons material-icon-avatar">
+                        <?php
+                        $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
+
+                        if (preg_match('/^https?:\/\//', $foto)) {
+                            $foto_url = $foto;
+                        } else {
+                            $foto_url = '../' . $foto;  // Caminho relativo ajustado
+                        }
+                        
+                        ?>
+                        <img src="<?php echo htmlspecialchars($foto_url); ?>" alt="Foto de perfil" class="foto-perfil">
                     </span>
                     Olá, <?php echo htmlspecialchars($_SESSION['nome_completo']); ?>
-
                 <?php else: ?>
-                    <span class="material-icons" aria-hidden="true">
-                        account_circle
-                    </span>
+                    <span class="material-icons" aria-hidden="true">account_circle</span>
                     Visitante
-
                 <?php endif; ?>
+
             </div>
 
             <button class="custom-toggle" type="button" aria-label="Abrir menu de navegação"
