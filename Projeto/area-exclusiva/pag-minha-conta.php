@@ -12,6 +12,8 @@ if (!isset($_SESSION['id_usuario'])) {
 
 $id_usuario = $_SESSION['id_usuario'];
 
+
+
 /* ============================
    SALVAR ALTERAÇÕES
 ============================ */
@@ -180,6 +182,60 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha') {
         }
     }
 }
+/* ===== Atualizar Foto de Perfil ===== */
+if (isset($_POST['acao']) && $_POST['acao'] === 'alterar_foto') {
+    if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+        // 1. Definir caminho base (relativo ao arquivo atual)
+        $pastaBase = realpath(dirname(__FILE__)) . '/../img/foto-perfil/';
+        
+        // 2. Criar pasta base se não existir
+        if (!file_exists($pastaBase)) {
+            mkdir($pastaBase, 0777, true);
+        }
+        
+        // 3. Criar pasta única para o usuário usando uniqid()
+        $pastaUsuario = uniqid();
+        $caminhoPastaUsuario = $pastaBase . $pastaUsuario;
+        
+        if (!file_exists($caminhoPastaUsuario)) {
+            mkdir($caminhoPastaUsuario, 0777, true);
+        }
+        
+        // 4. Processar o arquivo
+        $extensao = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
+        $nomeFoto = 'perfil.' . $extensao;
+        $caminhoCompleto = $caminhoPastaUsuario . '/' . $nomeFoto;
+        
+        // 5. Verificar se é uma imagem válida
+        $check = getimagesize($_FILES['foto_perfil']['tmp_name']);
+        if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png', 'gif'])) {
+            if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $caminhoCompleto)) {
+                // 6. Salvar caminho relativo no formato desejado
+                $novaFoto = './img/foto-perfil/' . $pastaUsuario . '/' . $nomeFoto;
+                
+                $sql_update_foto = "UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?";
+                $stmt = $conn->prepare($sql_update_foto);
+                $stmt->bind_param("si", $novaFoto, $id_usuario);
+                
+                if ($stmt->execute()) {
+                    $sucesso = "Foto de perfil atualizada com sucesso!";
+                    // Atualizar a sessão e recarregar a página
+                    $_SESSION['foto_perfil'] = $novaFoto;
+                    header("Refresh:0");
+                } else {
+                    $erro = "Erro ao atualizar foto no banco de dados.";
+                }
+                $stmt->close();
+            } else {
+                $erro = "Erro ao mover o arquivo. Verifique as permissões.";
+            }
+        } else {
+            $erro = "Arquivo inválido. Apenas imagens JPG, JPEG, PNG e GIF são permitidas.";
+        }
+    } else {
+        $erro = "Nenhuma foto foi selecionada ou ocorreu um erro no upload.";
+    }
+}
 $stmt_usuario->close();
 $stmt_candidaturas->close();
 $conn->close();
@@ -200,7 +256,7 @@ $conn->close();
     <link href="../css/pag-minha-conta.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        
+
     </style>
 </head>
 
@@ -454,7 +510,58 @@ $conn->close();
     <?php if (!empty($sucesso)): ?>
         <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
     <?php endif; ?>
+    <!-- Modal Editar Perfil -->
+    <div class="modal fade" id="editarPerfilModal" tabindex="-1" aria-labelledby="editarPerfilModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarPerfilModalLabel">Editar Foto de Perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarFoto" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="acao" value="alterar_foto">
 
+                        <div class="text-center mb-4">
+                            <div class="profile-avatar mx-auto">
+                                <img id="previewFotoPerfil" src="<?php echo htmlspecialchars($foto_url); ?>"
+                                    alt="Foto de Perfil"
+                                    style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                            </div>
+                            <label for="novaFoto" class="btn btn-cadastrar mt-3">
+                                <span class="material-icons">photo_camera</span> Escolher Nova Foto
+                            </label>
+                            <input type="file" id="novaFoto" name="foto_perfil" accept="image/*" class="d-none">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preview da nova foto selecionada
+        document.getElementById('novaFoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('previewFotoPerfil').src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Inicializar modal quando clicar no botão "Editar Perfil"
+        document.querySelector('.btn-cadastrar').addEventListener('click', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('editarPerfilModal'));
+            myModal.show();
+        });
+    </script>
     <!-- Scripts Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
