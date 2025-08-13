@@ -1,10 +1,10 @@
 <?php
 session_start();
 $erro = "";
+$sucesso = "";
 
 include_once("../db/conexao.php");
 
-// Verifica se o usuário está logado
 if (!isset($_SESSION['id_usuario'])) {
     header("Location: Login.html");
     exit();
@@ -12,46 +12,116 @@ if (!isset($_SESSION['id_usuario'])) {
 
 $id_usuario = $_SESSION['id_usuario'];
 
-// Consulta única para buscar todos os dados necessários
+/* ============================
+   SALVAR ALTERAÇÕES
+============================ */
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    /* ===== Atualizar Dados Pessoais ===== */
+    if (isset($_POST['acao']) && $_POST['acao'] === 'atualizar_dados') {
+        // Get all form data with proper null checks
+        $nome_completo = trim($_POST['nome_completo'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $telefone = trim($_POST['telefone'] ?? '');
+        $data_nascimento = trim($_POST['data_nascimento'] ?? null);
+        $endereco_rua = trim($_POST['endereco_rua'] ?? '');
+        $endereco_numero = trim($_POST['endereco_numero'] ?? '');
+        $endereco_complemento = trim($_POST['endereco_complemento'] ?? '');
+        $endereco_cidade = trim($_POST['endereco_cidade'] ?? '');
+        $endereco_estado = trim($_POST['endereco_estado'] ?? '');
+        $endereco_cep = trim($_POST['endereco_cep'] ?? '');
+        $resumo_profissional = trim($_POST['resumo_profissional'] ?? '');
+
+        $sql_update = "UPDATE usuarios 
+                      SET nome_completo = ?, email = ?, telefone = ?, data_nascimento = ?,
+                          endereco_rua = ?, endereco_numero = ?, endereco_complemento = ?,
+                          endereco_cidade = ?, endereco_estado = ?, endereco_cep = ?,
+                          resumo_profissional = ?
+                      WHERE id_usuario = ?";
+
+        $stmt = $conn->prepare($sql_update);
+        $stmt->bind_param(
+            "sssssssssssi",
+            $nome_completo,
+            $email,
+            $telefone,
+            $data_nascimento,
+            $endereco_rua,
+            $endereco_numero,
+            $endereco_complemento,
+            $endereco_cidade,
+            $endereco_estado,
+            $endereco_cep,
+            $resumo_profissional,
+            $id_usuario
+        );
+
+        if ($stmt->execute()) {
+            $sucesso = "Dados pessoais atualizados com sucesso!";
+        } else {
+            $erro = "Erro ao atualizar os dados pessoais: " . $stmt->error;
+        }
+        $stmt->close();
+    }
+    // ... rest of your POST handling code ...
+}
+
+/* ============================
+   CONSULTA DADOS DO USUÁRIO
+============================ */
 $sql_usuario = "
-    SELECT nome_completo, email, telefone, endereco_cidade, endereco_estado, foto_perfil
+    SELECT nome_completo, email, telefone, data_nascimento,
+           endereco_rua, endereco_numero, endereco_complemento,
+           endereco_cidade, endereco_estado, endereco_cep,
+           resumo_profissional, foto_perfil
     FROM usuarios
     WHERE id_usuario = ?
 ";
+
 $stmt_usuario = $conn->prepare($sql_usuario);
-
-if ($stmt_usuario === false) {
-    die('Erro na preparação da consulta: ' . $conn->error);
-}
-
 $stmt_usuario->bind_param("i", $id_usuario);
-$stmt_usuario->execute();
-$result_usuario = $stmt_usuario->get_result();
 
-if ($result_usuario->num_rows > 0) {
-    $usuario = $result_usuario->fetch_assoc();
-    $nome = $usuario['nome_completo'];
-    $email = $usuario['email'];
-    $telefone = $usuario['telefone'];
-    $cidade = $usuario['endereco_cidade'];
-    $estado = $usuario['endereco_estado'];
-    $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
+if ($stmt_usuario->execute()) {
+    $result_usuario = $stmt_usuario->get_result();
+
+    if ($result_usuario->num_rows > 0) {
+        $usuario = $result_usuario->fetch_assoc();
+
+        // Set default values if fields are null
+        $nome = $usuario['nome_completo'] ?? '';
+        $email = $usuario['email'] ?? '';
+        $telefone = $usuario['telefone'] ?? '';
+        $data_nascimento = $usuario['data_nascimento'] ?? '';
+        $endereco_rua = $usuario['endereco_rua'] ?? '';
+        $endereco_numero = $usuario['endereco_numero'] ?? '';
+        $endereco_complemento = $usuario['endereco_complemento'] ?? '';
+        $endereco_cidade = $usuario['endereco_cidade'] ?? '';
+        $endereco_estado = $usuario['endereco_estado'] ?? '';
+        $endereco_cep = $usuario['endereco_cep'] ?? '';
+        $resumo_profissional = $usuario['resumo_profissional'] ?? '';
+        $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
+    } else {
+        $erro = "Usuário não encontrado.";
+        // Set all default values
+        $nome = $email = $telefone = $endereco_rua = $endereco_numero =
+            $endereco_complemento = $endereco_cidade = $endereco_estado =
+            $endereco_cep = $resumo_profissional = '';
+        $data_nascimento = null;
+        $foto = 'img/foto-perfil/default.png';
+    }
 } else {
-    $erro = "Usuário não encontrado.";
-    $usuario = [];
-    $foto = 'img/foto-perfil/default.png';
+    $erro = "Erro ao consultar dados do usuário: " . $stmt_usuario->error;
 }
 
 // Ajusta caminho da foto
 if (preg_match('/^https?:\/\//', $foto)) {
-    // URL externa
     $foto_url = $foto;
 } else {
-    // Caminho relativo a partir da pasta /area-exclusiva/
     $foto_url = '../' . ltrim($foto, '/');
 }
 
-// Consulta candidaturas
+/* ============================
+   CONSULTA CANDIDATURAS
+============================ */
 $sql_candidaturas = "
     SELECT v.titulo, e.nome AS empresa, v.localizacao AS cidade, 
            SUBSTRING_INDEX(v.localizacao, ', ', -1) AS estado, c.data_candidatura 
@@ -61,11 +131,6 @@ $sql_candidaturas = "
     WHERE c.id_usuario = ?
 ";
 $stmt_candidaturas = $conn->prepare($sql_candidaturas);
-
-if ($stmt_candidaturas === false) {
-    die('Erro na preparação da consulta: ' . $conn->error);
-}
-
 $stmt_candidaturas->bind_param("i", $id_usuario);
 $stmt_candidaturas->execute();
 $res_candidaturas = $stmt_candidaturas->get_result();
@@ -74,13 +139,51 @@ $candidaturas = [];
 while ($row = $res_candidaturas->fetch_assoc()) {
     $candidaturas[] = $row;
 }
+/* ===== Alterar Senha ===== */
+if (isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha') {
+    // Verifica se todos os campos foram preenchidos
+    if (empty($_POST['senha_atual']) || empty($_POST['nova_senha']) || empty($_POST['confirmar_senha'])) {
+        $erro = "Todos os campos são obrigatórios.";
+    } else {
+        $senha_atual = md5($_POST['senha_atual']);
+        $nova_senha = $_POST['nova_senha'];
+        $confirmar_senha = $_POST['confirmar_senha'];
 
-// Fecha conexões
+        if ($nova_senha !== $confirmar_senha) {
+            $erro = "A nova senha e a confirmação não coincidem.";
+        } else {
+            // Verifica a senha atual
+            $sql_check = "SELECT senha FROM usuarios WHERE id_usuario = ?";
+            $stmt = $conn->prepare($sql_check);
+            $stmt->bind_param("i", $id_usuario);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if ($result && $result['senha'] === $senha_atual) {
+                // Aplica MD5 na nova senha antes de salvar
+                $nova_senha_md5 = md5($nova_senha);
+
+                $sql_update_senha = "UPDATE usuarios SET senha = ? WHERE id_usuario = ?";
+                $stmt = $conn->prepare($sql_update_senha);
+                $stmt->bind_param("si", $nova_senha_md5, $id_usuario);
+
+                if ($stmt->execute()) {
+                    $sucesso = "Senha alterada com sucesso!";
+                } else {
+                    $erro = "Erro ao alterar a senha: " . $stmt->error;
+                }
+                $stmt->close();
+            } else {
+                $erro = "Senha atual incorreta.";
+            }
+        }
+    }
+}
 $stmt_usuario->close();
 $stmt_candidaturas->close();
 $conn->close();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -94,235 +197,10 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../css/pag-minha-conta.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        :root {
-            --brand-color: #0b7285;
-            --brand-hover: #0d90b8;
-            --text-dark: #2d3748;
-            --text-light: #f8fafb;
-            --bg-light: #ffffff;
-            --nav-bg: #ffffff;
-        }
-
-        /* Estilos consistentes com seu site */
-        body {
-            font-family: "Poppins", sans-serif;
-            background-color: #f8fafb;
-            color: var(--text-dark);
-        }
-
-        /* Navbar Styles */
-        .navbar {
-            background-color: var(--nav-bg);
-            box-shadow: 0 2px 8px rgba(11, 114, 133, 0.15);
-            padding: 0.5rem 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-        }
-
-        .navbar-container {
-            display: flex;
-            flex-wrap: nowrap;
-            align-items: center;
-            width: 100%;
-            gap: 12px;
-        }
-
-        /* Botão Voltar */
-        .nav-back-button {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--brand-color);
-            font-weight: 600;
-            text-decoration: none;
-            margin-right: auto;
-            padding: 0.5rem 0;
-        }
-
-        .nav-back-button:hover {
-            color: var(--brand-hover);
-        }
-
-        /* Logo */
-        .navbar-brand {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .navbar-brand img {
-            width: 90px;
-        }
-
-        /* Botão Hamburguer */
-        .custom-toggle {
-            background: none;
-            border: none;
-            color: var(--brand-color);
-            font-size: 28px;
-            margin-left: auto;
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-        }
-
-        .custom-toggle:hover {
-            background-color: rgba(11, 114, 133, 0.1);
-        }
-
-        /* Menu Colapsável */
-        .navbar-collapse {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 1rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 280px;
-            z-index: 1000;
-            padding: 1rem;
-        }
-
-        .navbar-collapse.show {
-            display: block;
-        }
-
-        /* Conteúdo da Página */
-        .account-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        /* Card de perfil */
-        .profile-card {
-            background: var(--bg-light);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            background-color: #e2e8f0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-        }
-
-        .profile-avatar .material-icons {
-            font-size: 60px;
-            color: var(--brand-color);
-        }
-
-        /* Cards de resumo */
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Abas de navegação */
-        .account-tabs .nav-link {
-            color: var(--text-dark);
-            font-weight: 600;
-            border: none;
-            padding: 1rem 1.5rem;
-            position: relative;
-        }
-
-        .account-tabs .nav-link.active {
-            color: var(--brand-color);
-            background: transparent;
-        }
-
-        .account-tabs .nav-link.active::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50%;
-            height: 3px;
-            background: var(--brand-color);
-            border-radius: 3px;
-        }
-
-        /* Lista de candidaturas */
-        .application-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            margin-bottom: 1rem;
-            transition: transform 0.2s;
-        }
-
-        .application-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .status-badge {
-            font-size: 0.8rem;
-            padding: 0.35rem 0.75rem;
-        }
-
-        /* Botões */
-        .btn-primary {
-            background-color: var(--brand-color);
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--brand-hover);
-        }
-
-        .btn-cadastrar {
-            background: transparent;
-            border: 2px solid var(--brand-color);
-            color: var(--brand-color);
-        }
-
-        .btn-cadastrar:hover {
-            background: var(--brand-color);
-            color: white;
-        }
-
-        /* Foco acessível */
-        button:focus,
-        a:focus,
-        input:focus {
-            outline: 3px solid var(--brand-hover);
-            outline-offset: 2px;
-        }
-
-        @media (max-width: 768px) {
-            .account-tabs .nav-link {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-            }
-
-            .navbar-brand {
-                position: static;
-                transform: none;
-                order: 1;
-                margin: 0 auto;
-            }
-
-            .nav-back-button {
-                order: 0;
-            }
-
-            .custom-toggle {
-                order: 2;
-            }
-        }
+        
     </style>
 </head>
 
@@ -347,7 +225,7 @@ $conn->close();
         <?php endif; ?>
 
         <section class="profile-card text-center">
-            
+
             <div class="profile-avatar">
                 <?php
                 $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
@@ -422,29 +300,86 @@ $conn->close();
         <!-- Conteúdo Abas -->
         <div class="tab-content">
             <!-- Aba Dados -->
+            <!-- Aba Dados -->
+            <!-- Aba Dados -->
             <div class="tab-pane fade show active" id="dados">
-                <form method="POST" action="atualizar-dados.php">
-                    <h2 class="mb-4">Informações Pessoais</h2>
-                    <div class="row g-3">
+                <form method="POST" action="" class="form-dados-pessoais">
+                    <input type="hidden" name="acao" value="atualizar_dados">
+
+                    <h3 class="mb-4">Informações Básicas</h3>
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="nome" class="form-label">Nome Completo</label>
-                            <input type="text" class="form-control" id="nome" name="nome" value="<?= htmlspecialchars($nome ?? '') ?>" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email ?? '') ?>" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="telefone" class="form-label">Telefone</label>
-                            <input type="tel" class="form-control" id="telefone" name="telefone" value="<?= htmlspecialchars($telefone ?? '') ?>">
+                            <label class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" name="nome_completo"
+                                value="<?php echo htmlspecialchars($usuario['nome_completo'] ?? ''); ?>" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="localizacao" class="form-label">Localização</label>
-                            <input type="text" class="form-control" id="localizacao" name="localizacao" value="<?= htmlspecialchars(($cidade ?? '') . ' ' . ($estado ?? '')) ?>">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email"
+                                value="<?php echo htmlspecialchars($usuario['email'] ?? ''); ?>" required>
                         </div>
-                        <div class="col-12 mt-3">
-                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Telefone</label>
+                            <input type="text" class="form-control" name="telefone"
+                                value="<?php echo htmlspecialchars($usuario['telefone'] ?? ''); ?>">
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control" name="data_nascimento"
+                                value="<?php echo htmlspecialchars($usuario['data_nascimento'] ?? ''); ?>">
+                        </div>
+                    </div>
+
+                    <h3 class="mb-4 mt-4">Endereço</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Rua</label>
+                            <input type="text" class="form-control" name="endereco_rua"
+                                value="<?php echo htmlspecialchars($usuario['endereco_rua'] ?? ''); ?>">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Número</label>
+                            <input type="text" class="form-control" name="endereco_numero"
+                                value="<?php echo htmlspecialchars($usuario['endereco_numero'] ?? ''); ?>">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Complemento</label>
+                            <input type="text" class="form-control" name="endereco_complemento"
+                                value="<?php echo htmlspecialchars($usuario['endereco_complemento'] ?? ''); ?>">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Cidade</label>
+                            <input type="text" class="form-control" name="endereco_cidade"
+                                value="<?php echo htmlspecialchars($usuario['endereco_cidade'] ?? ''); ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Estado (UF)</label>
+                            <input type="text" class="form-control" name="endereco_estado" maxlength="2"
+                                value="<?php echo htmlspecialchars($usuario['endereco_estado'] ?? ''); ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">CEP</label>
+                            <input type="text" class="form-control" name="endereco_cep"
+                                value="<?php echo htmlspecialchars($usuario['endereco_cep'] ?? ''); ?>">
+                        </div>
+                    </div>
+
+                    <h3 class="mb-4 mt-4">Informações Profissionais</h3>
+                    <div class="mb-3">
+                        <label class="form-label">Resumo Profissional</label>
+                        <textarea class="form-control" name="resumo_profissional" rows="4"><?php
+                                                                                            echo htmlspecialchars($usuario['resumo_profissional'] ?? '');
+                                                                                            ?></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                     </div>
                 </form>
             </div>
@@ -483,26 +418,42 @@ $conn->close();
             </div>
 
             <!-- Aba Segurança -->
+            <!-- Aba Segurança -->
             <div class="tab-pane fade" id="seguranca">
                 <h2 class="mb-4">Configurações de Segurança</h2>
-                <form method="POST" action="atualizar-senha.php">
+                <?php if (!empty($erro) && isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha'): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
+                <?php endif; ?>
+                <?php if (!empty($sucesso) && isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha'): ?>
+                    <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
+                <?php endif; ?>
+
+                <form method="POST">
+                    <input type="hidden" name="acao" value="alterar_senha">
                     <div class="mb-3">
                         <label for="senha_atual" class="form-label">Senha Atual</label>
                         <input type="password" class="form-control" id="senha_atual" name="senha_atual" required>
                     </div>
                     <div class="mb-3">
                         <label for="nova_senha" class="form-label">Nova Senha</label>
-                        <input type="password" class="form-control" id="nova_senha" name="nova_senha" required>
+                        <input type="password" class="form-control" id="nova_senha" name="nova_senha" required minlength="6">
+                        <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
                     </div>
                     <div class="mb-3">
                         <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
-                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required minlength="6">
                     </div>
                     <button type="submit" class="btn btn-primary">Alterar Senha</button>
                 </form>
             </div>
-        </div>
     </main>
+    <?php if (!empty($erro)): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
+    <?php endif; ?>
+
+    <?php if (!empty($sucesso)): ?>
+        <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
+    <?php endif; ?>
 
     <!-- Scripts Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
