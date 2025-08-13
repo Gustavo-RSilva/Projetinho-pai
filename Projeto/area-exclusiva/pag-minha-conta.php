@@ -4,24 +4,20 @@ $erro = "";
 
 include_once("../db/conexao.php");
 
+// Verifica se o usuário está logado
 if (!isset($_SESSION['id_usuario'])) {
     header("Location: Login.html");
     exit();
 }
-$usuarioLogado = isset($_SESSION['id_usuario']) && !empty($_SESSION['email']);
-$usuario = [];
 
-if ($usuarioLogado) {
-    $id_usuario = $_SESSION['id_usuario'];
-    $query = "SELECT * FROM usuarios WHERE id_usuario = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $id_usuario);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    $usuario = $resultado->fetch_assoc();  // <-- Agora você tem acesso à foto
-}
+$id_usuario = $_SESSION['id_usuario'];
 
-$sql_usuario = "SELECT nome_completo, email, telefone, endereco_cidade, endereco_estado FROM usuarios WHERE id_usuario = ?";
+// Consulta única para buscar todos os dados necessários
+$sql_usuario = "
+    SELECT nome_completo, email, telefone, endereco_cidade, endereco_estado, foto_perfil
+    FROM usuarios
+    WHERE id_usuario = ?
+";
 $stmt_usuario = $conn->prepare($sql_usuario);
 
 if ($stmt_usuario === false) {
@@ -39,16 +35,31 @@ if ($result_usuario->num_rows > 0) {
     $telefone = $usuario['telefone'];
     $cidade = $usuario['endereco_cidade'];
     $estado = $usuario['endereco_estado'];
+    $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
 } else {
     $erro = "Usuário não encontrado.";
+    $usuario = [];
+    $foto = 'img/foto-perfil/default.png';
 }
 
-$sql_candidaturas = "SELECT v.titulo, e.nome AS empresa, v.localizacao AS cidade, 
-                    SUBSTRING_INDEX(v.localizacao, ', ', -1) AS estado, c.data_candidatura 
-                    FROM candidaturas c
-                    JOIN vagas v ON c.id_vaga = v.id_vaga
-                    JOIN empresas e ON v.id_empresa = e.id_empresa
-                    WHERE c.id_usuario = ?";
+// Ajusta caminho da foto
+if (preg_match('/^https?:\/\//', $foto)) {
+    // URL externa
+    $foto_url = $foto;
+} else {
+    // Caminho relativo a partir da pasta /area-exclusiva/
+    $foto_url = '../' . ltrim($foto, '/');
+}
+
+// Consulta candidaturas
+$sql_candidaturas = "
+    SELECT v.titulo, e.nome AS empresa, v.localizacao AS cidade, 
+           SUBSTRING_INDEX(v.localizacao, ', ', -1) AS estado, c.data_candidatura 
+    FROM candidaturas c
+    JOIN vagas v ON c.id_vaga = v.id_vaga
+    JOIN empresas e ON v.id_empresa = e.id_empresa
+    WHERE c.id_usuario = ?
+";
 $stmt_candidaturas = $conn->prepare($sql_candidaturas);
 
 if ($stmt_candidaturas === false) {
@@ -59,12 +70,12 @@ $stmt_candidaturas->bind_param("i", $id_usuario);
 $stmt_candidaturas->execute();
 $res_candidaturas = $stmt_candidaturas->get_result();
 
-// Armazenar resultados em array para usar posteriormente
 $candidaturas = [];
 while ($row = $res_candidaturas->fetch_assoc()) {
     $candidaturas[] = $row;
 }
 
+// Fecha conexões
 $stmt_usuario->close();
 $stmt_candidaturas->close();
 $conn->close();
@@ -336,19 +347,24 @@ $conn->close();
         <?php endif; ?>
 
         <section class="profile-card text-center">
+            
             <div class="profile-avatar">
                 <?php
                 $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
 
                 if (preg_match('/^https?:\/\//', $foto)) {
+                    // Se for link externo (Google, etc.)
                     $foto_url = $foto;
                 } else {
-                    $foto_url = '../' . $foto;  // Caminho relativo ajustado
+                    // Caminho relativo da página para a pasta img
+                    $foto_url = '../' . $foto;
                 }
-                
                 ?>
-
+                <img src="<?php echo htmlspecialchars($foto_url); ?>"
+                    alt="Foto de Perfil"
+                    style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
             </div>
+
             <h2><?php echo htmlspecialchars($nome ?? ''); ?></h2>
             <p class="text-muted"><?php echo htmlspecialchars($email ?? ''); ?></p>
             <button class="btn btn-cadastrar">
@@ -424,7 +440,7 @@ $conn->close();
                         </div>
                         <div class="col-md-6">
                             <label for="localizacao" class="form-label">Localização</label>
-                            <input type="text" class="form-control" id="localizacao" name="localizacao" value="<?= htmlspecialchars(($cidade ?? '') . ', ' . ($estado ?? '')) ?>">
+                            <input type="text" class="form-control" id="localizacao" name="localizacao" value="<?= htmlspecialchars(($cidade ?? '') . ' ' . ($estado ?? '')) ?>">
                         </div>
                         <div class="col-12 mt-3">
                             <button type="submit" class="btn btn-primary">Salvar Alterações</button>
