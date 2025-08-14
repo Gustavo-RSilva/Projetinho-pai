@@ -114,6 +114,22 @@ if ($stmt_usuario->execute()) {
     $erro = "Erro ao consultar dados do usuário: " . $stmt_usuario->error;
 }
 
+/* ============================
+   CONSULTA CURRÍCULOS
+============================ */
+$sql_curriculos = "SELECT id_curriculo, pdf_nome, data_envio FROM Curriculo WHERE id_usuario = ?";
+$stmt_curriculos = $conn->prepare($sql_curriculos);
+$stmt_curriculos->bind_param("i", $id_usuario);
+$stmt_curriculos->execute();
+$res_curriculos = $stmt_curriculos->get_result();
+
+$curriculos = [];
+while ($row = $res_curriculos->fetch_assoc()) {
+    $curriculos[] = $row;
+}
+
+$total_curriculos = count($curriculos);
+
 // Ajusta caminho da foto
 if (preg_match('/^https?:\/\//', $foto)) {
     $foto_url = $foto;
@@ -187,36 +203,36 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'alterar_foto') {
     if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
         // 1. Definir caminho base (relativo ao arquivo atual)
         $pastaBase = realpath(dirname(__FILE__)) . '/../img/foto-perfil/';
-        
+
         // 2. Criar pasta base se não existir
         if (!file_exists($pastaBase)) {
             mkdir($pastaBase, 0777, true);
         }
-        
+
         // 3. Criar pasta única para o usuário usando uniqid()
         $pastaUsuario = uniqid();
         $caminhoPastaUsuario = $pastaBase . $pastaUsuario;
-        
+
         if (!file_exists($caminhoPastaUsuario)) {
             mkdir($caminhoPastaUsuario, 0777, true);
         }
-        
+
         // 4. Processar o arquivo
         $extensao = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
         $nomeFoto = 'perfil.' . $extensao;
         $caminhoCompleto = $caminhoPastaUsuario . '/' . $nomeFoto;
-        
+
         // 5. Verificar se é uma imagem válida
         $check = getimagesize($_FILES['foto_perfil']['tmp_name']);
         if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png', 'gif'])) {
             if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $caminhoCompleto)) {
                 // 6. Salvar caminho relativo no formato desejado
                 $novaFoto = './img/foto-perfil/' . $pastaUsuario . '/' . $nomeFoto;
-                
+
                 $sql_update_foto = "UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?";
                 $stmt = $conn->prepare($sql_update_foto);
                 $stmt->bind_param("si", $novaFoto, $id_usuario);
-                
+
                 if ($stmt->execute()) {
                     $sucesso = "Foto de perfil atualizada com sucesso!";
                     // Atualizar a sessão e recarregar a página
@@ -322,9 +338,9 @@ $conn->close();
                 <div class="card h-100 text-center">
                     <div class="card-body">
                         <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;">description</span>
-                        <h3>1</h3>
-                        <p class="mb-3">Currículo Cadastrado</p>
-                        <button class="btn btn-primary">Gerenciar</button>
+                        <h3><?php echo $total_curriculos; ?></h3>
+                        <p class="mb-3">Currículo(s) Cadastrado(s)</p>
+                        <a href="curriculos.php" class="btn btn-primary">Gerenciar</a>
                     </div>
                 </div>
             </div>

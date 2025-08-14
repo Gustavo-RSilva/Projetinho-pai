@@ -149,7 +149,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                     </a>
                 </li>
                 <li class="nav-item" role="none">
-                    <a href="Meu-curriculo.php" class="nav-link" tabindex="0" role="menuitem">
+                    <a href="./curriculos.php" class="nav-link" tabindex="0" role="menuitem">
                         <span class="material-icons" aria-hidden="true">description</span>
                         Meu Currículo
                     </a>
