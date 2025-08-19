@@ -1,36 +1,38 @@
 <?php
 session_start();
-require_once('../db/conexao.php');
+require_once("../db/conexao.php");
 
+// Verifica se o usuário está logado
 if (!isset($_SESSION['id_usuario'])) {
-    header('Location: Login.php');
-    exit;
+    header("Location: ../Login.php");
+    exit();
 }
 
-if (isset($_GET['id'])) {
-    $candidatura_id = $_GET['id'];
-    $usuario_id = $_SESSION['id_usuario'];
-    
-    // Atualiza o status da candidatura para "Cancelado"
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_candidatura'])) {
+    $id_candidatura = intval($_POST['id_candidatura']);
+    $id_usuario = $_SESSION['id_usuario'];
+
+    // Atualiza a candidatura para "Cancelado" (somente do usuário logado)
     $sql = "UPDATE candidaturas 
-            SET status = 'Cancelado', 
-                data_atualizacao = CURRENT_TIMESTAMP,
-                observacoes = CONCAT(IFNULL(observacoes, ''), '\nCandidatura cancelada pelo candidato em ', NOW())
+            SET status = 'Cancelado' 
             WHERE id_candidatura = ? AND id_usuario = ? AND status = 'Em análise'";
-    
+
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $candidatura_id, $usuario_id);
-    
+    $stmt->bind_param("ii", $id_candidatura, $id_usuario);
+
     if ($stmt->execute()) {
-        $_SESSION['mensagem'] = 'Candidatura cancelada com sucesso!';
-        $_SESSION['tipo_mensagem'] = 'success';
+        $_SESSION['msg'] = "<div class='alert alert-success text-center'>✅ Candidatura cancelada com sucesso!</div>";
     } else {
-        $_SESSION['mensagem'] = 'Erro ao cancelar candidatura ou candidatura não está mais em análise.';
-        $_SESSION['tipo_mensagem'] = 'danger';
+        $_SESSION['msg'] = "<div class='alert alert-danger text-center'>❌ Erro ao cancelar a candidatura. Tente novamente.</div>";
     }
+
     $stmt->close();
+} else {
+    $_SESSION['msg'] = "<div class='alert alert-warning text-center'>⚠ Nenhuma candidatura selecionada.</div>";
 }
 
-header('Location: pag-candidaturas.php');
-exit;
-?>
+$conn->close();
+
+// Redireciona de volta para a página de candidaturas
+header("Location: pag-candidaturas.php");
+exit();

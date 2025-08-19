@@ -304,7 +304,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                     <li><a href="index.php">Início</a></li>
                     <li><a href="Pagina-vagas.php">Vagas</a></li>
                     <li><a href="Meu-curriculo.php">Cadastrar Currículo</a></li>
-                    <li><a href="contato.php">Contato</a></li>
+                    <li><a href="fale-conosco.php">Contato</a></li>
                 </ul>
             </div>
 

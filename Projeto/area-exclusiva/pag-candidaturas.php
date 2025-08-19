@@ -224,7 +224,7 @@ $status_colors = [
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
-                    <form id="formCancelar" method="POST" action="../cancelar-candidatura.php">
+                    <form id="formCancelar" method="POST" action="cancelar-candidatura.php">
                         <input type="hidden" name="id_candidatura" id="idCandidatura">
                         <button type="submit" class="btn btn-danger">Confirmar Cancelamento</button>
                     </form>
@@ -238,17 +238,19 @@ $status_colors = [
         <div class="footer-container">
             <div class="footer-section">
                 <h4 class="footer-title">Sobre Nós</h4>
-                <p class="footer-text">Conectamos talentos às melhores oportunidades.</p>
+                <p class="footer-text">Conectamos talentos às melhores oportunidades. Nosso compromisso é facilitar o acesso ao mercado de trabalho com simplicidade e eficiência.</p>
             </div>
-            <div class="footer-section">
+
+            <div class="footer-section rightlinks">
                 <h4 class="footer-title">Links Rápidos</h4>
                 <ul class="footer-links">
-                    <li><a href="../index.php">Início</a></li>
-                    <li><a href="../Pagina-vagas.php">Vagas</a></li>
-                    <li><a href="../Meu-curriculo.php">Currículo</a></li>
-                    <li><a href="../contato.php">Contato</a></li>
+                    <li><a href="index.php">Início</a></li>
+                    <li><a href="Pagina-vagas.php">Vagas</a></li>
+                    <li><a href="Meu-curriculo.php">Cadastrar Currículo</a></li>
+                    <li><a href="contato.php">Contato</a></li>
                 </ul>
             </div>
+
             <div class="footer-section rightredes">
                 <h4 class="footer-title">Redes Sociais</h4>
                 <div class="social-buttons">
@@ -259,8 +261,9 @@ $status_colors = [
                 </div>
             </div>
         </div>
+
         <div class="footer-bottom">
-            <p>&copy; <?= date('Y') ?> JobSearch. Todos os direitos reservados.</p>
+            <p>&copy; 2025 JobSearch. Todos os direitos reservados.</p>
         </div>
     </footer>
 

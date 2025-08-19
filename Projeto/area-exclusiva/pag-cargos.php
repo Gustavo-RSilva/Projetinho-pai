@@ -4,6 +4,20 @@ include_once("../db/conexao.php");
 
 // Verifica se o usuário está logado
 $usuarioLogado = isset($_SESSION['id_usuario']);
+$usuario = null;
+
+if ($usuarioLogado) {
+    $id_usuario = $_SESSION['id_usuario'];
+    $sql = "SELECT nome_completo, foto_perfil FROM usuarios WHERE id_usuario = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $usuario = $result->fetch_assoc();
+
+    // Atualiza nome na sessão (garante consistência)
+    $_SESSION['nome_completo'] = $usuario['nome_completo'];
+}
 
 // Funções de busca
 function buscarSugestoes($conn, $termo) {
@@ -126,12 +140,57 @@ $cargosPopulares = cargosPopulares($conn);
 
             <!-- User status container -->
             <div class="user-status" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
-                <span class="material-icons" aria-hidden="true">account_circle</span>
-                <?php if($usuarioLogado): ?>
+
+                <!-- Css da foto de perfil do usuario-->
+                <style>
+                    .material-icon-avatar {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 24px;
+                        /* tamanho padrão dos material-icons */
+                        height: 24px;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        vertical-align: middle;
+                        background-color: transparent;
+                        /* igual ao fundo do ícone */
+                        transition: background-color 0.2s ease;
+                    }
+
+                    .material-icon-avatar img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+
+                    .material-icon-avatar:hover {
+                        background-color: rgba(0, 0, 0, 0.1);
+                        /* efeito de hover igual aos ícones */
+                        cursor: pointer;
+                    }
+                </style>
+                <!-- Exibe foto de perfil se o usuário estiver logado -->
+                <?php if ($usuarioLogado): ?>
+                    <span class="material-icons material-icon-avatar">
+                        <?php
+                        $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
+
+                        if (preg_match('/^https?:\/\//', $foto)) {
+                            $foto_url = $foto;
+                        } else {
+                            $foto_url = '../' . $foto;  // Caminho relativo ajustado
+                        }
+                        
+                        ?>
+                        <img src="<?php echo htmlspecialchars($foto_url); ?>" alt="Foto de perfil" class="foto-perfil">
+                    </span>
                     Olá, <?php echo htmlspecialchars($_SESSION['nome_completo']); ?>
                 <?php else: ?>
+                    <span class="material-icons" aria-hidden="true">account_circle</span>
                     Visitante
                 <?php endif; ?>
+
             </div>
 
             <button class="custom-toggle" type="button" aria-label="Abrir menu de navegação"
