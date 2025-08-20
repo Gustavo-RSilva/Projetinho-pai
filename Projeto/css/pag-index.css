@@ -139,6 +139,7 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid #e1e5eb;
     margin-top: 10px;
+    min-height: 18.5rem;
   }
   
   .job-card .d-flex.align-items-center.mb-3 {
@@ -247,6 +248,7 @@
   
   .job-details {
     margin: 1.5rem 0;
+    
   }
   
   .detail-item {
@@ -279,14 +281,13 @@
   }
   
   .job-card-footer {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #eceff1;
-    display: flex;
-    justify-content: flex-end;
+    margin-top: auto;       /* cola no fim do card */
+  display: center;
+  justify-content: flex-end; /* botão à direita */
   }
   
   .btn-apply {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     background-color: var(--brand-color);
     color: white;
@@ -295,6 +296,7 @@
     text-decoration: none;
     font-weight: 600;
     transition: background-color 0.3s ease;
+    
   }
   
   .btn-apply .material-icons {
@@ -476,4 +478,3 @@
       right: -10px;
     }
   }
-  

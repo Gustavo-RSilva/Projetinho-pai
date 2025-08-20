@@ -240,7 +240,9 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                                 <span class="material-icons" style="font-size: 1rem;">description</span>
                                 <?php echo htmlspecialchars($vaga['tipo_contrato']); ?>
                             </p>
-                            <a href="Pagina-vagas.php?id_vaga=<?php echo $vaga['id_vaga']; ?>" class="btn btn-apply">Ver Vaga</a>
+                            <div class="job-card-footer">
+                            <a  href="Pagina-vagas.php?id_vaga=<?php echo $vaga['id_vaga']; ?>" class="btn btn-apply ">Ver Vaga</a>
+                            </div>
                         </div>
                     </div>
                 <?php endwhile; ?>
