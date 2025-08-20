@@ -121,7 +121,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                         } else {
                             $foto_url = '../' . $foto;  // Caminho relativo ajustado
                         }
-                        
+
                         ?>
                         <img src="<?php echo htmlspecialchars($foto_url); ?>" alt="Foto de perfil" class="foto-perfil">
                     </span>
@@ -214,34 +214,28 @@ $areasProfissionais = buscarAreasProfissionais($conn);
     <!-- Vagas em Destaque -->
     <section class="container my-5">
         <h2 class="section-title">Vagas em Destaque</h2>
-
         <div class="owl-carousel owl-theme" id="featured-jobs-carousel">
             <?php if ($vagasDestaque->num_rows > 0): ?>
                 <?php while ($vaga = $vagasDestaque->fetch_assoc()): ?>
                     <div class="item">
                         <div class="job-card">
                             <div class="d-flex align-items-center mb-3">
-
                                 <div>
                                     <h3><?php echo htmlspecialchars($vaga['titulo']); ?></h3>
                                     <p class="company"><?php echo htmlspecialchars($vaga['empresa_nome']); ?></p>
                                 </div>
                             </div>
                             <p class="details">
-                                <span class="material-icons" style="font-size: 1rem;">location_on</span>
+                                <span class="material-icons" style="font-size:1rem;">location_on</span>
                                 <?php echo htmlspecialchars($vaga['localizacao']); ?>
-                                <?php if ($vaga['remoto']): ?>
-                                    (Remoto)
-                                <?php endif; ?>
-                                <br>
-                                <span class="material-icons" style="font-size: 1rem;">attach_money</span>
-                                <?php echo htmlspecialchars($vaga['faixa_salarial']); ?>
-                                <br>
-                                <span class="material-icons" style="font-size: 1rem;">description</span>
+                                <?php if ($vaga['remoto']): ?> (Remoto) <?php endif; ?><br>
+                                <span class="material-icons" style="font-size:1rem;">attach_money</span>
+                                <?php echo htmlspecialchars($vaga['faixa_salarial']); ?><br>
+                                <span class="material-icons" style="font-size:1rem;">description</span>
                                 <?php echo htmlspecialchars($vaga['tipo_contrato']); ?>
                             </p>
                             <div class="job-card-footer">
-                            <a  href="Pagina-vagas.php?id_vaga=<?php echo $vaga['id_vaga']; ?>" class="btn btn-apply ">Ver Vaga</a>
+                                <a href="Pagina-vagas.php?id_vaga=<?php echo $vaga['id_vaga']; ?>" class="btn btn-apply">Ver Vaga</a>
                             </div>
                         </div>
                     </div>
@@ -257,7 +251,6 @@ $areasProfissionais = buscarAreasProfissionais($conn);
     <!-- Principais Áreas -->
     <section class="container my-5">
         <h2 class="section-title">Principais Áreas</h2>
-
         <div class="row">
             <?php if ($areasProfissionais->num_rows > 0): ?>
                 <?php while ($area = $areasProfissionais->fetch_assoc()): ?>
@@ -266,13 +259,12 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                             <div class="area-card">
                                 <div class="icon">
                                     <?php
-                                    // Ícones diferentes para cada área
                                     $icon = match ($area['id_area']) {
-                                        1 => 'shopping_cart',    // Comercial/Vendas
-                                        2 => 'local_shipping',   // Logística
-                                        3 => 'restaurant',       // Alimentação/Gastronomia
-                                        4 => 'business_center',  // Administração
-                                        5 => 'computer',         // Tecnologia da Informação
+                                        1 => 'shopping_cart',
+                                        2 => 'local_shipping',
+                                        3 => 'restaurant',
+                                        4 => 'business_center',
+                                        5 => 'computer',
                                         default => 'work'
                                     };
                                     ?>
@@ -297,9 +289,8 @@ $areasProfissionais = buscarAreasProfissionais($conn);
         <div class="footer-container">
             <div class="footer-section">
                 <h4 class="footer-title">Sobre Nós</h4>
-                <p class="footer-text">Conectamos talentos às melhores oportunidades. Nosso compromisso é facilitar o acesso ao mercado de trabalho com simplicidade e eficiência.</p>
+                <p class="footer-text">Conectamos talentos às melhores oportunidades.</p>
             </div>
-
             <div class="footer-section rightlinks">
                 <h4 class="footer-title">Links Rápidos</h4>
                 <ul class="footer-links">
@@ -309,18 +300,16 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                     <li><a href="fale-conosco.php">Contato</a></li>
                 </ul>
             </div>
-
             <div class="footer-section rightredes">
                 <h4 class="footer-title">Redes Sociais</h4>
                 <div class="social-buttons">
-                    <a href="#" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-btn linkedin" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="social-btn whatsapp" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
         </div>
-
         <div class="footer-bottom">
             <p>&copy; 2025 Contrata. Todos os direitos reservados.</p>
         </div>
@@ -329,12 +318,11 @@ $areasProfissionais = buscarAreasProfissionais($conn);
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <!-- Owl Carousel JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
     <script>
         $(document).ready(function() {
-            // Inicializar carrossel de vagas em destaque
+            // Inicializar carrossel
             $('#featured-jobs-carousel').owlCarousel({
                 loop: true,
                 margin: 20,
@@ -353,93 +341,70 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                 }
             });
 
-            // Dados de exemplo para sugestões (substituir por chamada AJAX para seu backend)
-            const jobTitles = [
-                "Desenvolvedor Front-End",
-                "Analista de Dados",
-                "UX Designer",
-                "Auxiliar Administrativo",
-                "Técnico de Suporte",
-                "Gerente de Projetos",
-                "Engenheiro de Software"
-            ];
-
-            const companies = [
-                "TechCode",
-                "DataMax",
-                "Inovart",
-                "Grupo Zênite",
-                "TecnoPlus Soluções"
-            ];
-
-            // Evento de input na barra de pesquisa
+            // Busca dinâmica no banco
             $('#search-input').on('input', function() {
-                const searchTerm = $(this).val().trim().toLowerCase();
+                const searchTerm = $(this).val().trim();
+                const location = $('#location-filter').val();
 
                 if (searchTerm.length === 0) {
                     $('#search-suggestions').hide();
                     return;
                 }
 
-                // Filtrar sugestões
-                const titleMatches = jobTitles.filter(title =>
-                    title.toLowerCase().includes(searchTerm)
-                );
+                $.ajax({
+                    url: '../api/search.php',
+                    method: 'GET',
+                    data: {
+                        term: searchTerm,
+                        location: location || ""
+                    },
 
-                const companyMatches = companies.filter(company =>
-                    company.toLowerCase().includes(searchTerm)
-                );
-
-                // Exibir sugestões
-                showSuggestions([...titleMatches, ...companyMatches]);
+                    success: function(response) {
+                        try {
+                            const suggestions = JSON.parse(response);
+                            showSuggestions(suggestions);
+                        } catch (e) {
+                            console.error("Erro:", e, response);
+                        }
+                    }
+                });
             });
 
-            // Função para exibir sugestões
             function showSuggestions(suggestions) {
-                if (suggestions.length === 0) {
+                if (!suggestions || suggestions.length === 0) {
                     $('#search-suggestions').hide();
                     return;
                 }
-
                 $('#search-suggestions').empty();
-                suggestions.slice(0, 5).forEach(suggestion => {
-                    const item = $('<div class="suggestion-item"></div>').text(suggestion);
-
+                suggestions.slice(0, 5).forEach(s => {
+                    const item = $('<div class="suggestion-item"></div>')
+                        .text(s.titulo + " - " + s.empresa + " (" + s.localizacao + ")");
                     item.on('click', function() {
-                        $('#search-input').val(suggestion);
+                        $('#search-input').val(s.titulo);
                         $('#search-suggestions').hide();
                         performSearch();
                     });
-
                     $('#search-suggestions').append(item);
                 });
-
                 $('#search-suggestions').show();
             }
 
-            // Fechar sugestões ao clicar fora
+            // Fechar ao clicar fora
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('#search-input, #search-suggestions').length) {
                     $('#search-suggestions').hide();
                 }
             });
 
-            // Evento de pesquisa
+            // Pesquisar manual
             $('#search-button').on('click', performSearch);
-
-            // Pesquisar ao pressionar Enter
             $('#search-input').on('keypress', function(e) {
-                if (e.which === 13) {
-                    performSearch();
-                }
+                if (e.which === 13) performSearch();
             });
 
-            // Função para realizar a pesquisa
             function performSearch() {
                 const searchTerm = $('#search-input').val().trim();
                 const location = $('#location-filter').val();
-
-                // Redirecionar para a página de vagas com os parâmetros de busca
                 window.location.href = `Pagina-vagas.php?search=${encodeURIComponent(searchTerm)}&location=${encodeURIComponent(location)}`;
             }
         });
