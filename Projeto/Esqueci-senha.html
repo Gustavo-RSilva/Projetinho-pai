@@ -10,7 +10,10 @@
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
         <link rel="stylesheet" href="./css/Esqueci-senha.css">
 </head>
-
+<style>
+    .step { display: none; }
+    .step.active { display: block; }
+  </style>
 <body>
    <div class="container password-container">
         <div class="container-header">
@@ -69,115 +72,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
     crossorigin="anonymous"></script>
-
-    <script>
-         // Simulação de contas existentes (apenas para demonstração)
-        const existingAccounts = ['usuario1@exemplo.com', 'usuario2@exemplo.com', 'teste@teste.com'];
-        let currentEmail = '';
-        let verificationCode = '';
-
-        // Elementos DOM
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
-        const emailInput = document.getElementById('email');
-        const emailDisplay = document.getElementById('emailDisplay');
-        const codeInput = document.getElementById('code');
-        const newPasswordInput = document.getElementById('newPassword');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-        const successMessage = document.getElementById('successMessage');
-        const emailError = document.getElementById('emailError');
-        const codeError = document.getElementById('codeError');
-        const passwordError = document.getElementById('passwordError');
-
-        // Função para gerar código aleatório
-        function generateCode() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-
-        // Função para mudar de passo
-        function goToStep(stepNumber) {
-            document.querySelectorAll('.step').forEach(step => {
-                step.classList.remove('active');
-            });
-            document.getElementById(`step${stepNumber}`).classList.add('active');
-        }
-
-        // Enviar código
-        document.getElementById('btnSendCode').addEventListener('click', function() {
-            const email = emailInput.value.trim();
-            
-            if (!email) {
-                emailInput.classList.add('is-invalid');
-                emailError.textContent = 'Por favor, digite seu e-mail';
-                return;
-            }
-
-            if (!existingAccounts.includes(email)) {
-                emailInput.classList.add('is-invalid');
-                emailError.textContent = 'Nenhuma conta encontrada com este e-mail';
-                return;
-            }
-
-            emailInput.classList.remove('is-invalid');
-            currentEmail = email;
-            verificationCode = generateCode();
-            
-            // Simulação de envio de e-mail
-            console.log(`Código enviado para ${email}: ${verificationCode}`);
-            
-            emailDisplay.textContent = email;
-            goToStep(2);
-        });
-
-        // Verificar código
-        document.getElementById('btnVerifyCode').addEventListener('click', function() {
-            if (codeInput.value !== verificationCode) {
-                codeInput.classList.add('is-invalid');
-                codeError.textContent = 'Código inválido. Tente novamente.';
-                return;
-            }
-
-            codeInput.classList.remove('is-invalid');
-            goToStep(3);
-        });
-
-        // Reenviar código
-        document.getElementById('btnResendCode').addEventListener('click', function() {
-            verificationCode = generateCode();
-            console.log(`Novo código enviado para ${currentEmail}: ${verificationCode}`);
-            alert('Um novo código foi enviado para seu e-mail.');
-        });
-
-        // Alterar senha
-        document.getElementById('btnChangePassword').addEventListener('click', function() {
-            const newPassword = newPasswordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
-
-            if (newPassword.length < 8) {
-                newPasswordInput.classList.add('is-invalid');
-                passwordError.textContent = 'A senha deve ter pelo menos 8 caracteres';
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-                confirmPasswordInput.classList.add('is-invalid');
-                passwordError.textContent = 'As senhas não coincidem';
-                return;
-            }
-
-            // Simulação de alteração de senha
-            console.log(`Senha alterada para a conta ${currentEmail}`);
-            
-            // Mostrar mensagem de sucesso
-            successMessage.classList.remove('d-none');
-            
-            // Simular redirecionamento após 3 segundos
-            setTimeout(() => {
-                window.location.href = 'login.html'; // Substitua pela sua página de login
-            }, 3000);
-        });
-    </script>
+    <script src="js/esqueci-senha.js"></script>
 
 
 </html>
