@@ -400,4 +400,14 @@
                 margin-bottom: 20px;
             }
         }
-    
+    .img-thumbnail {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.25rem;
+    background-color: #fff;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}

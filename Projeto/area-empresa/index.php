@@ -2,6 +2,11 @@
 session_start();
 include_once("../db/conexao.php");
 
+// Preservar a âncora após submit de formulários
+if (isset($_GET['anchor'])) {
+    $anchor = $_GET['anchor'];
+    echo "<script>document.addEventListener('DOMContentLoaded', function() { mostrarSecao('{$anchor}-section'); });</script>";
+}
 if (!isset($_SESSION['id_empresa'])) {
   header("Location: login.php");
   exit();
@@ -43,7 +48,8 @@ $stmt->execute();
 $counts["contratados"] = (int)($stmt->get_result()->fetch_assoc()['total'] ?? 0);
 
 // ------- Empresa info -------
-$stmt = $conn->prepare("SELECT id_empresa, nome, cnpj, website as email, ramo_atuacao as telefone, url_logo as endereco, descricao FROM empresas WHERE id_empresa = ?");
+// No seu index.php, altere a query para:
+$stmt = $conn->prepare("SELECT id_empresa, nome, cnpj, email, telefone, endereco, descricao FROM empresas WHERE id_empresa = ?");
 $stmt->bind_param("i", $id_empresa);
 $stmt->execute();
 $empresa = $stmt->get_result()->fetch_assoc();
@@ -154,6 +160,12 @@ foreach ($rep as $row) {
   $labels[] = $row['dia'];
   $data[] = (int)$row['total'];
 }
+// Mostrar mensagens de debug
+if (isset($_SESSION['msg'])) {
+  echo '<div class="alert alert-' . ($_SESSION['tipo_msg'] ?? 'info') . '">' . $_SESSION['msg'] . '</div>';
+  unset($_SESSION['msg']);
+  unset($_SESSION['tipo_msg']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -216,7 +228,7 @@ foreach ($rep as $row) {
       <div class="col-md-9 main-content">
 
         <!-- Dashboard -->
-        <div id="dashboard-section" class="section active">
+        <div id="dashboard-section" class="section active" id="dashboard">
           <div class="row mb-4">
             <div class="col-md-3">
               <div class="card stat-card">
@@ -285,7 +297,7 @@ foreach ($rep as $row) {
         </div>
 
         <!-- Vagas -->
-        <div id="vagas-section" class="section" style="display:none;">
+        <div id="vagas-section" class="section" style="display:none;" id="vagas">
           <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
               <h5 class="mb-0">Gerenciamento de Vagas</h5>
@@ -293,6 +305,7 @@ foreach ($rep as $row) {
             </div>
             <div class="card-body">
               <form method="GET" class="row g-2 mb-3">
+                <input type="hidden" name="anchor" value="vagas">
                 <div class="col-md-4"><input type="text" name="pesquisa" value="<?= htmlspecialchars($pesq) ?>" class="form-control" placeholder="Pesquisar por título"></div>
                 <div class="col-md-3">
                   <select name="status" class="form-select">
@@ -302,7 +315,9 @@ foreach ($rep as $row) {
                   </select>
                 </div>
                 <div class="col-md-2"><button type="submit" class="btn btn-secondary w-100">Filtrar</button></div>
-                <div class="col-md-2"><a href="index.php#vagas" class="btn btn-light w-100" onclick="location.href='index.php';">Limpar</a></div>
+                <div class="col-md-2">
+                  <a href="index.php#vagas" class="btn btn-light w-100">Limpar</a>
+                </div>
               </form>
 
               <div class="table-responsive">
@@ -338,13 +353,14 @@ foreach ($rep as $row) {
         </div>
 
         <!-- Candidatos -->
-        <div id="candidatos-section" class="section" style="display:none;">
+        <div id="candidatos-section" class="section" style="display:none;" id="candidatos">
           <div class="card mb-4">
             <div class="card-header">
               <h5 class="mb-0">Candidatos</h5>
             </div>
             <div class="card-body">
               <form method="GET" class="row g-2 mb-3">
+                <input type="hidden" name="anchor" value="candidatos">
                 <div class="col-md-4"><input type="text" name="cand_nome" value="<?= htmlspecialchars($pc_nom) ?>" class="form-control" placeholder="Nome do candidato"></div>
                 <div class="col-md-3">
                   <select name="cand_vaga" class="form-select">
@@ -406,7 +422,7 @@ foreach ($rep as $row) {
         </div>
 
         <!-- Empresa -->
-        <div id="empresa-section" class="section" style="display:none;">
+        <div id="empresa-section" class="section" style="display:none;" id="empresa">
           <div class="card mb-4">
             <div class="card-header">
               <h5 class="mb-0">Informações da Empresa</h5>
@@ -448,13 +464,14 @@ foreach ($rep as $row) {
         </div>
 
         <!-- Relatórios -->
-        <div id="relatorios-section" class="section" style="display:none;">
+        <div id="relatorios-section" class="section" style="display:none;" id="relatorios">
           <div class="card mb-4">
             <div class="card-header">
               <h5 class="mb-0">Relatórios</h5>
             </div>
             <div class="card-body">
               <form method="GET" class="row g-2 mb-4">
+                <input type="hidden" name="anchor" value="relatorios">
                 <div class="col-md-3">
                   <label class="form-label">Início</label>
                   <input type="date" class="form-control" name="r_ini" value="<?= htmlspecialchars($_GET['r_ini'] ?? '') ?>">
@@ -539,7 +556,7 @@ foreach ($rep as $row) {
         </div>
 
         <!-- Configurações -->
-        <div id="configuracoes-section" class="section" style="display:none;">
+        <div id="configuracoes-section" class="section" style="display:none;" id="configuracoes">
           <div class="card mb-4">
             <div class="card-header">
               <h5 class="mb-0">Configurações da Conta</h5>
@@ -584,8 +601,50 @@ foreach ($rep as $row) {
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     function mostrarSecao(id) {
+      // Esconder todas as seções
       document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+
+      // Mostrar a seção desejada
       document.getElementById(id).style.display = 'block';
+
+      // Remover a classe active de todos os itens do menu
+      document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+
+      // Adicionar a classe active ao item do menu correspondente
+      const menuItems = {
+        'dashboard-section': '[onclick*="mostrarDashboard"]',
+        'vagas-section': '[onclick*="mostrarVagas"]',
+        'candidatos-section': '[onclick*="mostrarCandidatos"]',
+        'empresa-section': '[onclick*="mostrarEmpresa"]',
+        'relatorios-section': '[onclick*="mostrarRelatorios"]',
+        'configuracoes-section': '[onclick*="mostrarConfiguracoes"]'
+      };
+
+      if (menuItems[id]) {
+        const activeLink = document.querySelector(`.sidebar .nav-link${menuItems[id]}`);
+        if (activeLink) {
+          activeLink.classList.add('active');
+        }
+      }
+
+      // Salvar a seção atual no sessionStorage
+      sessionStorage.setItem('secaoAtiva', id);
+
+      // Atualizar a URL com a âncora correspondente
+      const anchorMap = {
+        'dashboard-section': 'dashboard',
+        'vagas-section': 'vagas',
+        'candidatos-section': 'candidatos',
+        'empresa-section': 'empresa',
+        'relatorios-section': 'relatorios',
+        'configuracoes-section': 'configuracoes'
+      };
+
+      if (anchorMap[id]) {
+        history.replaceState(null, null, `#${anchorMap[id]}`);
+      }
     }
 
     function mostrarDashboard(e) {
@@ -642,6 +701,36 @@ foreach ($rep as $row) {
         }
       });
     }
+
+    // Ao carregar a página, restaurar a seção anterior ou usar a âncora da URL
+    document.addEventListener('DOMContentLoaded', function() {
+      // Primeiro verificar se há uma âncora na URL
+      const hash = window.location.hash;
+      if (hash) {
+        const sectionMap = {
+          '#dashboard': 'dashboard-section',
+          '#vagas': 'vagas-section',
+          '#candidatos': 'candidatos-section',
+          '#empresa': 'empresa-section',
+          '#relatorios': 'relatorios-section',
+          '#configuracoes': 'configuracoes-section'
+        };
+
+        if (sectionMap[hash]) {
+          mostrarSecao(sectionMap[hash]);
+          return;
+        }
+      }
+
+      // Se não houver âncora, verificar se há uma seção salva no sessionStorage
+      const secaoSalva = sessionStorage.getItem('secaoAtiva');
+      if (secaoSalva) {
+        mostrarSecao(secaoSalva);
+      } else {
+        // Por padrão, mostrar o dashboard
+        mostrarSecao('dashboard-section');
+      }
+    });
   </script>
 </body>
 
