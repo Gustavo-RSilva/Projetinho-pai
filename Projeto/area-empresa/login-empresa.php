@@ -11,7 +11,7 @@ $senha = isset($_POST["senha"]) ? $_POST["senha"] : "";
 if ($cnpj != "") {
     // Remover caracteres não numéricos do CNPJ digitado
     $cnpj_limpo = preg_replace('/[^0-9]/', '', $cnpj);
-    
+
     // Consulta que remove os caracteres não numéricos do CNPJ no banco para comparar
     $sql = "SELECT * FROM empresas WHERE REPLACE(REPLACE(REPLACE(REPLACE(cnpj, '.', ''), '/', ''), '-', ''), ' ', '') = ? AND senha = MD5(?)";
 
@@ -40,6 +40,7 @@ if ($cnpj != "") {
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -179,7 +180,7 @@ if ($cnpj != "") {
             border-radius: 4px;
             margin-left: 10px;
         }
-        
+
         .password-toggle-icon {
             position: absolute;
             right: 12px;
@@ -194,7 +195,7 @@ if ($cnpj != "") {
             border-radius: 1rem;
             margin-bottom: 20px;
         }
-        
+
         .test-accounts {
             margin-top: 20px;
             padding: 15px;
@@ -202,18 +203,19 @@ if ($cnpj != "") {
             border-radius: 8px;
             font-size: 14px;
         }
-        
+
         .test-accounts h6 {
             color: #144d78;
             margin-bottom: 10px;
         }
-        
+
         .test-accounts ul {
             margin-bottom: 0;
             padding-left: 20px;
         }
     </style>
 </head>
+
 <body class="paginaLogin">
 
     <form class="form-container" method="POST" action="login-empresa.php">
@@ -221,14 +223,14 @@ if ($cnpj != "") {
             <i class="fas fa-building"></i>
         </div>
         <h1 class="text-center entrarcom fw-bold">Área Empresas</h1>
-        
-        <?php 
+
+        <?php
         // Exibir mensagem de erro se existir
         if (!empty($erro)) {
             echo $erro;
         }
         ?>
-        
+
         <div class="mb-3">
             <div class="cnpj-label">
                 <label for="cnpj" class="form-label">CNPJ</label>
@@ -236,11 +238,11 @@ if ($cnpj != "") {
             </div>
             <input type="text" class="form-control" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00" required value="<?php echo htmlspecialchars($cnpj); ?>">
         </div>
-        
+
         <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
             <div class="input-with-icon">
-                <input type="password" class="form-control" id="senha" name="senha" required> 
+                <input type="password" class="form-control" id="senha" name="senha" required>
                 <i class="fas fa-eye password-toggle-icon" id="togglePassword"></i>
             </div>
             <a href="./Esqueci-senha-empresas.html" class="forgot-password-link">Esqueceu a senha?</a>
@@ -251,14 +253,9 @@ if ($cnpj != "") {
         <div class="naotemconta">Não tem uma conta empresa?
             <a href="./Criar-conta-empresas.html" class="btn criarc btn-outline-secondary w-100">Cadastrar Empresa</a>
         </div>
-        
-        <div class="test-accounts">
-            <h6>Contas de teste (CNPJ/Senha):</h6>
-            <ul>
-                <li>12.345.678/0001-90 / senha123</li>
-                <li>98.765.432/0001-10 / senha123</li>
-                <li>11.222.333/0001-44 / senha123</li>
-            </ul>
+
+        <div class="candidato-link text-center mt-3">
+            <p>É um candidato? <a href="../Login.php" class="text-decoration-none">Acesse aqui</a></p>
         </div>
     </form>
 
@@ -270,7 +267,7 @@ if ($cnpj != "") {
             cnpjInput.addEventListener('input', function() {
                 let value = this.value.replace(/\D/g, '');
                 if (value.length > 14) value = value.slice(0, 14);
-                
+
                 if (value.length > 12) {
                     value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
                 } else if (value.length > 8) {
@@ -282,16 +279,16 @@ if ($cnpj != "") {
                 }
                 this.value = value;
             });
-            
+
             // Mostrar/Ocultar senha
             const togglePassword = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('senha');
-            
+
             if (togglePassword && passwordInput) {
                 togglePassword.addEventListener('click', function() {
                     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                     passwordInput.setAttribute('type', type);
-                    
+
                     // Alternar entre os ícones de olho aberto e fechado
                     if (type === 'password') {
                         this.classList.remove('fa-eye-slash');
@@ -302,13 +299,13 @@ if ($cnpj != "") {
                     }
                 });
             }
-            
+
             // Validação do formulário
             const form = document.querySelector('form');
             form.addEventListener('submit', function(e) {
                 const cnpj = document.getElementById('cnpj').value;
                 const cnpjLimpo = cnpj.replace(/\D/g, '');
-                
+
                 if (cnpjLimpo.length !== 14) {
                     e.preventDefault();
                     alert('Por favor, insira um CNPJ válido com 14 dígitos.');
@@ -318,4 +315,5 @@ if ($cnpj != "") {
         });
     </script>
 </body>
+
 </html>

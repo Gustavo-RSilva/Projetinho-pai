@@ -321,94 +321,164 @@ $areasProfissionais = buscarAreasProfissionais($conn);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            // Inicializar carrossel
-            $('#featured-jobs-carousel').owlCarousel({
-                loop: true,
-                margin: 20,
-                nav: true,
-                dots: false,
-                responsive: {
-                    0: {
-                        items: 1
-                    },
-                    768: {
-                        items: 2
-                    },
-                    992: {
-                        items: 3
-                    }
+    // Função para mostrar seção e atualizar menu
+    function mostrarSecao(id) {
+        // Esconder todas as seções
+        document.querySelectorAll('.section').forEach(s => {
+            s.style.display = 'none';
+            s.classList.remove('active');
+        });
+        
+        // Mostrar a seção solicitada
+        const secao = document.getElementById(id);
+        if (secao) {
+            secao.style.display = 'block';
+            secao.classList.add('active');
+        }
+        
+        // Atualizar menu ativo
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Encontrar e ativar o link correspondente
+        const linkMap = {
+            'dashboard-section': 'mostrarDashboard',
+            'vagas-section': 'mostrarVagas',
+            'candidatos-section': 'mostrarCandidatos',
+            'empresa-section': 'mostrarEmpresa',
+            'relatorios-section': 'mostrarRelatorios',
+            'configuracoes-section': 'mostrarConfiguracoes'
+        };
+        
+        for (const [sectionId, functionName] of Object.entries(linkMap)) {
+            if (sectionId === id) {
+                const link = document.querySelector(`[onclick="${functionName}(event)"]`);
+                if (link) {
+                    link.classList.add('active');
                 }
-            });
-
-            // Busca dinâmica no banco
-            $('#search-input').on('input', function() {
-                const searchTerm = $(this).val().trim();
-                const location = $('#location-filter').val();
-
-                if (searchTerm.length === 0) {
-                    $('#search-suggestions').hide();
-                    return;
-                }
-
-                $.ajax({
-                    url: '../api/search.php',
-                    method: 'GET',
-                    data: {
-                        term: searchTerm,
-                        location: location || ""
-                    },
-
-                    success: function(response) {
-                        try {
-                            const suggestions = JSON.parse(response);
-                            showSuggestions(suggestions);
-                        } catch (e) {
-                            console.error("Erro:", e, response);
-                        }
-                    }
-                });
-            });
-
-            function showSuggestions(suggestions) {
-                if (!suggestions || suggestions.length === 0) {
-                    $('#search-suggestions').hide();
-                    return;
-                }
-                $('#search-suggestions').empty();
-                suggestions.slice(0, 5).forEach(s => {
-                    const item = $('<div class="suggestion-item"></div>')
-                        .text(s.titulo + " - " + s.empresa + " (" + s.localizacao + ")");
-                    item.on('click', function() {
-                        $('#search-input').val(s.titulo);
-                        $('#search-suggestions').hide();
-                        performSearch();
-                    });
-                    $('#search-suggestions').append(item);
-                });
-                $('#search-suggestions').show();
+                break;
             }
+        }
+        
+        // Atualizar URL com hash para manter a posição
+        const hashMap = {
+            'dashboard-section': 'dashboard',
+            'vagas-section': 'vagas',
+            'candidatos-section': 'candidatos',
+            'empresa-section': 'empresa',
+            'relatorios-section': 'relatorios',
+            'configuracoes-section': 'configuracoes'
+        };
+        
+        if (hashMap[id]) {
+            window.location.hash = hashMap[id];
+        }
+    }
 
-            // Fechar ao clicar fora
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('#search-input, #search-suggestions').length) {
-                    $('#search-suggestions').hide();
+    // Funções de navegação
+    function mostrarDashboard(e) {
+        if (e) e.preventDefault();
+        mostrarSecao('dashboard-section');
+    }
+
+    function mostrarVagas(e) {
+        if (e) e.preventDefault();
+        mostrarSecao('vagas-section');
+    }
+
+    function mostrarCandidatos(e) {
+        if (e) e.preventDefault();
+        mostrarSecao('candidatos-section');
+    }
+
+    function mostrarEmpresa(e) {
+        if (e) e.preventDefault();
+        mostrarSecao('empresa-section');
+    }
+
+    function mostrarRelatorios(e) {
+        if (e) e.preventDefault();
+        mostrarSecao('relatorios-section');
+    }
+
+    function mostrarConfiguracoes(e) {
+        if (e) e.preventDefault();
+        mostrarSecao('configuracoes-section');
+    }
+
+    // Verificar hash na URL ao carregar a página
+    document.addEventListener('DOMContentLoaded', function() {
+        const hash = window.location.hash.substring(1);
+        const sectionMap = {
+            'dashboard': 'dashboard-section',
+            'vagas': 'vagas-section',
+            'candidatos': 'candidatos-section',
+            'empresa': 'empresa-section',
+            'relatorios': 'relatorios-section',
+            'configuracoes': 'configuracoes-section'
+        };
+        
+        if (hash && sectionMap[hash]) {
+            mostrarSecao(sectionMap[hash]);
+        } else {
+            // Mostrar dashboard por padrão
+            mostrarSecao('dashboard-section');
+        }
+    });
+
+    // Interceptar envios de formulário para manter a seção
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            // Manter a seção atual no action do formulário
+            const secaoAtual = document.querySelector('.section.active');
+            if (secaoAtual && !form.action.includes('#')) {
+                const formAction = form.getAttribute('action') || '';
+                const sectionId = secaoAtual.id;
+                const sectionMap = {
+                    'dashboard-section': 'dashboard',
+                    'vagas-section': 'vagas',
+                    'candidatos-section': 'candidatos',
+                    'empresa-section': 'empresa',
+                    'relatorios-section': 'relatorios',
+                    'configuracoes-section': 'configuracoes'
+                };
+                
+                if (sectionMap[sectionId]) {
+                    form.setAttribute('action', formAction + '#' + sectionMap[sectionId]);
                 }
-            });
-
-            // Pesquisar manual
-            $('#search-button').on('click', performSearch);
-            $('#search-input').on('keypress', function(e) {
-                if (e.which === 13) performSearch();
-            });
-
-            function performSearch() {
-                const searchTerm = $('#search-input').val().trim();
-                const location = $('#location-filter').val();
-                window.location.href = `Pagina-vagas.php?search=${encodeURIComponent(searchTerm)}&location=${encodeURIComponent(location)}`;
             }
         });
-    </script>
+    });
+
+    // Chart.js (Relatórios)
+    const ctx = document.getElementById('chartCandidaturas');
+    if (ctx) {
+        const labels = <?= json_encode($labels ?? []) ?>;
+        const data = <?= json_encode($data   ?? []) ?>;
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Candidaturas por dia',
+                    data,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
 </body>
 
 </html>

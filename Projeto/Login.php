@@ -1,38 +1,36 @@
 <?php
 session_start();
-
 $erro = "";
-
 include_once("db/conexao.php");
 
-$email = isset($_POST["email"]) ? $_POST["email"] : "";
-$senha = isset($_POST["senha"]) ? $_POST["senha"] : "";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST["email"];
+    $senha = $_POST["senha"];
 
-if ($email != "") {
-    $sql = "SELECT * FROM usuarios WHERE email = ? and senha = MD5(?)";
+    if (!empty($email) && !empty($senha)) {
+        // Usar MD5 para compatibilidade com o banco
+        $senha_md5 = md5($senha);
 
-    $stmt = $conn->prepare($sql);
+        $sql = "SELECT * FROM usuarios WHERE email = ? AND senha = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $email, $senha_md5);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    $stmt->bind_param("ss", $email, $senha);
-
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        while ($linha = $result->fetch_object()) {
+        if ($result->num_rows > 0) {
+            $linha = $result->fetch_object();
             $_SESSION["id_usuario"] = $linha->id_usuario;
             $_SESSION["nome_completo"] = $linha->nome_completo;
             $_SESSION["email"] = $linha->email;
             header("Location: ./area-exclusiva/index.php");
             exit;
+        } else {
+            $erro = "<div class='alert alert-danger'>Usuário ou senha incorretos!</div>";
         }
     } else {
-        $erro = ("<div class='alert alert-danger'>
-            Usuário ou senha incorretos!</div>");
+        $erro = "<div class='alert alert-warning'>Preencha todos os campos!</div>";
     }
 }
-
 ?>
 
 
@@ -67,23 +65,27 @@ if ($email != "") {
             <button type="submit" class="btn cor w-100 py-3  rounded-5 ">Entrar</button>
         </div>
         <div class="dividir ">Ou entrar com</div>
-        
 
-                <div class="social2-button">
-                    <a href="login-google.php" class="btn social-btn btn-outline-danger">
-                        <img src="./img/icons8-google-logo-48.png" width="20" height="20" alt="Google">
-                        Google
-                    </a>
-                    <a href="#" class="btn social-btn btn-outline-primary">
-                        <img src="./img/linkedin.png" width="20" height="20" alt="LinkedIn">
-                        LinkedIn
-                    </a>
-                </div>
+
+        <div class="social2-button">
+            <a href="login-google.php" class="btn social-btn btn-outline-danger">
+                <img src="./img/icons8-google-logo-48.png" width="20" height="20" alt="Google">
+                Google
+            </a>
+            <a href="#" class="btn social-btn btn-outline-primary">
+                <img src="./img/linkedin.png" width="20" height="20" alt="LinkedIn">
+                LinkedIn
+            </a>
+        </div>
 
         </div>
         <div class="naotemconta">Não tem uma conta?
             <a href="./Criar-conta.html" class="btn criarc btn-outline-secondary w-100 ">Criar Conta </a></button>
         </div>
+        <div class="empresa-link text-center mt-3">
+            <p>É uma empresa? <a href="./area-empresa/login-empresa.php" class="text-decoration-none">Acesse aqui</a></p>
+        </div>
+
     </form>
 
 
