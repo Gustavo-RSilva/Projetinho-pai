@@ -1,59 +1,39 @@
 <?php
 session_start();
+// Recebe os dados JSON
+$input = json_decode(file_get_contents('php://input'), true);
+$token = $input['credential'] ?? '';
 
-require_once 'google-config.php';
-require_once 'db/conexao.php'; // Certifique-se de que o caminho esteja correto
+// Verifica o token no Google
+$clientId = '642053605341-651u695o9r1jur0tj65kdc2dvgdvs4pk.apps.googleusercontent.com'; // Substitua pelo seu CLIENT_ID
 
-if ($conn->connect_error) {
-    die("Erro de conexão: " . $conn->connect_error);
+if (!$token) {
+    echo json_encode(['success' => false, 'error' => 'Token não enviado.']);
+    exit;
 }
 
-if (isset($_GET['code'])) {
-    try {
-        $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+// Faz requisição para o endpoint de validação do Google
+$googleApiUrl = "https://oauth2.googleapis.com/tokeninfo?id_token=" . $token;
+$response = file_get_contents($googleApiUrl);
+$data = json_decode($response, true);
 
-        if (isset($token['error'])) {
-            throw new Exception("Erro ao obter token do Google: " . $token['error']);
-        }
-
-        $client->setAccessToken($token['access_token']);
-
-        $oauth = new Google_Service_Oauth2($client);
-        $googleUser = $oauth->userinfo->get();
-
-        $nome = $googleUser->name;
-        $email = $googleUser->email;
-        $foto = $googleUser->picture;
-
-        // Verifica se usuário existe
-        $stmt = $conn->prepare("INSERT INTO usuarios (nome_completo, email, foto_perfil) VALUES (?, ?, ?) 
-    ON DUPLICATE KEY UPDATE nome_completo = VALUES(nome_completo), foto_perfil = VALUES(foto_perfil)");
-        $stmt->bind_param("sss", $nome, $email, $foto);
-        $stmt->execute();
-        if ($stmt->error) {
-            throw new Exception("Erro ao inserir/atualizar usuário: " . $stmt->error);
-        }
-        // Corrigido: $_SESSION['nome_completo'] estava usando variável não definida
-        $_SESSION['nome_completo'] = $nome;
-        $_SESSION['email'] = $email;
-        $_SESSION['foto_perfil'] = $foto;
-
-        $stmt=  $conn->prepare("SELECT id_usuario FROM usuarios WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-               $result= $stmt->get_result();
-               if($result->num_rows > 0) {
-                while ($linha = $result->fetch_object()){
-                    $_SESSION["id_usuario"] = $linha->id_usuario;
-                    $usuarioLogado  = $linha->id_usuario;
-                }
-               }
-
-        header("Location: ./area-protec.php");
-        exit;
-    } catch (Exception $e) {
-        echo "Erro durante o login com o Google: " . $e->getMessage();
-    }
+// Verifica se o token é válido e emitido para seu Client ID
+if (isset($data['aud']) && $data['aud'] === $clientId) {
+    /*
+    echo json_encode([
+        'success' => true,
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'picture' => $data['picture']
+    ]);
+    */
+    echo json_encode([
+        'success' => true,
+        'id' => $codigo,
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'picture' => $data['picture']
+    ]);
 } else {
-    echo "Código de autorização do Google não recebido.";
+    echo json_encode(['success' => false, 'error' => 'Token inválido.']);
 }

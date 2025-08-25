@@ -42,8 +42,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
     <link rel="stylesheet" href="./css/Login.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+
+    <script>
+        function handleCredentialResponse(response) {
+            // Envia o token JWT para o servidor PHP
+            fetch('google_callback.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        credential: response.credential
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+
+                        document.getElementById("erroAlerta").innerHTML = `
+                                <p><strong>ID:</strong> ${data.id}</p>
+                                <p><strong>Nome:</strong> ${data.name}</p>
+                                <p><strong>Email:</strong> ${data.email}</p>
+                                <img src="${data.picture}" alt="Foto de perfil">
+                            `;
+                        document.getElementById("erroAlerta").classList.remove("d-none");
+                        window.location.href = "dashboard.php";
+                    } else {
+                        document.getElementById("erroAlerta").textContent = "Token inválido.";
+                        document.getElementById("erroAlerta").classList.remove("d-none");
+                    }
+                });
+        }
+    </script>
 </head>
 
 <body class="paginaLogin">
@@ -76,6 +109,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <img src="./img/linkedin.png" width="20" height="20" alt="LinkedIn">
                 LinkedIn
             </a>
+
+            <div id="g_id_onload"
+                data-client_id="642053605341-651u695o9r1jur0tj65kdc2dvgdvs4pk.apps.googleusercontent.com"
+                data-context="signin"
+                data-ux_mode="redirect"
+                data-login_uri="http://localhost/TIAM24/Projetinho-pai/Projeto/google_callback.php"
+                data-auto_prompt="false">
+            </div>
+
+            <!-- Botão do Google -->
+            <div class="g_id_signin"
+                data-type="standard"
+                data-shape="rectangular"
+                data-theme="outline"
+                data-text="signin_with"
+                data-size="large"
+                data-logo_alignment="left">
+            </div>
         </div>
 
         </div>
@@ -93,6 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
     crossorigin="anonymous"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const togglePassword = document.getElementById('togglePassword');

@@ -11,7 +11,7 @@ function enviarEmail($email, $codigo) {
         $mail->Host = 'smtp-mail.outlook.com'; 
         $mail->SMTPAuth = true;
         $mail->Username = 'gustavo.rsilva66@senacsp.edu.br'; // seu email
-        $mail->Password = '';      // senha de app
+        $mail->Password = '@Guchng10';      // senha de app
         $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
