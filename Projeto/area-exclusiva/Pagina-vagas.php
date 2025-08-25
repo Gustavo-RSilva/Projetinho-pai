@@ -18,32 +18,52 @@ if ($usuarioLogado) {
     $_SESSION['nome_completo'] = $usuario['nome_completo'];
 }
 
-// Função para buscar vagas
-function buscarVagas($conn, $filtro = '')
+// Configuração da paginação
+$vagas_por_pagina = 10; // Número de vagas por página
+$pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($pagina_atual < 1) $pagina_atual = 1;
+
+// Função para buscar vagas com paginação
+function buscarVagas($conn, $filtro = '', $pagina = 1, $vagas_por_pagina = 10)
 {
-    $sql = "SELECT v.*, e.nome as empresa_nome, e.url_logo 
+    $sql = "SELECT SQL_CALC_FOUND_ROWS v.*, e.nome as empresa_nome, e.url_logo 
             FROM vagas v 
             JOIN empresas e ON v.id_empresa = e.id_empresa 
             WHERE v.ativa = 1";
 
     if (!empty($filtro)) {
         $sql .= " AND (v.titulo LIKE ? OR e.nome LIKE ? OR v.localizacao LIKE ?)";
-        $filtro = "%$filtro%";
+        $filtro_like = "%$filtro%";
     }
 
-    $sql .= " ORDER BY v.data_publicacao DESC";
+    $sql .= " ORDER BY v.data_publicacao DESC LIMIT ?, ?";
+
+    $offset = ($pagina - 1) * $vagas_por_pagina;
 
     $stmt = $conn->prepare($sql);
     if (!empty($filtro)) {
-        $stmt->bind_param("sss", $filtro, $filtro, $filtro);
+        $stmt->bind_param("sssii", $filtro_like, $filtro_like, $filtro_like, $offset, $vagas_por_pagina);
+    } else {
+        $stmt->bind_param("ii", $offset, $vagas_por_pagina);
     }
+
     $stmt->execute();
-    return $stmt->get_result();
+    $result = $stmt->get_result();
+
+    // Obter o total de vagas (para paginação)
+    $total_vagas = $conn->query("SELECT FOUND_ROWS()")->fetch_row()[0];
+
+    return array('result' => $result, 'total' => $total_vagas);
 }
 
 // Processar pesquisa
 $filtro = isset($_GET['search']) ? trim($_GET['search']) : '';
-$vagas = buscarVagas($conn, $filtro);
+$resultado_vagas = buscarVagas($conn, $filtro, $pagina_atual, $vagas_por_pagina);
+$vagas = $resultado_vagas['result'];
+$total_vagas = $resultado_vagas['total'];
+
+// Calcular o total de páginas
+$total_paginas = ceil($total_vagas / $vagas_por_pagina);
 
 // Se uma vaga específica foi selecionada
 $vagaSelecionada = null;
@@ -57,7 +77,14 @@ if (isset($_GET['id_vaga'])) {
     $stmt->bind_param("i", $id_vaga);
     $stmt->execute();
     $vagaSelecionada = $stmt->get_result()->fetch_assoc();
+    
+    // Se a vaga não for encontrada, redirecionar para evitar erro
+    if (!$vagaSelecionada) {
+        header("Location: Pagina-vagas.php?search=" . urlencode($filtro) . "&pagina=" . $pagina_atual);
+        exit();
+    }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -107,6 +134,17 @@ if (isset($_GET['id_vaga'])) {
 
         .list-group-item:hover {
             background-color: #f8f9fa;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .page-info {
+            text-align: center;
+            margin-top: 10px;
+            color: #6c757d;
         }
     </style>
 </head>
@@ -213,14 +251,14 @@ if (isset($_GET['id_vaga'])) {
             </ul>
             <div class="auth-buttons">
                 <?php if ($usuarioLogado): ?>
-                    <a href="../logout2.php">
+                    <a href="logout2.php">
                         <button type="button" class="btn btn-entrar" tabindex="0">Sair</button>
                     </a>
                 <?php else: ?>
-                    <a href="Login.php">
+                    <a href="../Login.php">
                         <button type="button" class="btn btn-entrar" tabindex="0">Entrar</button>
                     </a>
-                    <a href="Crie-conta.php">
+                    <a href="../Crie-conta.php">
                         <button type="button" class="btn btn-cadastrar" tabindex="0">Cadastrar</button>
                     </a>
                 <?php endif; ?>
@@ -233,6 +271,7 @@ if (isset($_GET['id_vaga'])) {
             <!-- Lista de vagas -->
             <div class="col-md-4">
                 <form method="GET" action="Pagina-vagas.php" class="mb-3">
+                    <input type="hidden" name="pagina" value="1">
                     <div class="vaga-search-wrapper">
                         <div class="vaga-search-input">
                             <span class="material-icons" aria-hidden="true">search</span>
@@ -246,7 +285,7 @@ if (isset($_GET['id_vaga'])) {
                 <div class="list-group" id="jobList">
                     <?php if ($vagas->num_rows > 0): ?>
                         <?php while ($vaga = $vagas->fetch_assoc()): ?>
-                            <a href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&id_vaga=<?php echo $vaga['id_vaga']; ?>"
+                            <a href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&id_vaga=<?php echo $vaga['id_vaga']; ?>&pagina=<?php echo $pagina_atual; ?>"
                                 class="list-group-item list-group-item-action d-flex gap-3 align-items-start <?php echo ($vagaSelecionada && $vagaSelecionada['id_vaga'] == $vaga['id_vaga']) ? 'active' : ''; ?>">
                                 <img src="<?php echo htmlspecialchars($vaga['url_logo']); ?>" alt="<?php echo htmlspecialchars($vaga['empresa_nome']); ?>" width="48" height="48" style="object-fit: contain;">
                                 <div class="text-start">
@@ -264,6 +303,59 @@ if (isset($_GET['id_vaga'])) {
                         <div class="alert alert-info">Nenhuma vaga encontrada.</div>
                     <?php endif; ?>
                 </div>
+
+                <!-- Paginação -->
+                <?php if ($total_paginas > 1): ?>
+                    <nav aria-label="Navegação de páginas de vagas">
+                        <ul class="pagination">
+                            <?php if ($pagina_atual > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&pagina=<?php echo $pagina_atual - 1; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>" aria-label="Página anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-hidden="true">&laquo;</span>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php
+                            // Exibir até 5 páginas ao redor da página atual
+                            $inicio = max(1, $pagina_atual - 2);
+                            $fim = min($total_paginas, $inicio + 4);
+
+                            // Ajustar se estiver no final
+                            if ($fim - $inicio < 4) {
+                                $inicio = max(1, $fim - 4);
+                            }
+
+                            for ($i = $inicio; $i <= $fim; $i++):
+                            ?>
+                                <li class="page-item <?php echo ($i == $pagina_atual) ? 'active' : ''; ?>">
+                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&pagina=<?php echo $i; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>">
+                                        <?php echo $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <?php if ($pagina_atual < $total_paginas): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&pagina=<?php echo $pagina_atual + 1; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>" aria-label="Próxima página">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-hidden="true">&raquo;</span>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                    <div class="page-info">
+                        Exibindo <?php echo $vagas->num_rows; ?> de <?php echo $total_vagas; ?> vagas
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- Detalhes da vaga -->
@@ -372,6 +464,12 @@ if (isset($_GET['id_vaga'])) {
                     const texto = $(this).text().toLowerCase();
                     $(this).toggle(texto.includes(termo));
                 });
+            });
+            
+            // Adicionar evento de submit para garantir que a pesquisa funcione corretamente
+            $('form').on('submit', function() {
+                // Garantir que a página seja resetada para 1 ao pesquisar
+                $('input[name="pagina"]').val(1);
             });
         });
     </script>
