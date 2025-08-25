@@ -2,6 +2,7 @@
 session_start();
 include_once("../db/conexao.php");
 
+// Verifica login
 $usuarioLogado = isset($_SESSION['id_usuario']) && !empty($_SESSION['email']);
 $usuario = [];
 
@@ -12,8 +13,9 @@ if ($usuarioLogado) {
     $stmt->bind_param("i", $id_usuario);
     $stmt->execute();
     $resultado = $stmt->get_result();
-    $usuario = $resultado->fetch_assoc();  // <-- Agora você tem acesso à foto
+    $usuario = $resultado->fetch_assoc();
 }
+
 // Função para buscar vagas em destaque
 function buscarVagasDestaque($conn)
 {
@@ -25,8 +27,16 @@ function buscarVagasDestaque($conn)
             LIMIT 5";
 
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("Erro prepare: " . $conn->error);
+    }
+
     $stmt->execute();
-    return $stmt->get_result();
+    $result = $stmt->get_result();
+    if (!$result) {
+        die("Erro get_result: " . $stmt->error);
+    }
+    return $result;
 }
 
 // Função para buscar áreas profissionais
@@ -38,8 +48,16 @@ function buscarAreasProfissionais($conn)
             LIMIT 6";
 
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("Erro prepare: " . $conn->error);
+    }
+
     $stmt->execute();
-    return $stmt->get_result();
+    $result = $stmt->get_result();
+    if (!$result) {
+        die("Erro get_result: " . $stmt->error);
+    }
+    return $result;
 }
 
 // Buscar dados
@@ -187,15 +205,14 @@ $areasProfissionais = buscarAreasProfissionais($conn);
 
                 <!-- Barra de pesquisa -->
                 <div class="search-container">
-                    <div class="search-bar">
+                    <form method="GET" action="Pagina-vagas.php" class="search-bar">
                         <div class="search-section">
                             <span class="material-icons">search</span>
-                            <input type="text" id="search-input" placeholder="Pesquisar por cargo, empresa ou palavra-chave..." autocomplete="off">
-                            <div id="search-suggestions" class="suggestions-dropdown"></div>
+                            <input type="text" name="q" placeholder="Pesquisar por cargo, empresa ou palavra-chave..." autocomplete="off">
                         </div>
                         <div class="search-section separator">
                             <span class="material-icons">location_on</span>
-                            <select id="location-filter" class="location-select">
+                            <select name="local" class="location-select">
                                 <option value="">Todas localizações</option>
                                 <option value="Remoto">Remoto</option>
                                 <option value="São Paulo">São Paulo</option>
@@ -204,10 +221,11 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                                 <option value="Porto Alegre">Porto Alegre</option>
                             </select>
                         </div>
-                        <button class="btn-search" id="search-button">Pesquisar</button>
-                    </div>
+                        <button type="submit" class="btn-search">Pesquisar</button>
+                    </form>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 
@@ -303,12 +321,13 @@ $areasProfissionais = buscarAreasProfissionais($conn);
             <div class="footer-section rightredes">
                 <h4 class="footer-title">Redes Sociais</h4>
                 <div class="social-buttons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn linkedin" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-btn whatsapp" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
+        </div>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2025 Contrata. Todos os direitos reservados.</p>
@@ -321,164 +340,184 @@ $areasProfissionais = buscarAreasProfissionais($conn);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
     <script>
-    // Função para mostrar seção e atualizar menu
-    function mostrarSecao(id) {
-        // Esconder todas as seções
-        document.querySelectorAll('.section').forEach(s => {
-            s.style.display = 'none';
-            s.classList.remove('active');
-        });
-        
-        // Mostrar a seção solicitada
-        const secao = document.getElementById(id);
-        if (secao) {
-            secao.style.display = 'block';
-            secao.classList.add('active');
-        }
-        
-        // Atualizar menu ativo
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        
-        // Encontrar e ativar o link correspondente
-        const linkMap = {
-            'dashboard-section': 'mostrarDashboard',
-            'vagas-section': 'mostrarVagas',
-            'candidatos-section': 'mostrarCandidatos',
-            'empresa-section': 'mostrarEmpresa',
-            'relatorios-section': 'mostrarRelatorios',
-            'configuracoes-section': 'mostrarConfiguracoes'
-        };
-        
-        for (const [sectionId, functionName] of Object.entries(linkMap)) {
-            if (sectionId === id) {
-                const link = document.querySelector(`[onclick="${functionName}(event)"]`);
-                if (link) {
-                    link.classList.add('active');
-                }
-                break;
-            }
-        }
-        
-        // Atualizar URL com hash para manter a posição
-        const hashMap = {
-            'dashboard-section': 'dashboard',
-            'vagas-section': 'vagas',
-            'candidatos-section': 'candidatos',
-            'empresa-section': 'empresa',
-            'relatorios-section': 'relatorios',
-            'configuracoes-section': 'configuracoes'
-        };
-        
-        if (hashMap[id]) {
-            window.location.hash = hashMap[id];
-        }
-    }
-
-    // Funções de navegação
-    function mostrarDashboard(e) {
-        if (e) e.preventDefault();
-        mostrarSecao('dashboard-section');
-    }
-
-    function mostrarVagas(e) {
-        if (e) e.preventDefault();
-        mostrarSecao('vagas-section');
-    }
-
-    function mostrarCandidatos(e) {
-        if (e) e.preventDefault();
-        mostrarSecao('candidatos-section');
-    }
-
-    function mostrarEmpresa(e) {
-        if (e) e.preventDefault();
-        mostrarSecao('empresa-section');
-    }
-
-    function mostrarRelatorios(e) {
-        if (e) e.preventDefault();
-        mostrarSecao('relatorios-section');
-    }
-
-    function mostrarConfiguracoes(e) {
-        if (e) e.preventDefault();
-        mostrarSecao('configuracoes-section');
-    }
-
-    // Verificar hash na URL ao carregar a página
-    document.addEventListener('DOMContentLoaded', function() {
-        const hash = window.location.hash.substring(1);
-        const sectionMap = {
-            'dashboard': 'dashboard-section',
-            'vagas': 'vagas-section',
-            'candidatos': 'candidatos-section',
-            'empresa': 'empresa-section',
-            'relatorios': 'relatorios-section',
-            'configuracoes': 'configuracoes-section'
-        };
-        
-        if (hash && sectionMap[hash]) {
-            mostrarSecao(sectionMap[hash]);
-        } else {
-            // Mostrar dashboard por padrão
-            mostrarSecao('dashboard-section');
-        }
-    });
-
-    // Interceptar envios de formulário para manter a seção
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            // Manter a seção atual no action do formulário
-            const secaoAtual = document.querySelector('.section.active');
-            if (secaoAtual && !form.action.includes('#')) {
-                const formAction = form.getAttribute('action') || '';
-                const sectionId = secaoAtual.id;
-                const sectionMap = {
-                    'dashboard-section': 'dashboard',
-                    'vagas-section': 'vagas',
-                    'candidatos-section': 'candidatos',
-                    'empresa-section': 'empresa',
-                    'relatorios-section': 'relatorios',
-                    'configuracoes-section': 'configuracoes'
-                };
-                
-                if (sectionMap[sectionId]) {
-                    form.setAttribute('action', formAction + '#' + sectionMap[sectionId]);
-                }
-            }
-        });
-    });
-
-    // Chart.js (Relatórios)
-    const ctx = document.getElementById('chartCandidaturas');
-    if (ctx) {
-        const labels = <?= json_encode($labels ?? []) ?>;
-        const data = <?= json_encode($data   ?? []) ?>;
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [{
-                    label: 'Candidaturas por dia',
-                    data,
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
+        $(document).ready(function() {
+            // Inicializar o carousel de vagas em destaque
+            $("#featured-jobs-carousel").owlCarousel({
+                loop: true,
+                margin: 20,
+                nav: true,
+                dots: false,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    600: {
+                        items: 2
+                    },
+                    1000: {
+                        items: 3
                     }
                 }
+            });
+        });
+        // Função para mostrar seção e atualizar menu
+        function mostrarSecao(id) {
+            // Esconder todas as seções
+            document.querySelectorAll('.section').forEach(s => {
+                s.style.display = 'none';
+                s.classList.remove('active');
+            });
+
+            // Mostrar a seção solicitada
+            const secao = document.getElementById(id);
+            if (secao) {
+                secao.style.display = 'block';
+                secao.classList.add('active');
+            }
+
+            // Atualizar menu ativo
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Encontrar e ativar o link correspondente
+            const linkMap = {
+                'dashboard-section': 'mostrarDashboard',
+                'vagas-section': 'mostrarVagas',
+                'candidatos-section': 'mostrarCandidatos',
+                'empresa-section': 'mostrarEmpresa',
+                'relatorios-section': 'mostrarRelatorios',
+                'configuracoes-section': 'mostrarConfiguracoes'
+            };
+
+            for (const [sectionId, functionName] of Object.entries(linkMap)) {
+                if (sectionId === id) {
+                    const link = document.querySelector(`[onclick="${functionName}(event)"]`);
+                    if (link) {
+                        link.classList.add('active');
+                    }
+                    break;
+                }
+            }
+
+            // Atualizar URL com hash para manter a posição
+            const hashMap = {
+                'dashboard-section': 'dashboard',
+                'vagas-section': 'vagas',
+                'candidatos-section': 'candidatos',
+                'empresa-section': 'empresa',
+                'relatorios-section': 'relatorios',
+                'configuracoes-section': 'configuracoes'
+            };
+
+            if (hashMap[id]) {
+                window.location.hash = hashMap[id];
+            }
+        }
+
+        // Funções de navegação
+        function mostrarDashboard(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('dashboard-section');
+        }
+
+        function mostrarVagas(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('vagas-section');
+        }
+
+        function mostrarCandidatos(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('candidatos-section');
+        }
+
+        function mostrarEmpresa(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('empresa-section');
+        }
+
+        function mostrarRelatorios(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('relatorios-section');
+        }
+
+        function mostrarConfiguracoes(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('configuracoes-section');
+        }
+
+        // Verificar hash na URL ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash.substring(1);
+            const sectionMap = {
+                'dashboard': 'dashboard-section',
+                'vagas': 'vagas-section',
+                'candidatos': 'candidatos-section',
+                'empresa': 'empresa-section',
+                'relatorios': 'relatorios-section',
+                'configuracoes': 'configuracoes-section'
+            };
+
+            if (hash && sectionMap[hash]) {
+                mostrarSecao(sectionMap[hash]);
+            } else {
+                // Mostrar dashboard por padrão
+                mostrarSecao('dashboard-section');
             }
         });
-    }
-</script>
+
+        // Interceptar envios de formulário para manter a seção
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                // Manter a seção atual no action do formulário
+                const secaoAtual = document.querySelector('.section.active');
+                if (secaoAtual && !form.action.includes('#')) {
+                    const formAction = form.getAttribute('action') || '';
+                    const sectionId = secaoAtual.id;
+                    const sectionMap = {
+                        'dashboard-section': 'dashboard',
+                        'vagas-section': 'vagas',
+                        'candidatos-section': 'candidatos',
+                        'empresa-section': 'empresa',
+                        'relatorios-section': 'relatorios',
+                        'configuracoes-section': 'configuracoes'
+                    };
+
+                    if (sectionMap[sectionId]) {
+                        form.setAttribute('action', formAction + '#' + sectionMap[sectionId]);
+                    }
+                }
+            });
+        });
+
+        // Chart.js (Relatórios)
+        const ctx = document.getElementById('chartCandidaturas');
+        if (ctx) {
+            const labels = <?= json_encode($labels ?? []) ?>;
+            const data = <?= json_encode($data   ?? []) ?>;
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Candidaturas por dia',
+                        data,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

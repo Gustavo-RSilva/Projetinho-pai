@@ -411,3 +411,17 @@
     font-size: 0.875rem;
     margin-top: 0.25rem;
 }
+
+.navbar-brand img {
+    height: 40px;
+}
+
+.navbar .dropdown-toggle img {
+    border: 1px solid #dee2e6;
+}
+
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        padding-top: 1rem;
+    }
+}

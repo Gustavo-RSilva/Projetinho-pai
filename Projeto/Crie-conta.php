@@ -33,26 +33,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($_FILES['foto']['name'])) {
                 // 1. Definir caminho base
                 $pastaBase = realpath(dirname(__FILE__) . './img/foto-perfil/');
-                
+
                 // 2. Criar pasta base se não existir
                 if (!file_exists($pastaBase)) {
                     mkdir($pastaBase, 0777, true);
                 }
-                
+
                 // 3. Criar pasta única para o usuário
                 $pastaUsuario = uniqid();
                 $caminhoPastaUsuario = $pastaBase . '/' . $pastaUsuario;
-                
+
                 if (!file_exists($caminhoPastaUsuario)) {
                     mkdir($caminhoPastaUsuario, 0777);
                 }
-                
+
                 // 4. Processar o arquivo
                 $nomeArquivo = $_FILES['foto']['name'];
                 $extensao = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
                 $nomeFoto = 'perfil.' . $extensao;
                 $caminhoCompleto = $caminhoPastaUsuario . '/' . $nomeFoto;
-                
+
                 // 5. Verificar e mover o arquivo
                 $check = getimagesize($_FILES['foto']['tmp_name']);
                 if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png', 'gif'])) {
@@ -70,19 +70,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (empty($erro)) {
                 // Hash da senha
                 $senha_hash = md5($senha);
-                
+
                 // Inserir no banco de dados
                 $sql = "INSERT INTO usuarios (nome_completo, email, senha, foto_perfil) VALUES (?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("ssss", $nome, $email, $senha_hash, $foto);
-                
+
                 if ($stmt->execute()) {
                     // Configurar sessão
                     $_SESSION['id_usuario'] = $stmt->insert_id;
                     $_SESSION['email'] = $email;
                     $_SESSION['nome_completo'] = $nome;
                     $_SESSION['foto_perfil'] = $foto;
-                    
+
                     header("Location: area-exclusiva/index.php");
                     exit();
                 } else {
@@ -180,6 +180,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="mt-3 text-center">
                     Já tem uma conta? <a href="Login.php">Faça login</a>
+                </div>
+                <div class="empresa-link text-center mt-3">
+                    <p>É uma empresa? <a href="./area-empresa/criar-conta-emp.php" class="text-decoration-none">Acesse aqui</a></p>
                 </div>
             </form>
         </div>
