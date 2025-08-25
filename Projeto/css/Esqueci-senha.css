@@ -1,4 +1,37 @@
 
+.input-with-icon {
+    position: relative;
+    width: 100%; /* mantém o tamanho original do input */
+}
+.input-with-icon {
+    position: relative;
+    width: 100%; /* mantém o tamanho original do input */
+}
+
+.input-with-icon input {
+    padding-right: 40px; /* espaço pro ícone não ficar em cima do texto */
+}
+
+.input-with-icon .eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%); /* centraliza verticalmente */
+    cursor: pointer;
+    width: 20px;   /* controla o tamanho do ícone */
+    height: 20px;
+    opacity: 0.7;
+    transition: opacity 0.2s
+}
+
+.input-with-icon .eye-icon:hover {
+    opacity: 1;
+}
+.input-with-icon input {
+    width: 100%; /* ocupa toda a largura do container */
+    padding-right: 40px; /* espaço para o ícone à direita */
+}
+
         .password-container {
             background: white;
             padding: 2rem;

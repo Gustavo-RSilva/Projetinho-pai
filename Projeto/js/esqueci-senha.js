@@ -1,3 +1,29 @@
+document.addEventListener('DOMContentLoaded', function() {
+  const toggles = document.querySelectorAll('.toggle-password');
+
+  toggles.forEach(function(toggle) {
+      toggle.addEventListener('click', function() {
+          const input = this.previousElementSibling; // pega o input antes do ícone
+          if (input && input.classList.contains('password-input')) {
+              const type = input.type === 'password' ? 'text' : 'password';
+              input.type = type;
+
+              // Alterna ícone
+              if (type === 'password') {
+                  this.src = './img/view.png';
+                  this.alt = 'Mostrar senha';
+                  this.title = 'Mostrar senha';
+              } else {
+                  this.src = './img/hidden.png';
+                  this.alt = 'Ocultar senha';
+                  this.title = 'Ocultar senha';
+              }
+          }
+      });
+  });
+});
+
+
 let currentEmail = '';
 
 function goToStep(step) {
@@ -104,7 +130,7 @@ document.getElementById('btnChangePassword').addEventListener('click', async () 
 
   if (data.status === 'ok') {
     document.getElementById('successMessage').classList.remove('d-none');
-    setTimeout(() => window.location.href = '../area-exclusiva/pag-minha-conta.php', 3000);
+    setTimeout(() => window.location.href = '/../area-exclusiva/pag-minha-conta.php', 3000);
   } else {
     alert(data.msg || 'Erro ao atualizar senha');
   }
