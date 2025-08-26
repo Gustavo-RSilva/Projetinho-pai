@@ -16,6 +16,8 @@ if ($usuarioLogado) {
     $usuario = $resultado->fetch_assoc();
 }
 
+
+
 // Função para buscar vagas em destaque
 function buscarVagasDestaque($conn)
 {
@@ -208,7 +210,10 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                     <form method="GET" action="Pagina-vagas.php" class="search-bar">
                         <div class="search-section">
                             <span class="material-icons">search</span>
-                            <input type="text" name="q" placeholder="Pesquisar por cargo, empresa ou palavra-chave..." autocomplete="off">
+                            <input type="text" id="search-input" name="search"
+                                placeholder="Pesquisar por cargo, empresa ou palavra-chave..."
+                                autocomplete="off">
+                            <div id="suggestions-container" class="suggestions-dropdown"></div>
                         </div>
                         <div class="search-section separator">
                             <span class="material-icons">location_on</span>
@@ -517,6 +522,87 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                 }
             });
         }
+    </script>
+    <script>
+        // Buscar sugestões em tempo real - CORRIGIDO
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const suggestionsContainer = document.getElementById('suggestions-container');
+            let timeoutId;
+            let sugestaoAtual = -1;
+
+            searchInput.addEventListener('input', function() {
+                const termo = this.value.trim();
+                clearTimeout(timeoutId);
+
+                if (termo === '') {
+                    suggestionsContainer.style.display = 'none';
+                    return;
+                }
+
+                timeoutId = setTimeout(() => {
+                    fetch(`buscar_sugestoes.php?termo=${encodeURIComponent(termo)}`)
+                        .then(response => response.json())
+                        .then(sugestoes => {
+                            suggestionsContainer.innerHTML = '';
+                            if (sugestoes.length > 0) {
+                                sugestoes.forEach(sugestao => {
+                                    const div = document.createElement('div');
+                                    div.className = 'suggestion-item';
+                                    div.textContent = sugestao;
+                                    div.addEventListener('click', function() {
+                                        searchInput.value = sugestao;
+                                        suggestionsContainer.style.display = 'none';
+                                        // searchInput.form.submit(); // opcional
+                                    });
+                                    suggestionsContainer.appendChild(div);
+                                });
+                                suggestionsContainer.style.display = 'block';
+                            } else {
+                                suggestionsContainer.style.display = 'none';
+                            }
+                        })
+                        .catch(() => suggestionsContainer.style.display = 'none');
+                }, 300);
+            });
+
+            // fechar ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            });
+
+            // navegação com teclado
+            searchInput.addEventListener('keydown', function(e) {
+                const sugestoes = suggestionsContainer.querySelectorAll('.suggestion-item');
+                if (sugestoes.length === 0) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    sugestaoAtual = (sugestaoAtual + 1) % sugestoes.length;
+                    updateActiveSuggestion(sugestoes, sugestaoAtual);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    sugestaoAtual = sugestaoAtual <= 0 ? sugestoes.length - 1 : sugestaoAtual - 1;
+                    updateActiveSuggestion(sugestoes, sugestaoAtual);
+                } else if (e.key === 'Enter' && sugestaoAtual !== -1) {
+                    e.preventDefault();
+                    searchInput.value = sugestoes[sugestaoAtual].textContent;
+                    suggestionsContainer.style.display = 'none';
+                    searchInput.form.submit();
+                }
+            });
+
+            function updateActiveSuggestion(sugestoes, index) {
+                sugestoes.forEach(s => s.classList.remove('active'));
+                sugestoes[index].classList.add('active');
+                sugestoes[index].scrollIntoView({
+                    block: 'nearest'
+                });
+                searchInput.value = sugestoes[index].textContent;
+            }
+        });
     </script>
 </body>
 

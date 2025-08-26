@@ -4,29 +4,27 @@ include_once("../db/conexao.php");
 
 header('Content-Type: application/json');
 
-if (isset($_POST['termo']) && strlen(trim($_POST['termo'])) > 2) {
-    $termo = trim($_POST['termo']) . "%";
+if (isset($_GET['termo'])) {
+    $termo = $_GET['termo'];
     
-    try {
-        $sql = "SELECT DISTINCT cargo FROM salarios_referencia 
-                WHERE cargo LIKE ? 
-                ORDER BY cargo 
-                LIMIT 5";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $termo);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        $sugestoes = [];
-        while ($row = $result->fetch_assoc()) {
-            $sugestoes[] = $row['cargo'];
-        }
-        
-        echo json_encode($sugestoes);
-    } catch (Exception $e) {
-        echo json_encode(['error' => $e->getMessage()]);
+    // Buscar sugestões de vagas com base no termo
+    $sql = "SELECT titulo FROM vagas 
+            WHERE ativa = 1 AND data_expiracao >= CURDATE() 
+            AND titulo LIKE ? 
+            GROUP BY titulo 
+            LIMIT 5";
+    
+    $stmt = $conn->prepare($sql);
+    $termoLike = "%" . $termo . "%";
+    $stmt->bind_param("s", $termoLike);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $sugestoes = [];
+    while ($row = $result->fetch_assoc()) {
+        $sugestoes[] = $row['titulo'];
     }
-} else {
-    echo json_encode([]);
+    
+    echo json_encode($sugestoes);
 }
 ?>

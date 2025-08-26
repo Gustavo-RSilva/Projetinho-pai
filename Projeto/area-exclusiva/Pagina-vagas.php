@@ -5,6 +5,7 @@ include_once("../db/conexao.php");
 $usuarioLogado = isset($_SESSION['id_usuario']);
 $usuario = null;
 
+
 if ($usuarioLogado) {
     $id_usuario = $_SESSION['id_usuario'];
     $sql = "SELECT nome_completo, foto_perfil FROM usuarios WHERE id_usuario = ?";
@@ -24,27 +25,40 @@ $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 if ($pagina_atual < 1) $pagina_atual = 1;
 
 // Função para buscar vagas com paginação
-function buscarVagas($conn, $filtro = '', $pagina = 1, $vagas_por_pagina = 10)
+function buscarVagas($conn, $filtro = '', $localizacao = '', $pagina = 1, $vagas_por_pagina = 10)
 {
     $sql = "SELECT SQL_CALC_FOUND_ROWS v.*, e.nome as empresa_nome, e.url_logo 
             FROM vagas v 
             JOIN empresas e ON v.id_empresa = e.id_empresa 
             WHERE v.ativa = 1";
 
+    $params = array();
+    $types = "";
+
     if (!empty($filtro)) {
         $sql .= " AND (v.titulo LIKE ? OR e.nome LIKE ? OR v.localizacao LIKE ?)";
         $filtro_like = "%$filtro%";
+        $params = array_merge($params, [$filtro_like, $filtro_like, $filtro_like]);
+        $types .= "sss";
+    }
+
+    if (!empty($localizacao)) {
+        $sql .= " AND v.localizacao LIKE ?";
+        $local_like = "%$localizacao%";
+        $params[] = $local_like;
+        $types .= "s";
     }
 
     $sql .= " ORDER BY v.data_publicacao DESC LIMIT ?, ?";
 
     $offset = ($pagina - 1) * $vagas_por_pagina;
+    $params = array_merge($params, [$offset, $vagas_por_pagina]);
+    $types .= "ii";
 
     $stmt = $conn->prepare($sql);
-    if (!empty($filtro)) {
-        $stmt->bind_param("sssii", $filtro_like, $filtro_like, $filtro_like, $offset, $vagas_por_pagina);
-    } else {
-        $stmt->bind_param("ii", $offset, $vagas_por_pagina);
+
+    if (!empty($types)) {
+        $stmt->bind_param($types, ...$params);
     }
 
     $stmt->execute();
@@ -58,7 +72,8 @@ function buscarVagas($conn, $filtro = '', $pagina = 1, $vagas_por_pagina = 10)
 
 // Processar pesquisa
 $filtro = isset($_GET['search']) ? trim($_GET['search']) : '';
-$resultado_vagas = buscarVagas($conn, $filtro, $pagina_atual, $vagas_por_pagina);
+$localizacao = isset($_GET['local']) ? trim($_GET['local']) : '';
+$resultado_vagas = buscarVagas($conn, $filtro, $localizacao, $pagina_atual, $vagas_por_pagina);
 $vagas = $resultado_vagas['result'];
 $total_vagas = $resultado_vagas['total'];
 
@@ -77,10 +92,10 @@ if (isset($_GET['id_vaga'])) {
     $stmt->bind_param("i", $id_vaga);
     $stmt->execute();
     $vagaSelecionada = $stmt->get_result()->fetch_assoc();
-    
+
     // Se a vaga não for encontrada, redirecionar para evitar erro
     if (!$vagaSelecionada) {
-        header("Location: Pagina-vagas.php?search=" . urlencode($filtro) . "&pagina=" . $pagina_atual);
+        header("Location: Pagina-vagas.php?search=" . urlencode($filtro) . "&local=" . urlencode($localizacao) . "&pagina=" . $pagina_atual);
         exit();
     }
 }
@@ -275,9 +290,21 @@ if (isset($_GET['id_vaga'])) {
                     <div class="vaga-search-wrapper">
                         <div class="vaga-search-input">
                             <span class="material-icons" aria-hidden="true">search</span>
-                            <input type="search" name="search" placeholder="Buscar vaga, empresa ou local..."
-                                value="<?php echo htmlspecialchars($filtro); ?>" />
+                            <input type="search" id="searchInput" name="search"
+                                placeholder="Buscar vaga, empresa ou local..."
+                                value="<?php echo htmlspecialchars($filtro); ?>" autocomplete="off" />
                         </div>
+                        <div id="suggestions" class="suggestions-box"></div>
+                    </div>
+                    <div class="mt-2">
+                        <select name="local" class="form-select">
+                            <option value="">Todas as localizações</option>
+                            <option value="Remoto" <?php echo ($localizacao == 'Remoto') ? 'selected' : ''; ?>>Remoto</option>
+                            <option value="São Paulo" <?php echo ($localizacao == 'São Paulo') ? 'selected' : ''; ?>>São Paulo</option>
+                            <option value="Rio de Janeiro" <?php echo ($localizacao == 'Rio de Janeiro') ? 'selected' : ''; ?>>Rio de Janeiro</option>
+                            <option value="Belo Horizonte" <?php echo ($localizacao == 'Belo Horizonte') ? 'selected' : ''; ?>>Belo Horizonte</option>
+                            <option value="Porto Alegre" <?php echo ($localizacao == 'Porto Alegre') ? 'selected' : ''; ?>>Porto Alegre</option>
+                        </select>
                     </div>
                 </form>
 
@@ -285,7 +312,7 @@ if (isset($_GET['id_vaga'])) {
                 <div class="list-group" id="jobList">
                     <?php if ($vagas->num_rows > 0): ?>
                         <?php while ($vaga = $vagas->fetch_assoc()): ?>
-                            <a href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&id_vaga=<?php echo $vaga['id_vaga']; ?>&pagina=<?php echo $pagina_atual; ?>"
+                            <a href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&local=<?php echo urlencode($localizacao); ?>&id_vaga=<?php echo $vaga['id_vaga']; ?>&pagina=<?php echo $pagina_atual; ?>"
                                 class="list-group-item list-group-item-action d-flex gap-3 align-items-start <?php echo ($vagaSelecionada && $vagaSelecionada['id_vaga'] == $vaga['id_vaga']) ? 'active' : ''; ?>">
                                 <img src="<?php echo htmlspecialchars($vaga['url_logo']); ?>" alt="<?php echo htmlspecialchars($vaga['empresa_nome']); ?>" width="48" height="48" style="object-fit: contain;">
                                 <div class="text-start">
@@ -310,7 +337,7 @@ if (isset($_GET['id_vaga'])) {
                         <ul class="pagination">
                             <?php if ($pagina_atual > 1): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&pagina=<?php echo $pagina_atual - 1; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>" aria-label="Página anterior">
+                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&local=<?php echo urlencode($localizacao); ?>&pagina=<?php echo $pagina_atual - 1; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>" aria-label="Página anterior">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
@@ -333,7 +360,7 @@ if (isset($_GET['id_vaga'])) {
                             for ($i = $inicio; $i <= $fim; $i++):
                             ?>
                                 <li class="page-item <?php echo ($i == $pagina_atual) ? 'active' : ''; ?>">
-                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&pagina=<?php echo $i; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>">
+                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&local=<?php echo urlencode($localizacao); ?>&pagina=<?php echo $i; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>">
                                         <?php echo $i; ?>
                                     </a>
                                 </li>
@@ -341,7 +368,7 @@ if (isset($_GET['id_vaga'])) {
 
                             <?php if ($pagina_atual < $total_paginas): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&pagina=<?php echo $pagina_atual + 1; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>" aria-label="Próxima página">
+                                    <a class="page-link" href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&local=<?php echo urlencode($localizacao); ?>&pagina=<?php echo $pagina_atual + 1; ?><?php echo $vagaSelecionada ? '&id_vaga=' . $vagaSelecionada['id_vaga'] : ''; ?>" aria-label="Próxima página">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -424,7 +451,7 @@ if (isset($_GET['id_vaga'])) {
         <div class="footer-container">
             <div class="footer-section">
                 <h4 class="footer-title">Sobre Nós</h4>
-                <p class="footer-text">Conectamos talentos às melhores oportunidades. Nosso compromisso é facilitar o acesso ao mercado de trabalho com simplicidade e eficiência.</p>
+                <p class="footer-text">Conectamos talentos às melhores oportunidades. Nosso compromisso é facilitar o acesso ao mercado de trabalho com simplicidade и eficiência.</p>
             </div>
 
             <div class="footer-section rightlinks">
@@ -465,11 +492,64 @@ if (isset($_GET['id_vaga'])) {
                     $(this).toggle(texto.includes(termo));
                 });
             });
-            
+
+            // Enviar formulário quando o select de localização for alterado
+            $('select[name="local"]').on('change', function() {
+                $('form').submit();
+            });
+
             // Adicionar evento de submit para garantir que a pesquisa funcione corretamente
             $('form').on('submit', function() {
                 // Garantir que a página seja resetada para 1 ao pesquisar
                 $('input[name="pagina"]').val(1);
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Buscar sugestões em tempo real
+            $("#searchInput").on("keyup", function() {
+                let query = $(this).val();
+                if (query.length > 1) {
+                    $.ajax({
+                        url: "buscar_sugestoes.php",
+                        method: "GET",
+                        dataType: "json", // IMPORTANTE: especificar que esperamos JSON
+                        data: {
+                            termo: query
+                        },
+                        success: function(data) {
+                            if (data.length > 0) {
+                                let suggestionsHtml = '';
+                                data.forEach(function(sugestao) {
+                                    suggestionsHtml += '<div>' + sugestao + '</div>';
+                                });
+                                $("#suggestions").html(suggestionsHtml).show();
+                            } else {
+                                $("#suggestions").hide();
+                            }
+                        },
+                        error: function() {
+                            $("#suggestions").hide();
+                        }
+                    });
+                } else {
+                    $("#suggestions").hide();
+                }
+            });
+
+            // Clique em sugestão → preenche input
+            $(document).on("click", "#suggestions div", function() {
+                $("#searchInput").val($(this).text());
+                $("#suggestions").hide();
+                $("form").submit(); // envia automaticamente
+            });
+
+            // Fecha sugestões se clicar fora
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.vaga-search-wrapper').length) {
+                    $("#suggestions").hide();
+                }
             });
         });
     </script>

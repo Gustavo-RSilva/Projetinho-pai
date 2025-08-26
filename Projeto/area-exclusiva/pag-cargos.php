@@ -20,14 +20,15 @@ if ($usuarioLogado) {
 }
 
 // Funções de busca
-function buscarSugestoes($conn, $termo) {
+function buscarSugestoes($conn, $termo)
+{
     $termo = $termo . "%";
     $sql = "SELECT DISTINCT cargo FROM salarios_referencia WHERE cargo LIKE ? ORDER BY cargo LIMIT 5";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $termo);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     $sugestoes = [];
     while ($row = $result->fetch_assoc()) {
         $sugestoes[] = $row['cargo'];
@@ -35,7 +36,8 @@ function buscarSugestoes($conn, $termo) {
     return $sugestoes;
 }
 
-function buscarSalarios($conn, $cargo) {
+function buscarSalarios($conn, $cargo)
+{
     $sql = "SELECT * FROM salarios_referencia WHERE cargo = ? ORDER BY nivel_experiencia";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $cargo);
@@ -43,7 +45,8 @@ function buscarSalarios($conn, $cargo) {
     return $stmt->get_result();
 }
 
-function cargosPopulares($conn) {
+function cargosPopulares($conn)
+{
     $sql = "SELECT cargo, AVG((salario_minimo + salario_maximo)/2) as media 
             FROM salarios_referencia 
             GROUP BY cargo 
@@ -86,31 +89,37 @@ $cargosPopulares = cargosPopulares($conn);
             display: none;
             border: 1px solid #ddd;
             border-radius: 0 0 4px 4px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         #sugestoesLista li {
             padding: 8px 12px;
             cursor: pointer;
             background: white;
             border-bottom: 1px solid #eee;
         }
+
         #sugestoesLista li:hover {
             background-color: #f8f9fa;
         }
+
         .card-cargo {
             transition: all 0.3s ease;
             height: 100%;
             border: none;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
+
         .card-cargo:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
         .card-cargo .card-body {
             padding: 1.5rem;
         }
+
         .media-salarial {
             font-size: 1.2rem;
             color: var(--brand-color);
@@ -181,7 +190,7 @@ $cargosPopulares = cargosPopulares($conn);
                         } else {
                             $foto_url = '../' . $foto;  // Caminho relativo ajustado
                         }
-                        
+
                         ?>
                         <img src="<?php echo htmlspecialchars($foto_url); ?>" alt="Foto de perfil" class="foto-perfil">
                     </span>
@@ -222,7 +231,7 @@ $cargosPopulares = cargosPopulares($conn);
                 </li>
             </ul>
             <div class="auth-buttons">
-                <?php if($usuarioLogado): ?>
+                <?php if ($usuarioLogado): ?>
                     <a href="../logout2.php">
                         <button type="button" class="btn btn-entrar" tabindex="0">Sair</button>
                     </a>
@@ -242,12 +251,12 @@ $cargosPopulares = cargosPopulares($conn);
         <section class="pesquisa">
             <h2 class="mb-3">Consulte o salário de um cargo</h2>
             <form id="formPesquisa" method="POST" class="d-flex mb-4 position-relative">
-                <input type="text" id="inputCargo" name="cargo" class="form-control me-2" 
-                       placeholder="Digite o cargo..." autocomplete="off" required />
+                <input type="text" id="inputCargo" name="cargo" class="form-control me-2"
+                    placeholder="Digite o cargo..." autocomplete="off" required />
                 <button type="submit" class="btn btn-primary">Pesquisar</button>
                 <ul id="sugestoesLista" class="list-group"></ul>
-            </form>          
-            
+            </form>
+
             <?php if (!empty($resultados) && $resultados->num_rows > 0): ?>
                 <div id="resultadoBusca">
                     <h3 class="mb-3">Resultados para: <?php echo htmlspecialchars($cargoPesquisa); ?></h3>
@@ -267,7 +276,7 @@ $cargosPopulares = cargosPopulares($conn);
                                         <td><?php echo htmlspecialchars($row['nivel_experiencia']); ?></td>
                                         <td><?php echo htmlspecialchars($row['ramo_atuacao']); ?></td>
                                         <td><?php echo htmlspecialchars($row['localizacao']); ?></td>
-                                        <td>R$ <?php echo number_format($row['salario_minimo'], 2, ',', '.'); ?> - 
+                                        <td>R$ <?php echo number_format($row['salario_minimo'], 2, ',', '.'); ?> -
                                             R$ <?php echo number_format($row['salario_maximo'], 2, ',', '.'); ?></td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -281,7 +290,7 @@ $cargosPopulares = cargosPopulares($conn);
                 </div>
             <?php endif; ?>
         </section>
-        
+
         <!-- Seção de Cargos Populares (Nova) -->
         <section class="sugestoes mt-5">
             <h3 class="mb-4">Cargos em Destaque</h3>
@@ -349,25 +358,27 @@ $cargosPopulares = cargosPopulares($conn);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    $(document).ready(function() {
-        // Auto-complete para campo de pesquisa
-        $('#inputCargo').on('input', function() {
-            const termo = $(this).val().trim();
-            const $lista = $('#sugestoesLista');
-            
-            if (termo.length > 2) {
-                $.ajax({
-                    url: 'buscar_sugestoes.php',
-                    method: 'POST',
-                    data: { termo: termo },
-                    dataType: 'json',
-                    success: function(sugestoes) {
-                        $lista.empty();
-                        
-                        if (sugestoes.length > 0) {
-                            sugestoes.forEach(function(cargo) {
-                                $lista.append(
-                                    $('<li>')
+        $(document).ready(function() {
+            // Auto-complete para campo de pesquisa
+            $('#inputCargo').on('input', function() {
+                const termo = $(this).val().trim();
+                const $lista = $('#sugestoesLista');
+
+                if (termo.length > 2) {
+                    $.ajax({
+                        url: 'buscar_sugestoes.php',
+                        method: 'POST',
+                        data: {
+                            termo: termo
+                        },
+                        dataType: 'json',
+                        success: function(sugestoes) {
+                            $lista.empty();
+
+                            if (sugestoes.length > 0) {
+                                sugestoes.forEach(function(cargo) {
+                                    $lista.append(
+                                        $('<li>')
                                         .addClass('list-group-item list-group-item-action')
                                         .text(cargo)
                                         .on('click', function() {
@@ -375,36 +386,73 @@ $cargosPopulares = cargosPopulares($conn);
                                             $lista.hide();
                                             $('#formPesquisa').submit();
                                         })
-                                );
-                            });
-                            $lista.show();
-                        } else {
+                                    );
+                                });
+                                $lista.show();
+                            } else {
+                                $lista.hide();
+                            }
+                        },
+                        error: function() {
                             $lista.hide();
                         }
-                    },
-                    error: function() {
-                        $lista.hide();
-                    }
-                });
-            } else {
+                    });
+                } else {
+                    $lista.hide();
+                }
+            });
+
+            // Esconder sugestões ao clicar fora
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#formPesquisa').length) {
+                    $('#sugestoesLista').hide();
+                }
+            });
+
+            // Mostrar sugestões ao focar no campo (se houver termo)
+            $('#inputCargo').on('focus', function() {
+                if ($(this).val().trim().length > 2 && $('#sugestoesLista').children().length > 0) {
+                    $('#sugestoesLista').show();
+                }
+            });
+        });
+    </script>
+    <script>
+        // No código JavaScript, altere a URL do AJAX:
+        $.ajax({
+            url: 'buscar_sugestoes_cargos.php', // Alterado para o novo arquivo
+            method: 'POST',
+            data: {
+                termo: termo
+            },
+            dataType: 'json',
+            success: function(sugestoes) {
+                // Restante do código permanece igual
+                $lista.empty();
+
+                if (sugestoes.length > 0) {
+                    sugestoes.forEach(function(cargo) {
+                        $lista.append(
+                            $('<li>')
+                            .addClass('list-group-item list-group-item-action')
+                            .text(cargo)
+                            .on('click', function() {
+                                $('#inputCargo').val(cargo);
+                                $lista.hide();
+                                $('#formPesquisa').submit();
+                            })
+                        );
+                    });
+                    $lista.show();
+                } else {
+                    $lista.hide();
+                }
+            },
+            error: function() {
                 $lista.hide();
             }
         });
-
-        // Esconder sugestões ao clicar fora
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('#formPesquisa').length) {
-                $('#sugestoesLista').hide();
-            }
-        });
-
-        // Mostrar sugestões ao focar no campo (se houver termo)
-        $('#inputCargo').on('focus', function() {
-            if ($(this).val().trim().length > 2 && $('#sugestoesLista').children().length > 0) {
-                $('#sugestoesLista').show();
-            }
-        });
-    });
     </script>
 </body>
+
 </html>

@@ -6,7 +6,7 @@ $sucesso = "";
 include_once("../db/conexao.php");
 
 if (!isset($_SESSION['id_usuario'])) {
-    header("Location: Login.html");
+    header("Location: ../Login.php");
     exit();
 }
 
