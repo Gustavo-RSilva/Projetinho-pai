@@ -99,17 +99,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <div class="dividir ">Ou entrar com</div>
 
-
+        <!-- 
         <div class="social2-button">
             <a href="login-google.php" class="btn social-btn btn-outline-danger">
                 <img src="./img/icons8-google-logo-48.png" width="20" height="20" alt="Google">
                 Google
-            </a>
-            <a href="#" class="btn social-btn btn-outline-primary">
+            </a> -->
+        <!-- <a href="#" class="btn social-btn btn-outline-primary">
                 <img src="./img/linkedin.png" width="20" height="20" alt="LinkedIn">
                 LinkedIn
-            </a>
-
+            </a> -->
+        <div class="social2-button">
             <div id="g_id_onload"
                 data-client_id="642053605341-651u695o9r1jur0tj65kdc2dvgdvs4pk.apps.googleusercontent.com"
                 data-context="signin"
@@ -128,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 data-logo_alignment="left">
             </div>
         </div>
-
+        
         </div>
         <div class="naotemconta">Não tem uma conta?
             <a href="./Criar-conta.html" class="btn criarc btn-outline-secondary w-100 ">Criar Conta </a></button>
