@@ -542,3 +542,48 @@
   max-height: 300px;
   overflow-y: auto;
 }
+
+/* Responsividade extra para cards e pesquisa */
+
+/* Search bar no mobile */
+@media (max-width: 767.98px) {
+  .search-bar {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .search-section {
+    width: 100%;
+  }
+
+  .btn-search {
+    width: 100%;
+  }
+
+  #suggestions-container {
+    position: absolute; /* em vez de fixed, para não “quebrar” no mobile */
+    top: 100%;
+    left: 0;
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+/* Cards */
+@media (max-width: 575.98px) {
+  .job-card,
+  .area-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  .job-title {
+    font-size: 1rem;
+  }
+
+  .area-card h3 {
+    font-size: 1rem;
+  }
+}
+

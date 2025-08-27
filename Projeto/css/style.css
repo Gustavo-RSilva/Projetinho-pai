@@ -1,5 +1,6 @@
 :root {
-  --brand-color: #144d78; /* Trusted muted teal */
+  --brand-color: #144d78;
+  /* Trusted muted teal */
   --brand-hover: #0d90b8;
   --nav-bg: #ffffff;
   --nav-text: #144d78;
@@ -87,6 +88,7 @@ body {
   flex-shrink: 0;
 }
 
+
 .custom-toggle:hover,
 .custom-toggle:focus {
   color: var(--brand-hover);
@@ -125,11 +127,15 @@ body {
 
 /* User status container */
 .user-status {
+
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 600;
+  gap: 8px;
+  margin-left: auto;
+  /* empurra para a direita */
+  text-align: right;
   color: var(--brand-color);
+  font-weight: 600;
   cursor: default;
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
@@ -140,6 +146,7 @@ body {
 
 .user-status .material-icons {
   font-size: 28px;
+  color: var(--brand-color);
 }
 
 /* On smaller screens, smaller padding for items */
@@ -148,6 +155,7 @@ body {
     padding: 0.5rem 0.75rem;
     font-size: 0.91rem;
   }
+
   .user-status {
     font-size: 0.9rem;
     padding: 0.4rem 0.5rem;
@@ -164,7 +172,7 @@ body {
   top: 100%;
   right: 1rem;
   background: white;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
   width: 280px;
@@ -172,11 +180,13 @@ body {
   padding: 1rem;
   z-index: 1050;
 }
+
 .navbar-expand-md .navbar-collapse.show {
   display: flex !important;
   opacity: 1;
   transform: scale(1);
 }
+
 .navbar-expand-md .navbar-nav {
   flex-direction: column;
   width: 100%;
@@ -189,7 +199,7 @@ body {
   flex-direction: column;
   gap: 12px;
   padding-top: 1rem;
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   margin-top: 1rem;
 }
 
@@ -209,6 +219,7 @@ body {
   color: white;
   border: none;
 }
+
 .btn-entrar:hover,
 .btn-entrar:focus {
   background: var(--brand-hover);
@@ -221,6 +232,7 @@ body {
   border: 2px solid var(--brand-color);
   color: var(--brand-color);
 }
+
 .btn-cadastrar:hover,
 .btn-cadastrar:focus {
   background: var(--brand-color);
@@ -361,7 +373,90 @@ body {
 
 /* Responsividade */
 @media (max-width: 1199.98px) {
-  .rightlinks, .rightredes {
+
+  .rightlinks,
+  .rightredes {
     margin-left: 0;
+  }
+}
+
+/* Ajustes de responsividade adicionais */
+
+/* Navbar e layout */
+@media (max-width: 991.98px) {
+  .navbar-container {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .nav-always-visible {
+    display: none;
+    /* esconde os links sempre visíveis no mobile */
+  }
+
+  .custom-toggle {
+    margin-left: auto;
+  }
+}
+
+/* Hero section mobile */
+@media (max-width: 767.98px) {
+  .hero-section {
+    padding: 2.5rem 1rem;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* Footer no mobile */
+@media (max-width: 767.98px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 1.5rem;
+  }
+
+  .rightlinks,
+  .rightredes {
+    margin-left: 0 !important;
+  }
+
+  .social-buttons {
+    justify-content: flex-start;
+  }
+}
+
+/* Desktop: mostra os links fixos */
+@media (min-width: 992px) {
+  .nav-always-visible {
+    display: flex !important;
+    /* força mostrar no desktop */
+  }
+
+  .navbar-collapse .nav-item.d-lg-none {
+    display: none !important;
+    /* esconde duplicados no hamburguer */
+  }
+}
+
+/* Mobile: esconde os fixos e deixa só no hamburguer */
+@media (max-width: 991.98px) {
+  .nav-always-visible {
+    display: none !important;
+    /* some da barra de cima */
+  }
+
+  .navbar-collapse .nav-item {
+    display: flex;
+    width: 100%;
   }
 }
