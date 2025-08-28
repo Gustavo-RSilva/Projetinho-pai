@@ -1,4 +1,6 @@
-/* pag vagas */
+/* ===========================
+   PAGINA VAGAS - CSS
+=========================== */
 
 /* listas das vagas */
 .list-group-item {
@@ -28,7 +30,6 @@
   background-color: #f9fafb44;
 }
 
-
 #jobList img {
   object-fit: cover;
   border-radius: 8px;
@@ -42,7 +43,6 @@
 }
 
 /* barra de pesquisa */
-/* Barra de pesquisa de vagas */
 .vaga-search-wrapper {
   background: #ffffff;
   border-radius: 12px;
@@ -50,6 +50,7 @@
   padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
+  position: relative; /* necessário para sugestões */
 }
 
 .vaga-search-input {
@@ -58,6 +59,9 @@
   gap: 0.5rem;
   flex: 1;
   width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
 }
 
 .vaga-search-input input {
@@ -76,6 +80,11 @@
 .vaga-search-input .material-icons {
   font-size: 1.4rem;
   color: #6b7280;
+}
+
+.vaga-search-input span {
+  margin-right: 8px;
+  color: #666;
 }
 
 /* Garante que o item selecionado continue azul mesmo ao passar o mouse */
@@ -115,4 +124,91 @@
 
 .suggestions-box div:hover {
   background-color: #f1f5f9;
+}
+
+/* Paginação */
+.pagination {
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.page-info {
+  text-align: center;
+  margin-top: 10px;
+  color: #6c757d;
+}
+
+/* ===== RESPONSIVIDADE - Página de Vagas ===== */
+
+/* Telas até 768px (tablets e celulares grandes) */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .vaga-search-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.75rem;
+  }
+
+  .vaga-search-input {
+    width: 100%;
+  }
+
+  .list-group-item {
+    font-size: 0.9rem;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .sticky-card {
+    position: static; /* remove o "grude" no mobile */
+    margin-top: 20px;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* Telas até 576px (celulares pequenos) */
+@media (max-width: 576px) {
+  .vaga-search-wrapper {
+    padding: 0.5rem;
+  }
+
+  .vaga-search-input {
+    flex-direction: row;
+    gap: 0.25rem;
+  }
+
+  .vaga-search-input input {
+    font-size: 0.9rem;
+  }
+
+  .list-group-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .list-group-item img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card-body {
+    font-size: 0.9rem;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .page-link {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+  }
 }

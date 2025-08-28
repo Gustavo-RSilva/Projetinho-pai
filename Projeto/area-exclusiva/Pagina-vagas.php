@@ -114,71 +114,26 @@ if (isset($_GET['id_vaga'])) {
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/pag2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        .vaga-search-wrapper {
-            position: relative;
-        }
 
-        .vaga-search-input {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 8px 12px;
-        }
-
-        .vaga-search-input span {
-            margin-right: 8px;
-            color: #666;
-        }
-
-        .vaga-search-input input {
-            border: none;
-            outline: none;
-            width: 100%;
-        }
-
-        .sticky-card {
-            position: sticky;
-            top: 20px;
-        }
-
-        .list-group-item {
-            transition: all 0.3s ease;
-        }
-
-        .list-group-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .pagination {
-            margin-top: 20px;
-            justify-content: center;
-        }
-
-        .page-info {
-            text-align: center;
-            margin-top: 10px;
-            color: #6c757d;
-        }
-    </style>
 </head>
 
 <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
         <div class="navbar-container">
-            <a href="index.php" class="navbar-brand" aria-label="Página inicial JobSearch">
-                <img style="width: 90px;" src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="JobSearch">
+            <a href="index.php" class="navbar-brand">
+                <img style="width: 90px;" src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="Contrata">
             </a>
 
-            <div class="nav-always-visible">
-                <a href="Pagina-vagas.php" class="nav-link" tabindex="0">
-                    <span class="material-icons" aria-hidden="true">list_alt</span>
+            <!-- Links Desktop -->
+            <div class="nav-always-visible d-none d-lg-flex" aria-hidden="true" aria-label="Links de navegação principal">
+                <a href="Pagina-vagas.php" class="nav-link">
+                    <span class="material-icons">list_alt</span>
                     Vagas Ativas
                 </a>
-                <a href="pag-cargos.php" class="nav-link" tabindex="0">
-                    <span class="material-icons" aria-hidden="true">next_week</span>
-                    Cargos/Salarios
+                <a href="pag-cargos.php" class="nav-link">
+                    <span class="material-icons">next_week</span>
+                    Cargos/Salários
                 </a>
             </div>
 
@@ -243,27 +198,44 @@ if (isset($_GET['id_vaga'])) {
             </button>
         </div>
 
-        <div class="collapse navbar-collapse navbar-expand-collapse" id="mainNav">
-            <ul class="navbar-nav ms-auto align-items-center" role="menu">
-                <li class="nav-item" role="none">
-                    <a href="pag-minha-conta.php" class="nav-link" tabindex="0" role="menuitem">
-                        <span class="material-icons" aria-hidden="true">account_circle</span>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                <!-- Links Mobile -->
+                <li class="nav-item d-lg-none">
+                    <a href="Pagina-vagas.php" class="nav-link">
+                        <span class="material-icons">list_alt</span>
+                        Vagas Ativas
+                    </a>
+                </li>
+                <li class="nav-item d-lg-none">
+                    <a href="pag-cargos.php" class="nav-link">
+                        <span class="material-icons">next_week</span>
+                        Cargos/Salários
+                    </a>
+                </li>
+
+                <!-- Seus outros links -->
+                <li class="nav-item">
+                    <a href="pag-minha-conta.php" class="nav-link">
+                        <span class="material-icons">account_circle</span>
                         Minha Conta
                     </a>
                 </li>
-                <li class="nav-item" role="none">
-                    <a href="Meu-curriculo.php" class="nav-link" tabindex="0" role="menuitem">
-                        <span class="material-icons" aria-hidden="true">description</span>
+                <li class="nav-item">
+                    <a href="curriculos.php" class="nav-link">
+                        <span class="material-icons">description</span>
                         Meu Currículo
                     </a>
                 </li>
-                <li class="nav-item" role="none">
-                    <a href="pag-candidaturas.php" class="nav-link" tabindex="0" role="menuitem">
-                        <span class="material-icons" aria-hidden="true">work_outline</span>
+                <li class="nav-item">
+                    <a href="pag-candidaturas.php" class="nav-link">
+                        <span class="material-icons">work_outline</span>
                         Minhas Candidaturas
                     </a>
                 </li>
             </ul>
+
             <div class="auth-buttons">
                 <?php if ($usuarioLogado): ?>
                     <a href="logout2.php">
@@ -386,7 +358,7 @@ if (isset($_GET['id_vaga'])) {
             </div>
 
             <!-- Detalhes da vaga -->
-            <div class="col-md-8">
+            <div class="col-md-8" id="vaga-detalhes">
                 <div class="card shadow-sm sticky-card">
                     <div class="card-body">
                         <?php if ($vagaSelecionada): ?>
@@ -551,6 +523,19 @@ if (isset($_GET['id_vaga'])) {
                     $("#suggestions").hide();
                 }
             });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Verifica se há vaga selecionada (via parâmetro na URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has("id_vaga")) {
+                const detalhes = document.getElementById("vaga-detalhes");
+                if (detalhes) {
+                    // Rolagem suave até a seção de detalhes
+                    detalhes.scrollIntoView({
+                        behavior: "smooth"
+                    });
+                }
+            }
         });
     </script>
 </body>

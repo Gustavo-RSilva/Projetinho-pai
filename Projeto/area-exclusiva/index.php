@@ -89,7 +89,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
             </a>
 
             <!-- Links Desktop -->
-            <div class="nav-always-visible d-none d-lg-flex">
+            <div class="nav-always-visible d-none d-lg-flex" aria-hidden="true" aria-label="Links de navegação principal">
                 <a href="Pagina-vagas.php" class="nav-link">
                     <span class="material-icons">list_alt</span>
                     Vagas Ativas

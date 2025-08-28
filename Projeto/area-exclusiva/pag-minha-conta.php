@@ -330,7 +330,7 @@ $conn->close();
                         <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;">work_outline</span>
                         <h3><?php echo count($candidaturas); ?></h3>
                         <p class="mb-3">Candidaturas Ativas</p>
-                        <a href="#candidaturas" class="btn btn-primary">Ver Todas</a>
+                        <a href="pag-candidaturas.php" class="btn btn-primary">Ver Todas</a>
                     </div>
                 </div>
             </div>

@@ -450,13 +450,70 @@ body {
 
 /* Mobile: esconde os fixos e deixa só no hamburguer */
 @media (max-width: 991.98px) {
-  .nav-always-visible {
-    display: none !important;
-    /* some da barra de cima */
+  .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
   }
 
-  .navbar-collapse .nav-item {
+  .navbar-brand {
+    flex-shrink: 0;
+    margin-right: auto;
+  }
+
+  .user-status {
+    margin-left: auto;
+    margin-right: 0 ;
     display: flex;
-    width: 100%;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .custom-toggle {
+    flex-shrink: 0;
+    margin-left: 0;
+  }
+  
+  /* Esconde os links sempre visíveis no mobile */
+  .nav-always-visible {
+    display: none !important;
   }
 }
+
+/* Para telas muito pequenas (menos de 400px) */
+@media (max-width: 400px) {
+  .user-status span:not(.material-icons) {
+    display: none;
+  }
+  
+  .user-status {
+    margin-right: 0px;
+  }
+  
+  .navbar-brand img {
+    width: 70px !important;
+  }
+}
+
+/* Ajuste extra para iPhone SE e dispositivos muito estreitos */
+@media (max-width: 320px) {
+  .navbar-brand {
+    max-width: 60px;
+    overflow: hidden;
+  }
+  
+  .navbar-brand img {
+    width: 60px !important;
+  }
+  
+  .user-status {
+    margin-right: 2px;
+  }
+}
+

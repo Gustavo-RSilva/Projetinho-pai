@@ -94,22 +94,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Conta</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .form-container {
+            width: 100%;
             max-width: 500px;
-            margin: 50px auto;
             padding: 30px;
             background: #fff;
             border-radius: 10px;
@@ -122,12 +133,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid #007bff;
-            margin-bottom: 15px;
+            margin: 0 auto 15px;
+            display: block;
         }
 
         .upload-label {
             cursor: pointer;
             color: #007bff;
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .upload-label:hover {
+            text-decoration: underline;
         }
 
         .form-title {
@@ -135,57 +154,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 30px;
             text-align: center;
         }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Responsividade para dispositivos móveis */
+        @media (max-width: 576px) {
+            .form-container {
+                padding: 20px;
+                box-shadow: none;
+            }
+            
+            body {
+                padding: 10px;
+                background-color: #fff;
+            }
+            
+            .foto-preview {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .form-container {
+                padding: 15px;
+            }
+            
+            .foto-preview {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .form-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="form-container">
-            <h2 class="form-title">Criar Conta</h2>
+    <div class="form-container">
+        <h2 class="form-title">Criar Conta</h2>
 
-            <?php if (!empty($erro)): ?>
-                <div class="alert alert-danger"><?php echo $erro; ?></div>
-            <?php endif; ?>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-4">
+                <img src="https://placehold.co/120x120/007bff/white?text=Perfil" class="foto-preview" id="preview">
+                <label for="foto" class="upload-label">
+                    <i class="bi bi-camera-fill"></i> Escolher Foto (opcional)
+                </label>
+                <input type="file" name="foto" id="foto" accept="image/*" class="d-none">
+            </div>
 
-            <form method="POST" enctype="multipart/form-data">
-                <div class="text-center mb-4">
-                    <img src="./img/default-profile.png" class="foto-preview" id="preview">
-                    <label for="foto" class="upload-label">
-                        <i class="bi bi-camera-fill"></i> Escolher Foto (opcional)
-                    </label>
-                    <input type="file" name="foto" id="foto" accept="image/*" class="d-none">
-                </div>
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome Completo</label>
+                <input type="text" class="form-control" id="nome" name="nome" required>
+            </div>
 
-                <div class="mb-3">
-                    <label for="nome" class="form-label">Nome Completo</label>
-                    <input type="text" class="form-control" id="nome" name="nome" required>
-                </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
+            <div class="mb-3">
+                <label for="senha" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="senha" name="senha" required>
+            </div>
 
-                <div class="mb-3">
-                    <label for="senha" class="form-label">Senha</label>
-                    <input type="password" class="form-control" id="senha" name="senha" required>
-                </div>
+            <div class="mb-4">
+                <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
+                <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+            </div>
 
-                <div class="mb-4">
-                    <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
-                    <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
-                </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Criar Conta</button>
 
-                <button type="submit" class="btn btn-primary w-100">Criar Conta</button>
-
-                <div class="mt-3 text-center">
-                    Já tem uma conta? <a href="Login.php">Faça login</a>
-                </div>
-                <div class="empresa-link text-center mt-3">
-                    <p>É uma empresa? <a href="./area-empresa/criar-conta-emp.php" class="text-decoration-none">Acesse aqui</a></p>
-                </div>
-            </form>
-        </div>
+            <div class="mt-3 text-center">
+                Já tem uma conta? <a href="Login.php">Faça login</a>
+            </div>
+            <div class="empresa-link text-center mt-3">
+                <p>É uma empresa? <a href="./area-empresa/criar-conta-emp.php" class="text-decoration-none">Acesse aqui</a></p>
+            </div>
+        </form>
     </div>
 
     <script>
@@ -202,5 +252,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
 </body>
-
 </html>
