@@ -88,11 +88,14 @@ $todas_vagas = $stmt->get_result();
 $pc_nom = trim($_GET['cand_nome'] ?? '');
 $pc_sta = trim($_GET['cand_status'] ?? '');
 $pc_vag = (int)($_GET['cand_vaga'] ?? 0);
-$query_c = "SELECT c.id_candidatura, u.nome_completo, v.titulo AS vaga_titulo, c.data_candidatura, c.status
+$query_c = "SELECT c.id_candidatura, c.id_curriculo, u.id_usuario, u.nome_completo, v.titulo AS vaga_titulo,
+       c.data_candidatura, c.status, cur.pdf_caminho
             FROM candidaturas c
             INNER JOIN usuarios u ON u.id_usuario = c.id_usuario
             INNER JOIN vagas v ON v.id_vaga = c.id_vaga
-            WHERE v.id_empresa = ?";
+            LEFT JOIN curriculo cur ON cur.id_curriculo = c.id_curriculo
+            WHERE v.id_empresa = ?
+";
 $pc_params = [$id_empresa];
 $pc_types = 'i';
 if ($pc_nom !== '') {
@@ -411,20 +414,36 @@ if (isset($_SESSION['msg'])) {
                                                 <td><?= $cand['data_candidatura'] ? date('d/m/Y', strtotime($cand['data_candidatura'])) : '-' ?></td>
                                                 <td><?= htmlspecialchars($cand['status']); ?></td>
                                                 <td class="d-flex gap-2">
-                                                    <form method="POST" action="atualizar_status_candidatura.php" onsubmit="return confirm('Confirmar ação?');">
+                                                    <!-- Botão visualizar currículo -->
+                                                    <!-- Botão visualizar perfil -->
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-info btn-view-curriculo"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalPerfilCandidato"
+                                                        data-id="<?= (int)$cand['id_usuario'] ?>">
+                                                        <i class="fas fa-user"></i> Ver Perfil
+                                                    </button>
+
+
+                                                    <!-- Formulário de atualização de status -->
+                                                    <form method="POST" action="atualizar_status_candidatura.php"
+                                                        class="d-flex gap-1 align-items-center"
+                                                        onsubmit="return confirm('Confirmar alteração de status?');">
                                                         <input type="hidden" name="id_candidatura" value="<?= (int)$cand['id_candidatura'] ?>" />
-                                                        <select name="novo_status" class="form-select form-select-sm d-inline-block w-auto">
-                                                            <option value="Em análise">Em análise</option>
-                                                            <option value="Aprovado">Aprovado</option>
-                                                            <option value="Rejeitado">Rejeitado</option>
-                                                            <option value="Cancelado">Cancelado</option>
+                                                        <select name="novo_status" class="form-select form-select-sm w-auto">
+                                                            <option value="Em análise" <?= $cand['status'] === 'Em análise' ? 'selected' : '' ?>>Em análise</option>
+                                                            <option value="Aprovado" <?= $cand['status'] === 'Aprovado' ? 'selected' : '' ?>>Aprovado</option>
+                                                            <option value="Rejeitado" <?= $cand['status'] === 'Rejeitado' ? 'selected' : '' ?>>Rejeitado</option>
+                                                            <option value="Cancelado" <?= $cand['status'] === 'Cancelado' ? 'selected' : '' ?>>Cancelado</option>
                                                         </select>
-                                                        <button class="btn btn-sm btn-primary" type="submit">Atualizar</button>
+                                                        <button class="btn btn-sm btn-warning" type="submit">Atualizar</button>
                                                     </form>
                                                 </td>
                                             </tr>
                                         <?php endwhile; ?>
                                     </tbody>
+
+
                                 </table>
                             </div>
                         </div>
@@ -585,6 +604,23 @@ if (isset($_SESSION['msg'])) {
             </div>
         </div>
     </div>
+    <!-- Modal Perfil do Candidato -->
+    <div class="modal fade" id="modalPerfilCandidato" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Perfil do Candidato</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="perfil-content" class="p-2 text-center">
+                        <p>Carregando informações...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <footer class="text-center py-3 bg-dark text-white">
         <p>&copy; 2025 Contrata</p>
@@ -737,6 +773,27 @@ if (isset($_SESSION['msg'])) {
             }
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = document.getElementById("modalPerfilCandidato");
+            modal.addEventListener("show.bs.modal", function(event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute("data-id");
+                const content = document.getElementById("perfil-content");
+                content.innerHTML = "<p>Carregando informações...</p>";
+
+                fetch("get_candidato.php?id=" + id)
+                    .then(res => res.text())
+                    .then(html => {
+                        content.innerHTML = html;
+                    })
+                    .catch(() => {
+                        content.innerHTML = "<p class='text-danger'>Erro ao carregar perfil.</p>";
+                    });
+            });
+        });
+    </script>
+
 </body>
 
 </html>
