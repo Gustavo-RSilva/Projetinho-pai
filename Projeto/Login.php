@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         </div>
         <div class="naotemconta">Não tem uma conta?
-            <a href="./Criar-conta.html" class="btn criarc btn-outline-secondary w-100 ">Criar Conta </a></button>
+            <a href="./Crie-conta.php" class="btn criarc btn-outline-secondary w-100 ">Criar Conta </a></button>
         </div>
         <div class="empresa-link text-center mt-3">
             <p>É uma empresa? <a href="./area-empresa/login-empresa.php" class="text-decoration-none">Acesse aqui</a></p>
