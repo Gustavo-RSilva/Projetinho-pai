@@ -59,8 +59,8 @@ document.getElementById('btnSendCode').addEventListener('click', async () => {
       body: new URLSearchParams({ action: 'enviar_codigo', email })
     });
     const data = await res.json();
-
     if (data.status === 'ok') {
+      console.log(data);
       currentEmail = email;
       document.getElementById('emailDisplay').textContent = email;
       goToStep(2);
@@ -130,7 +130,7 @@ document.getElementById('btnChangePassword').addEventListener('click', async () 
 
   if (data.status === 'ok') {
     document.getElementById('successMessage').classList.remove('d-none');
-    setTimeout(() => window.location.href = '/../area-exclusiva/pag-minha-conta.php', 3000);
+    setTimeout(() => window.location.href = 'login.php', 3000);
   } else {
     alert(data.msg || 'Erro ao atualizar senha');
   }

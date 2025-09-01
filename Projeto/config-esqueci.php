@@ -1,140 +1,125 @@
 <?php
 header('Content-Type: application/json');
-require 'db/conexao.php'; // ajustado caminho
-require 'vendor/autoload.php';
-require_once 'mailersend-config.php';
+
+// Corrigido caminho da conexão
+require __DIR__ . '/db/conexao.php';
+
 // Função para enviar email usando PHPMailer
+function enviarEmail($email, $codigo) {
+    require __DIR__ . '/vendor/autoload.php';
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-function enviarEmailMailerSend(string $email, string $codigo): array
-{
-    $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
-        $mail->Host = 'smtp.mailersend.net'; 
+        $mail->Host = 'smtp-mail.outlook.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'apikey'; // seu email
-        $mail->Password = 'mlsn.8a3cdcac2155274887138b0edb904e74cf6198059793618ef7e15ebadc5850f9';      // senha de app
+        $mail->Username = 'gustavo.rsilva66@senacsp.edu.br'; // seu email institucional
+        $mail->Password ='xxxx';      // senha de app (não a normal!)
+        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
-        $mail->CharSet    = 'UTF-8';
 
-        if (MS_SMTP_SECURE === 'ssl') {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // porta 465
-        } else {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // porta 587
-        }
-
-        $mail->setFrom('gustavo.rsilva66@senacsp.edu.br', 'Sistema');
+        $mail->setFrom($mail->Username, 'Sistema');
         $mail->addAddress($email);
         $mail->isHTML(true);
-
         $mail->Subject = 'Código de Verificação';
         $mail->Body = "Seu código de verificação é: <b>$codigo</b>";
 
+        // Debug opcional
+        // $mail->SMTPDebug = 2;
+        // $mail->Debugoutput = 'error_log';
+
         $mail->send();
-        return ['ok' => true, 'err' => null];
+        return true;
+
     } catch (Exception $e) {
-        // Loga o erro detalhado no servidor (não expor ao usuário final)
-        error_log('MailerSend SMTP error: ' . $mail->ErrorInfo);
-        return ['ok' => false, 'err' => $mail->ErrorInfo];
+        echo json_encode([
+            "status" => "erro",
+            "msg" => "Erro no envio: " . $mail->ErrorInfo
+        ]);
+        exit;
     }
 }
 
-
 $action = $_POST['action'] ?? '';
-// Helper: resposta JSON e fim
-function respond(array $data): void {
-    echo json_encode($data, JSON_UNESCAPED_UNICODE);
-    exit;
-}
 
 if ($action === 'enviar_codigo') {
     $email = $_POST['email'] ?? '';
-    if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        respond(["status" => "erro", "msg" => "E-mail inválido"]);
+    if (!$email) {
+        echo json_encode(["status" => "erro", "msg" => "Email vazio"]);
+        exit;
     }
 
-    // 1) Verifica se o e-mail existe
-    $stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
-    if (!$stmt) respond(["status" => "erro", "msg" => "Falha interna (SELECT): ".$conn->error]);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->bind_result($uid);
-    $found = $stmt->fetch();
-    $stmt->close();
+    // Gerar código de 6 dígitos
+    $codigo = rand(100000, 999999);
 
-    if (!$found) {
-        respond(["status" => "erro", "msg" => "E-mail não encontrado"]);
-    }
-
-    // 2) Gera código criptograficamente forte (6 dígitos)
-    $codigo = (string) random_int(100000, 999999);
-
-    // 3) Atualiza o código na base
+    // Atualizar código na tabela usuarios
     $stmt = $conn->prepare("UPDATE usuarios SET cod_verificacao = ? WHERE email = ?");
-    if (!$stmt) respond(["status" => "erro", "msg" => "Falha interna (UPDATE): ".$conn->error]);
+    if (!$stmt) {
+        echo json_encode(["status" => "erro", "msg" => "Erro na query: " . $conn->error]);
+        exit;
+    }
+
     $stmt->bind_param("ss", $codigo, $email);
     $stmt->execute();
-    $stmt->close();
 
-    // 4) Envia o e-mail
-    $r = enviarEmailMailerSend($email, $codigo);
-    if ($r['ok']) {
-        respond(["status" => "ok"]);
+    if ($stmt->affected_rows > 0) {
+        if (enviarEmail($email, $codigo)) {
+            echo json_encode(["status" => "ok", "msg" => "Email enviado"]);
+        }
     } else {
-        respond(["status" => "erro", "msg" => "Falha ao enviar e-mail"]);
+        echo json_encode(["status" => "erro", "msg" => "Email não encontrado"]);
     }
+
+    $stmt->close();
+    exit;
 }
 
 if ($action === 'verificar_codigo') {
     $email = $_POST['email'] ?? '';
-    $code  = $_POST['code']  ?? '';
-
-    if (!$email || !$code) {
-        respond(["status" => "erro", "msg" => "Dados insuficientes"]);
-    }
+    $code = $_POST['code'] ?? '';
 
     $stmt = $conn->prepare("SELECT cod_verificacao FROM usuarios WHERE email = ?");
-    if (!$stmt) respond(["status" => "erro", "msg" => "Falha interna (SELECT): ".$conn->error]);
+    if (!$stmt) {
+        echo json_encode(["status" => "erro", "msg" => "Erro na query: " . $conn->error]);
+        exit;
+    }
+
     $stmt->bind_param("s", $email);
     $stmt->execute();
-    $stmt->bind_result($codDB);
+    $stmt->bind_result($cod);
     $stmt->fetch();
     $stmt->close();
 
-    if ($codDB && hash_equals((string)$codDB, (string)$code)) {
-        respond(["status" => "ok"]);
+    if ($cod && $cod == $code) {
+        echo json_encode(["status" => "ok"]);
     } else {
-        respond(["status" => "erro", "msg" => "Código inválido"]);
+        echo json_encode(["status" => "erro", "msg" => "Código inválido"]);
     }
+    exit;
 }
 
 if ($action === 'alterar_senha') {
     $email = $_POST['email'] ?? '';
     $senha = $_POST['senha'] ?? '';
-
-    if (!$email || strlen($senha) < 6) {
-        respond(["status" => "erro", "msg" => "Senha muito curta"]);
-    }
-
     $hash = password_hash($senha, PASSWORD_DEFAULT);
 
     $stmt = $conn->prepare("UPDATE usuarios SET senha = ?, cod_verificacao = NULL WHERE email = ?");
-    if (!$stmt) respond(["status" => "erro", "msg" => "Falha interna (UPDATE): ".$conn->error]);
+    if (!$stmt) {
+        echo json_encode(["status" => "erro", "msg" => "Erro na query: " . $conn->error]);
+        exit;
+    }
+
     $stmt->bind_param("ss", $hash, $email);
     $stmt->execute();
 
     if ($stmt->affected_rows > 0) {
-        $stmt->close();
-        respond(["status" => "ok"]);
+        echo json_encode(["status" => "ok", "msg" => "Enviado"]);
     } else {
-        $stmt->close();
-        respond(["status" => "erro", "msg" => "Falha ao atualizar senha"]);
+        echo json_encode(["status" => "erro", "msg" => "Falha ao atualizar senha"]);
     }
+
+    $stmt->close();
+    exit;
 }
 
-// Action desconhecida
-respond(["status" => "erro", "msg" => "Ação inválida"]);
+echo json_encode(["status" => "erro", "msg" => "Ação inválida"]);

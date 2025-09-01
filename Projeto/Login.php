@@ -125,7 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 data-theme="outline"
                 data-text="signin_with"
                 data-size="large"
-                data-logo_alignment="left">
+                data-logo_alignment="center">
             </div>
         </div>
         

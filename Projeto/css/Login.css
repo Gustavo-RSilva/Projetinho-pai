@@ -34,27 +34,15 @@ font-size: 20px
 
   
           /* Container dos botões sociais lado a lado */
-          .social2-button {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            position: relative;
-            top: 150px;
-            background-color: transparent;
-          }
           
           /* Botões sociais tamanho aumentado, mesma altura, largura proporcional */
-          .social2-button .social-btn {  
-            flex: 1;
+          .social2-button  {  
+            position: relative;
+            top: 150px;
             display: flex !important;
             align-items: center;
             justify-content: center;
             height: 50px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            border-radius: 8px;
-            text-decoration: none;
-            gap: 8px;
             /* espaço entre ícone e texto */
             width: 100%;
             /* igualar tamanho */
@@ -64,11 +52,7 @@ font-size: 20px
             right: 2%;
           }
           
-          .google{
-            background-color: sienna ;
-          
-          }
-          .entrarcom{
+           .entrarcom{
             font-family:Arial, Helvetica, sans-serif;
             font-size: 290%;
             position: static;
