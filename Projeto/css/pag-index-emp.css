@@ -425,3 +425,36 @@
         padding-top: 1rem;
     }
 }
+.btn-group-candidatos {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.btn-view-curriculo {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.btn-view-curriculo:hover {
+    background-color: #5a6268;
+}
+
+.btn-status-update {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Garantir que os elementos cabem na célula */
+.table td {
+    vertical-align: middle;
+}
