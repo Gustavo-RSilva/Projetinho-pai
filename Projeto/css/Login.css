@@ -1,36 +1,14 @@
 /* Página login */
-.paginaLogin{
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Adicionado para centralizar verticalmente */
-    background-color: #ffffff;
-  }
-  
-  .form-control{
-    border: 1px solid #000000 !important;
-    border-radius: 1rem !important;
-  }
-
-  .form-label{
-font-size: 20px
-  }
-
-  .form-container {
-   margin-top: 2%;
-   margin-bottom: 2%;
-              max-width: 450px;
-              background-color: #fff; /* cor de fundo, opcional */
-              padding: 2rem;          /* espaçamento interno */
-              border-radius: 20px;    /* cantos arredondados */
-              box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* sombra suave */
-          }
-
-          /* Caixas de texto tamanho e largura iguais */
-          .mb-3 {
-              height: 88px;
-          }
+.bgcontrata {
+ position: relative;
+  display: flex; 
+  width: auto;
+  height: auto;   /* defina altura fixa para poder centralizar */
+  justify-content: center !important; /* centro horizontal */
+  align-items: center !important;     /* centro vertical */
+  margin-bottom: 28px !important;
+  margin-top: -23px !important;
+}
 
 
 .paginaLogin {
