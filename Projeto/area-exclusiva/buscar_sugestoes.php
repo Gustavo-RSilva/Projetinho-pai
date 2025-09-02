@@ -1,30 +1,38 @@
 <?php
-session_start();
 include_once("../db/conexao.php");
 
-header('Content-Type: application/json');
+$termo = $_GET['termo'] ?? '';
+$termo = trim($termo);
 
-if (isset($_GET['termo'])) {
-    $termo = $_GET['termo'];
-    
-    // Buscar sugestões de vagas com base no termo
-    $sql = "SELECT titulo FROM vagas 
-            WHERE ativa = 1 AND data_expiracao >= CURDATE() 
-            AND titulo LIKE ? 
-            GROUP BY titulo 
-            LIMIT 5";
-    
+$sugestoes = [];
+
+if ($termo !== '') {
+    $like = "%" . $termo . "%";
+
+    $sql = "
+        SELECT titulo AS sugestao
+        FROM vagas
+        WHERE ativa = 1 AND titulo LIKE ?
+        UNION
+        SELECT nome AS sugestao
+        FROM empresas
+        WHERE nome LIKE ?
+        UNION
+        SELECT nome AS sugestao
+        FROM areas_profissionais
+        WHERE nome LIKE ?
+        LIMIT 10
+    ";
+
     $stmt = $conn->prepare($sql);
-    $termoLike = "%" . $termo . "%";
-    $stmt->bind_param("s", $termoLike);
+    $stmt->bind_param("sss", $like, $like, $like);
     $stmt->execute();
     $result = $stmt->get_result();
-    
-    $sugestoes = [];
+
     while ($row = $result->fetch_assoc()) {
-        $sugestoes[] = $row['titulo'];
+        $sugestoes[] = $row['sugestao'];
     }
-    
-    echo json_encode($sugestoes);
 }
-?>
+
+header('Content-Type: application/json; charset=utf-8');
+echo json_encode($sugestoes);

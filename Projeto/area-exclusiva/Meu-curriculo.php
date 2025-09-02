@@ -235,7 +235,62 @@ if ($curriculo) {
         $habilidades = explode(';;', $curriculo['habilidades']);
     }
 }
+function buscarVagas($conn, $filtro = '', $localizacao = '', $pagina = 1, $vagas_por_pagina = 10, $area = null)
+{
+    $sql = "SELECT SQL_CALC_FOUND_ROWS v.*, e.nome as empresa_nome, e.url_logo 
+            FROM vagas v 
+            JOIN empresas e ON v.id_empresa = e.id_empresa 
+            WHERE v.ativa = 1";
+
+    $params = array();
+    $types = "";
+
+    if (!empty($filtro)) {
+        $sql .= " AND (v.titulo LIKE ? OR e.nome LIKE ? OR v.localizacao LIKE ?)";
+        $filtro_like = "%$filtro%";
+        $params = array_merge($params, [$filtro_like, $filtro_like, $filtro_like]);
+        $types .= "sss";
+    }
+
+    if (!empty($localizacao)) {
+        $sql .= " AND v.localizacao LIKE ?";
+        $local_like = "%$localizacao%";
+        $params[] = $local_like;
+        $types .= "s";
+    }
+
+    if (!empty($area)) {
+        $sql .= " AND EXISTS (
+            SELECT 1 FROM vagas_areas va 
+            WHERE va.id_vaga = v.id_vaga AND va.id_area = ?
+        )";
+        $params[] = $area;
+        $types .= "i";
+    }
+
+    $sql .= " ORDER BY v.data_publicacao DESC LIMIT ?, ?";
+
+    $offset = ($pagina - 1) * $vagas_por_pagina;
+    $params = array_merge($params, [$offset, $vagas_por_pagina]);
+    $types .= "ii";
+
+    $stmt = $conn->prepare($sql);
+
+    if (!empty($types)) {
+        $stmt->bind_param($types, ...$params);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $total_vagas = $conn->query("SELECT FOUND_ROWS()")->fetch_row()[0];
+
+    return array('result' => $result, 'total' => $total_vagas);
+}
+$resultado_vagas = buscarVagas($conn, $filtro, $localizacao, $pagina_atual, $vagas_por_pagina, $area);
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -696,44 +751,91 @@ if ($curriculo) {
     </div>
 
     <!-- jQuery e Inputmask -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.9/jquery.inputmask.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7/jquery.inputmask.min.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         $(document).ready(function() {
-            // Máscaras
-            $("#phone").inputmask("(99) 99999-9999");
-            $("#zipCode").inputmask("99999-999");
-            $("#birthDate").inputmask("9999-99-99");
+            // Aplicar máscaras aos campos
+            $('#phone').inputmask('(99) 99999-9999');
+            $('#zipCode').inputmask('99999-999');
 
-            // ViaCEP
-            $("#zipCode").on("blur", function() {
-                let cep = $(this).val().replace(/\D/g, "");
-                if (cep.length === 8) {
-                    $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
-                        if (!("erro" in dados)) {
-                            $("#street").val(dados.logradouro);
-                            $("#city").val(dados.localidade);
-                            $("#state").val(dados.uf);
-                            $("#complement").val(dados.complemento);
+            // Configurar a data para formato brasileiro (mas manter o valor original)
+            const birthDateValue = $('#birthDate').val();
+            if (birthDateValue) {
+                $('#birthDate').val(birthDateValue); // Manter o formato YYYY-MM-DD para o input type="date"
+            }
+
+            // ViaCEP - Buscar endereço pelo CEP
+            $('#zipCode').on('blur', function() {
+                const cep = $(this).val().replace(/\D/g, '');
+
+                // Verificar se o CEP tem 8 dígitos
+                if (cep.length !== 8) {
+                    alert('CEP inválido. Deve conter 8 dígitos.');
+                    return;
+                }
+
+                // Fazer a requisição para o ViaCEP
+                $.getJSON(`https://viacep.com.br/ws/${cep}/json/`)
+                    .done(function(data) {
+                        if (!data.erro) {
+                            // Preencher os campos com os dados retornados
+                            $('#street').val(data.logradouro);
+                            $('#city').val(data.localidade);
+                            $('#state').val(data.uf);
+                            $('#complement').val(data.complemento);
+
+                            // Dar foco ao campo número após preencher o endereço
+                            $('#number').focus();
                         } else {
-                            alert("CEP não encontrado.");
+                            alert('CEP não encontrado.');
                         }
+                    })
+                    .fail(function() {
+                        alert('Erro ao consultar o CEP. Tente novamente.');
                     });
+            });
+
+            // Alternar entre mostrar/ocultar data de conclusão com base no checkbox
+            $(document).on('change', 'input[name="currentlyStudying[]"]', function() {
+                const endDateInput = $(this).closest('.form-group').find('input[type="date"]');
+                if ($(this).is(':checked')) {
+                    endDateInput.val('').prop('disabled', true);
+                } else {
+                    endDateInput.prop('disabled', false);
+                }
+            });
+
+            // Alternar entre mostrar/ocultar data de término com base no checkbox de trabalho atual
+            $(document).on('change', 'input[name="currentlyWorking[]"]', function() {
+                const endDateInput = $(this).closest('.form-group').find('input[type="date"]');
+                if ($(this).is(':checked')) {
+                    endDateInput.val('').prop('disabled', true);
+                } else {
+                    endDateInput.prop('disabled', false);
+                }
+            });
+
+            // Inicializar o estado dos checkboxes de data
+            $('input[name="currentlyStudying[]"]').each(function() {
+                const endDateInput = $(this).closest('.form-group').find('input[type="date"]');
+                if ($(this).is(':checked')) {
+                    endDateInput.prop('disabled', true);
+                }
+            });
+
+            $('input[name="currentlyWorking[]"]').each(function() {
+                const endDateInput = $(this).closest('.form-group').find('input[type="date"]');
+                if ($(this).is(':checked')) {
+                    endDateInput.prop('disabled', true);
                 }
             });
         });
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // === funções de toggle e repetição de campos (como no seu código anterior) ===
-        });
-    </script>
-
-    <script>
+        // Funções para adicionar e remover itens dinamicamente
         document.addEventListener('DOMContentLoaded', function() {
             // Função para alternar os cards
             function setupCardToggle(headerId, bodyId) {
@@ -741,11 +843,23 @@ if ($curriculo) {
                 const body = document.getElementById(bodyId);
                 const btn = header.querySelector('.toggle-btn');
 
-                header.addEventListener('click', function() {
+                header.addEventListener('click', function(e) {
+                    // Não fechar/abrir se o clique foi no botão de toggle
+                    if (e.target !== btn && !btn.contains(e.target)) {
+                        body.classList.toggle('show');
+                        btn.classList.toggle('rotated');
+
+                        // Acessibilidade - alternar aria-expanded
+                        const isExpanded = body.classList.contains('show');
+                        header.setAttribute('aria-expanded', isExpanded);
+                    }
+                });
+
+                // Também permitir toggle pelo botão
+                btn.addEventListener('click', function() {
                     body.classList.toggle('show');
                     btn.classList.toggle('rotated');
 
-                    // Acessibilidade - alternar aria-expanded
                     const isExpanded = body.classList.contains('show');
                     header.setAttribute('aria-expanded', isExpanded);
                 });
@@ -758,64 +872,145 @@ if ($curriculo) {
             setupCardToggle('experienceHeader', 'experienceBody');
             setupCardToggle('skillsHeader', 'skillsBody');
 
-            // Adicionar dinamicamente mais itens de formação
-            document.getElementById('addEducation').addEventListener('click', function() {
-                const container = document.getElementById('educationItems');
-                const newItem = container.firstElementChild.cloneNode(true);
-
-                // Limpar os valores dos inputs
-                const inputs = newItem.querySelectorAll('input, textarea, select');
-                inputs.forEach(input => {
-                    if (input.type !== 'button') {
-                        input.value = '';
-                        if (input.type === 'checkbox') {
-                            input.checked = false;
-                        }
-                    }
-                });
+            // Função para adicionar item dinâmico
+            function addItem(containerId, templateHtml) {
+                const container = document.getElementById(containerId);
+                const newItem = document.createElement('div');
+                newItem.className = 'repeater-item';
+                newItem.innerHTML = templateHtml;
 
                 // Adicionar evento de remoção
                 const removeBtn = newItem.querySelector('.remove-item');
                 removeBtn.addEventListener('click', function() {
-                    container.removeChild(newItem);
-                });
-
-                container.appendChild(newItem);
-            });
-
-            // Adicionar dinamicamente mais itens de experiência
-            document.getElementById('addExperience').addEventListener('click', function() {
-                const container = document.getElementById('experienceItems');
-                const newItem = container.firstElementChild.cloneNode(true);
-
-                // Limpar os valores dos inputs
-                const inputs = newItem.querySelectorAll('input, textarea');
-                inputs.forEach(input => {
-                    if (input.type !== 'button') {
-                        input.value = '';
-                        if (input.type === 'checkbox') {
-                            input.checked = false;
-                        }
-                    }
-                });
-
-                // Adicionar evento de remoção
-                const removeBtn = newItem.querySelector('.remove-item');
-                removeBtn.addEventListener('click', function() {
-                    container.removeChild(newItem);
-                });
-
-                container.appendChild(newItem);
-            });
-
-            // Configurar remoção para itens existentes
-            document.querySelectorAll('.remove-item').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const item = this.closest('.repeater-item');
-                    const container = item.parentElement;
-
-                    // Não permitir remover o último item
                     if (container.children.length > 1) {
+                        container.removeChild(newItem);
+                    }
+                });
+
+                // Inicializar máscaras para novos campos
+                setTimeout(() => {
+                    $(newItem).find('input[type="tel"]').inputmask('(99) 99999-9999');
+                }, 100);
+
+                container.appendChild(newItem);
+                return newItem;
+            }
+
+            // Template para formação acadêmica
+            const educationTemplate = `
+                <button type="button" class="remove-item">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Instituição de Ensino</label>
+                            <input type="text" class="form-control" name="institution[]">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Curso</label>
+                            <input type="text" class="form-control" name="course[]">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Grau</label>
+                            <select class="form-control" name="degree[]">
+                                <option value="">Selecione...</option>
+                                <option value="Ensino Médio">Ensino Médio</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Graduação">Graduação</option>
+                                <option value="Pós-Graduação">Pós-Graduação</option>
+                                <option value="Mestrado">Mestrado</option>
+                                <option value="Doutorado">Doutorado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Data de Início</label>
+                            <input type="date" class="form-control" name="startDate[]">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Data de Conclusão</label>
+                            <input type="date" class="form-control" name="endDate[]">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="currentlyStudying[]">
+                                <label class="form-check-label">Cursando atualmente</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Template para experiência profissional
+            const experienceTemplate = `
+                <button type="button" class="remove-item">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Empresa</label>
+                            <input type="text" class="form-control" name="company[]">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Cargo</label>
+                            <input type="text" class="form-control" name="position[]">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Data de Início</label>
+                            <input type="date" class="form-control" name="jobStartDate[]">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Data de Término</label>
+                            <input type="date" class="form-control" name="jobEndDate[]">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="currentlyWorking[]">
+                                <label class="form-check-label">Trabalho atual</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label">Principais Responsabilidades</label>
+                            <textarea class="form-control" name="responsibilities[]" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Eventos de adicionar formação e experiência
+            document.getElementById('addEducation').addEventListener('click', function() {
+                addItem('educationItems', educationTemplate);
+            });
+
+            document.getElementById('addExperience').addEventListener('click', function() {
+                addItem('experienceItems', experienceTemplate);
+            });
+
+            // Ativar os botões de remover já existentes
+            document.querySelectorAll('.remove-item').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const item = btn.closest('.repeater-item');
+                    const container = item.parentElement;
+                    if (container && container.children.length > 1) {
                         container.removeChild(item);
                     }
                 });

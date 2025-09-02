@@ -268,12 +268,36 @@ if (isset($_GET['id_vaga'])) {
                     <div class="mt-2">
                         <select name="local" class="form-select">
                             <option value="">Todas as localizações</option>
-                            <option value="Remoto" <?php echo ($localizacao == 'Remoto') ? 'selected' : ''; ?>>Remoto</option>
-                            <option value="São Paulo" <?php echo ($localizacao == 'São Paulo') ? 'selected' : ''; ?>>São Paulo</option>
-                            <option value="Rio de Janeiro" <?php echo ($localizacao == 'Rio de Janeiro') ? 'selected' : ''; ?>>Rio de Janeiro</option>
-                            <option value="Belo Horizonte" <?php echo ($localizacao == 'Belo Horizonte') ? 'selected' : ''; ?>>Belo Horizonte</option>
-                            <option value="Porto Alegre" <?php echo ($localizacao == 'Porto Alegre') ? 'selected' : ''; ?>>Porto Alegre</option>
+                            <option value="Remoto" <?= ($localizacao == 'Remoto') ? 'selected' : ''; ?>>Remoto</option>
+                            <option value="Acre" <?= ($localizacao == 'Acre') ? 'selected' : ''; ?>>Acre (AC)</option>
+                            <option value="Alagoas" <?= ($localizacao == 'Alagoas') ? 'selected' : ''; ?>>Alagoas (AL)</option>
+                            <option value="Amapá" <?= ($localizacao == 'Amapá') ? 'selected' : ''; ?>>Amapá (AP)</option>
+                            <option value="Amazonas" <?= ($localizacao == 'Amazonas') ? 'selected' : ''; ?>>Amazonas (AM)</option>
+                            <option value="Bahia" <?= ($localizacao == 'Bahia') ? 'selected' : ''; ?>>Bahia (BA)</option>
+                            <option value="Ceará" <?= ($localizacao == 'Ceará') ? 'selected' : ''; ?>>Ceará (CE)</option>
+                            <option value="Distrito Federal" <?= ($localizacao == 'Distrito Federal') ? 'selected' : ''; ?>>Distrito Federal (DF)</option>
+                            <option value="Espírito Santo" <?= ($localizacao == 'Espírito Santo') ? 'selected' : ''; ?>>Espírito Santo (ES)</option>
+                            <option value="Goiás" <?= ($localizacao == 'Goiás') ? 'selected' : ''; ?>>Goiás (GO)</option>
+                            <option value="Maranhão" <?= ($localizacao == 'Maranhão') ? 'selected' : ''; ?>>Maranhão (MA)</option>
+                            <option value="Mato Grosso" <?= ($localizacao == 'Mato Grosso') ? 'selected' : ''; ?>>Mato Grosso (MT)</option>
+                            <option value="Mato Grosso do Sul" <?= ($localizacao == 'Mato Grosso do Sul') ? 'selected' : ''; ?>>Mato Grosso do Sul (MS)</option>
+                            <option value="Minas Gerais" <?= ($localizacao == 'Minas Gerais') ? 'selected' : ''; ?>>Minas Gerais (MG)</option>
+                            <option value="Pará" <?= ($localizacao == 'Pará') ? 'selected' : ''; ?>>Pará (PA)</option>
+                            <option value="Paraíba" <?= ($localizacao == 'Paraíba') ? 'selected' : ''; ?>>Paraíba (PB)</option>
+                            <option value="Paraná" <?= ($localizacao == 'Paraná') ? 'selected' : ''; ?>>Paraná (PR)</option>
+                            <option value="Pernambuco" <?= ($localizacao == 'Pernambuco') ? 'selected' : ''; ?>>Pernambuco (PE)</option>
+                            <option value="Piauí" <?= ($localizacao == 'Piauí') ? 'selected' : ''; ?>>Piauí (PI)</option>
+                            <option value="Rio de Janeiro" <?= ($localizacao == 'Rio de Janeiro') ? 'selected' : ''; ?>>Rio de Janeiro (RJ)</option>
+                            <option value="Rio Grande do Norte" <?= ($localizacao == 'Rio Grande do Norte') ? 'selected' : ''; ?>>Rio Grande do Norte (RN)</option>
+                            <option value="Rio Grande do Sul" <?= ($localizacao == 'Rio Grande do Sul') ? 'selected' : ''; ?>>Rio Grande do Sul (RS)</option>
+                            <option value="Rondônia" <?= ($localizacao == 'Rondônia') ? 'selected' : ''; ?>>Rondônia (RO)</option>
+                            <option value="Roraima" <?= ($localizacao == 'Roraima') ? 'selected' : ''; ?>>Roraima (RR)</option>
+                            <option value="Santa Catarina" <?= ($localizacao == 'Santa Catarina') ? 'selected' : ''; ?>>Santa Catarina (SC)</option>
+                            <option value="São Paulo" <?= ($localizacao == 'São Paulo') ? 'selected' : ''; ?>>São Paulo (SP)</option>
+                            <option value="Sergipe" <?= ($localizacao == 'Sergipe') ? 'selected' : ''; ?>>Sergipe (SE)</option>
+                            <option value="Tocantins" <?= ($localizacao == 'Tocantins') ? 'selected' : ''; ?>>Tocantins (TO)</option>
                         </select>
+
                     </div>
                 </form>
 
