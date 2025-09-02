@@ -164,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["excluir_curriculo"])) 
                 Voltar
             </a>
             <a href="#" class="navbar-brand">
-                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="JobSearch">
+                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" alt="JobSearch">
             </a>
         </div>
     </nav>

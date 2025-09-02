@@ -290,7 +290,7 @@ $conn->close();
                 Voltar
             </a>
             <a href="#" class="navbar-brand">
-                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="JobSearch">
+                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" alt="JobSearch">
             </a>
         </div>
     </nav>
@@ -419,17 +419,17 @@ $conn->close();
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Rua</label>
-                            <input type="text" class="form-control" name="endereco_rua"
+                            <input id="endereco_rua" type="text" class="form-control" name="endereco_rua"
                                 value="<?php echo htmlspecialchars($usuario['endereco_rua'] ?? ''); ?>">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Número</label>
-                            <input type="text" class="form-control" name="endereco_numero"
+                            <input id="endereco_numero" type="text" class="form-control" name="endereco_numero"
                                 value="<?php echo htmlspecialchars($usuario['endereco_numero'] ?? ''); ?>">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Complemento</label>
-                            <input type="text" class="form-control" name="endereco_complemento"
+                            <input id="endereco_complemento" type="text" class="form-control" name="endereco_complemento"
                                 value="<?php echo htmlspecialchars($usuario['endereco_complemento'] ?? ''); ?>">
                         </div>
                     </div>
@@ -437,20 +437,23 @@ $conn->close();
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label class="form-label">Cidade</label>
-                            <input type="text" class="form-control" name="endereco_cidade"
+                            <input id="endereco_cidade" type="text" class="form-control" name="endereco_cidade"
                                 value="<?php echo htmlspecialchars($usuario['endereco_cidade'] ?? ''); ?>">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Estado (UF)</label>
-                            <input type="text" class="form-control" name="endereco_estado" maxlength="2"
+                            <input id="endereco_estado" type="text" class="form-control" name="endereco_estado" maxlength="2"
                                 value="<?php echo htmlspecialchars($usuario['endereco_estado'] ?? ''); ?>">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">CEP</label>
-                            <input type="text" class="form-control" name="endereco_cep"
-                                value="<?php echo htmlspecialchars($usuario['endereco_cep'] ?? ''); ?>">
+                            <input id="endereco_cep" type="text" class="form-control" name="endereco_cep"
+                                value="<?php echo htmlspecialchars($usuario['endereco_cep'] ?? ''); ?>"
+                                inputmode="numeric" autocomplete="postal-code" placeholder="00000-000">
+                            <small id="cepHelp" class="text-muted d-block mt-1"></small>
                         </div>
                     </div>
+
 
                     <h3 class="mb-4 mt-4">Informações Profissionais</h3>
                     <div class="mb-3">
@@ -648,6 +651,96 @@ $conn->close();
             myModal.show();
         });
     </script>
+    <script>
+        (function() {
+            const cepInput = document.getElementById('endereco_cep');
+            const ruaInput = document.getElementById('endereco_rua');
+            const cidadeInput = document.getElementById('endereco_cidade');
+            const ufInput = document.getElementById('endereco_estado');
+            const cepHelp = document.getElementById('cepHelp');
+
+            function limparEndereco() {
+                // Não limpamos número e complemento
+                ruaInput.value = '';
+                cidadeInput.value = '';
+                ufInput.value = '';
+            }
+
+            function setLoading(loading) {
+                const text = loading ? 'Consultando CEP...' : '';
+                cepHelp.textContent = text;
+                cepInput.disabled = loading;
+                ruaInput.readOnly = loading;
+                cidadeInput.readOnly = loading;
+                ufInput.readOnly = loading;
+            }
+
+            // Máscara simples de CEP enquanto digita
+            function mascaraCEP(v) {
+                v = v.replace(/\D/g, '').slice(0, 8);
+                if (v.length > 5) v = v.replace(/(\d{5})(\d{1,3})/, '$1-$2');
+                return v;
+            }
+
+            cepInput.addEventListener('input', function() {
+                this.value = mascaraCEP(this.value);
+            });
+
+            // Dispara a consulta quando perde o foco ou ao pressionar Enter
+            cepInput.addEventListener('blur', consultarCEP);
+            cepInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    consultarCEP();
+                }
+            });
+
+            async function consultarCEP() {
+                let cep = (cepInput.value || '').replace(/\D/g, '');
+
+                // Validação básica
+                if (cep.length === 0) {
+                    cepHelp.textContent = '';
+                    return;
+                }
+                if (cep.length !== 8) {
+                    cepHelp.textContent = 'CEP inválido. Use 8 dígitos (ex.: 01001000 ou 01001-000).';
+                    limparEndereco();
+                    return;
+                }
+
+                try {
+                    setLoading(true);
+                    const resp = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    if (!resp.ok) throw new Error('Falha na consulta do CEP');
+
+                    const data = await resp.json();
+                    if (data.erro) {
+                        cepHelp.textContent = 'CEP não encontrado.';
+                        limparEndereco();
+                        return;
+                    }
+
+                    // Preenche os campos (fallbacks para evitar "undefined")
+                    ruaInput.value = data.logradouro || '';
+                    cidadeInput.value = data.localidade || '';
+                    ufInput.value = (data.uf || '').toUpperCase();
+
+                    // Mensagem final
+                    cepHelp.textContent = (data.bairro) ?
+                        `Bairro: ${data.bairro}` :
+                        'Endereço preenchido pelo ViaCEP.';
+                } catch (err) {
+                    console.error(err);
+                    cepHelp.textContent = 'Não foi possível consultar o CEP agora.';
+                    limparEndereco();
+                } finally {
+                    setLoading(false);
+                }
+            }
+        })();
+    </script>
+
     <!-- Scripts Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

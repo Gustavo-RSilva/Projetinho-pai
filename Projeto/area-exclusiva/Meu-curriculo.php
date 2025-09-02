@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $telefone = $_POST['phone'];
     $data_nascimento = $_POST['birthDate'];
     $resumo_profissional = $_POST['about'];
-    
+
     // Processar endereço
     $endereco_rua = $_POST['street'];
     $endereco_numero = $_POST['number'];
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $endereco_cidade = $_POST['city'];
     $endereco_estado = $_POST['state'];
     $endereco_cep = $_POST['zipCode'];
-    
+
     // Atualizar informações do usuário
     $sql_update = "UPDATE usuarios 
                   SET nome_completo = ?, email = ?, telefone = ?, data_nascimento = ?,
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                       endereco_cidade = ?, endereco_estado = ?, endereco_cep = ?,
                       resumo_profissional = ?
                   WHERE id_usuario = ?";
-    
+
     $stmt = $conn->prepare($sql_update);
     $stmt->bind_param(
         "sssssssssssi",
@@ -50,32 +50,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $resumo_profissional,
         $id_usuario
     );
-    
+
     $stmt->execute();
     $stmt->close();
-    
+
     // Verificar se o usuário já tem um currículo
     $sql_curriculo = "SELECT id_curriculo FROM Curriculo WHERE id_usuario = ? LIMIT 1";
     $stmt = $conn->prepare($sql_curriculo);
     $stmt->bind_param("i", $id_usuario);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows > 0) {
         $curriculo = $result->fetch_assoc();
         $id_curriculo = $curriculo['id_curriculo'];
-        
+
         // Limpar dados antigos
         $sql_delete = "DELETE FROM formacoes WHERE id_curriculo = ?";
         $stmt = $conn->prepare($sql_delete);
         $stmt->bind_param("i", $id_curriculo);
         $stmt->execute();
-        
+
         $sql_delete = "DELETE FROM experiencias WHERE id_curriculo = ?";
         $stmt = $conn->prepare($sql_delete);
         $stmt->bind_param("i", $id_curriculo);
         $stmt->execute();
-        
+
         $sql_delete = "DELETE FROM habilidades WHERE id_curriculo = ?";
         $stmt = $conn->prepare($sql_delete);
         $stmt->bind_param("i", $id_curriculo);
@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $id_curriculo = $stmt->insert_id;
         $stmt->close();
     }
-    
+
     // Processar formações
     if (isset($_POST['institution'])) {
         for ($i = 0; $i < count($_POST['institution']); $i++) {
@@ -98,10 +98,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $instituicao = $_POST['institution'][$i];
                 $curso = $_POST['course'][$i];
                 $nivel_formacao = $_POST['degree'][$i];
-                $data_inicio = $_POST['startDate'][$i];
-                $data_conclusao = $_POST['endDate'][$i];
+
+                // Formatar datas para o MySQL (YYYY-MM-DD)
+                $data_inicio = !empty($_POST['startDate'][$i]) ? date('Y-m-d', strtotime($_POST['startDate'][$i])) : NULL;
+                $data_conclusao = NULL;
+
+                // Se estiver cursando, data_conclusao é NULL
                 $cursando = isset($_POST['currentlyStudying'][$i]) ? 1 : 0;
-                
+                if (!$cursando && !empty($_POST['endDate'][$i])) {
+                    $data_conclusao = date('Y-m-d', strtotime($_POST['endDate'][$i]));
+                }
+
                 $sql = "INSERT INTO formacoes (id_curriculo, instituicao, curso, nivel_formacao, data_inicio, data_conclusao, cursando) 
                         VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
@@ -111,18 +118,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
-    
+
     // Processar experiências
     if (isset($_POST['company'])) {
         for ($i = 0; $i < count($_POST['company']); $i++) {
             if (!empty($_POST['company'][$i])) {
                 $empresa = $_POST['company'][$i];
                 $cargo = $_POST['position'][$i];
-                $data_inicio = $_POST['jobStartDate'][$i];
-                $data_fim = $_POST['jobEndDate'][$i];
+
+                // Formatar datas para o MySQL (YYYY-MM-DD)
+                $data_inicio = !empty($_POST['jobStartDate'][$i]) ? date('Y-m-d', strtotime($_POST['jobStartDate'][$i])) : NULL;
+                $data_fim = NULL;
+
+                // Se for trabalho atual, data_fim é NULL
                 $trabalho_atual = isset($_POST['currentlyWorking'][$i]) ? 1 : 0;
+                if (!$trabalho_atual && !empty($_POST['jobEndDate'][$i])) {
+                    $data_fim = date('Y-m-d', strtotime($_POST['jobEndDate'][$i]));
+                }
+
                 $responsabilidades = $_POST['responsibilities'][$i];
-                
+
                 $sql = "INSERT INTO experiencias (id_curriculo, empresa, cargo, data_inicio, data_fim, trabalho_atual, responsabilidades) 
                         VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
@@ -132,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
-    
+
     // Processar habilidades
     if (isset($_POST['skills'])) {
         foreach ($_POST['skills'] as $habilidade) {
@@ -144,7 +159,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->close();
         }
     }
-    
+
     header("Location: curriculos.php?sucesso=Currículo atualizado com sucesso!");
     exit();
 }
@@ -200,7 +215,7 @@ if ($curriculo) {
             ];
         }
     }
-    
+
     if ($curriculo['experiencias']) {
         $experiencias_array = explode(';;', $curriculo['experiencias']);
         foreach ($experiencias_array as $experiencia_str) {
@@ -215,7 +230,7 @@ if ($curriculo) {
             ];
         }
     }
-    
+
     if ($curriculo['habilidades']) {
         $habilidades = explode(';;', $curriculo['habilidades']);
     }
@@ -224,6 +239,7 @@ if ($curriculo) {
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -235,6 +251,7 @@ if ($curriculo) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
+
 <body>
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
         <div class="navbar-container">
@@ -243,19 +260,19 @@ if ($curriculo) {
                 <span class="material-icons" aria-hidden="true">arrow_back</span>
                 Voltar
             </a>
-           
+
             <!-- Logo -->
             <a href="#" class="navbar-brand" aria-label="Página inicial">
-                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="JobSearch">
+                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" alt="JobSearch">
             </a>
         </div>
     </nav>
-    
+
     <div class="container">
         <h1 class="header-title mb-4">
             <i class="fas fa-file-alt me-2"></i>Formulário de Currículo
         </h1>
-        
+
         <form id="resumeForm" method="POST">
             <!-- Informações Pessoais -->
             <div class="resume-card">
@@ -270,15 +287,15 @@ if ($curriculo) {
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="fullName" class="form-label">Nome Completo*</label>
-                                <input type="text" class="form-control" id="fullName" name="fullName" 
-                                       value="<?php echo htmlspecialchars($usuario['nome_completo'] ?? ''); ?>" required>
+                                <input type="text" class="form-control" id="fullName" name="fullName"
+                                    value="<?php echo htmlspecialchars($usuario['nome_completo'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="email" class="form-label">E-mail*</label>
                                 <input type="email" class="form-control" id="email" name="email"
-                                       value="<?php echo htmlspecialchars($usuario['email'] ?? ''); ?>" required>
+                                    value="<?php echo htmlspecialchars($usuario['email'] ?? ''); ?>" required>
                             </div>
                         </div>
                     </div>
@@ -286,15 +303,15 @@ if ($curriculo) {
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="phone" class="form-label">Telefone</label>
-                                <input type="tel" class="form-control" id="phone" name="phone"
-                                       value="<?php echo htmlspecialchars($usuario['telefone'] ?? ''); ?>">
+                                <input type="text" class="form-control" id="phone" name="phone"
+                                    value="<?php echo htmlspecialchars($usuario['telefone'] ?? ''); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="birthDate" class="form-label">Data de Nascimento</label>
                                 <input type="date" class="form-control" id="birthDate" name="birthDate"
-                                       value="<?php echo htmlspecialchars($usuario['data_nascimento'] ?? ''); ?>">
+                                    value="<?php echo htmlspecialchars($usuario['data_nascimento'] ?? ''); ?>">
                             </div>
                         </div>
                     </div>
@@ -302,15 +319,15 @@ if ($curriculo) {
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="about" class="form-label">Breve Resumo Profissional</label>
-                                <textarea class="form-control" id="about" name="about" rows="3"><?php 
-                                    echo htmlspecialchars($usuario['resumo_profissional'] ?? ''); 
-                                ?></textarea>
+                                <textarea class="form-control" id="about" name="about" rows="3"><?php
+                                                                                                echo htmlspecialchars($usuario['resumo_profissional'] ?? '');
+                                                                                                ?></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Endereço -->
             <div class="resume-card">
                 <div class="card-header" id="addressHeader">
@@ -325,14 +342,14 @@ if ($curriculo) {
                             <div class="form-group">
                                 <label for="street" class="form-label">Rua</label>
                                 <input type="text" class="form-control" id="street" name="street"
-                                       value="<?php echo htmlspecialchars($usuario['endereco_rua'] ?? ''); ?>">
+                                    value="<?php echo htmlspecialchars($usuario['endereco_rua'] ?? ''); ?>">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="number" class="form-label">Número</label>
                                 <input type="text" class="form-control" id="number" name="number"
-                                       value="<?php echo htmlspecialchars($usuario['endereco_numero'] ?? ''); ?>">
+                                    value="<?php echo htmlspecialchars($usuario['endereco_numero'] ?? ''); ?>">
                             </div>
                         </div>
                     </div>
@@ -341,21 +358,21 @@ if ($curriculo) {
                             <div class="form-group">
                                 <label for="city" class="form-label">Cidade</label>
                                 <input type="text" class="form-control" id="city" name="city"
-                                       value="<?php echo htmlspecialchars($usuario['endereco_cidade'] ?? ''); ?>">
+                                    value="<?php echo htmlspecialchars($usuario['endereco_cidade'] ?? ''); ?>">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="state" class="form-label">Estado</label>
                                 <input type="text" class="form-control" id="state" name="state"
-                                       value="<?php echo htmlspecialchars($usuario['endereco_estado'] ?? ''); ?>">
+                                    value="<?php echo htmlspecialchars($usuario['endereco_estado'] ?? ''); ?>">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="zipCode" class="form-label">CEP</label>
                                 <input type="text" class="form-control" id="zipCode" name="zipCode"
-                                       value="<?php echo htmlspecialchars($usuario['endereco_cep'] ?? ''); ?>">
+                                    value="<?php echo htmlspecialchars($usuario['endereco_cep'] ?? ''); ?>">
                             </div>
                         </div>
                     </div>
@@ -364,13 +381,13 @@ if ($curriculo) {
                             <div class="form-group">
                                 <label for="complement" class="form-label">Complemento</label>
                                 <input type="text" class="form-control" id="complement" name="complement"
-                                       value="<?php echo htmlspecialchars($usuario['endereco_complemento'] ?? ''); ?>">
+                                    value="<?php echo htmlspecialchars($usuario['endereco_complemento'] ?? ''); ?>">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Formação Acadêmica -->
             <div class="resume-card">
                 <div class="card-header" id="educationHeader">
@@ -418,13 +435,13 @@ if ($curriculo) {
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="form-label">Data de Início</label>
-                                            <input type="month" class="form-control" name="startDate[]">
+                                            <input type="date" class="form-control" name="startDate[]">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="form-label">Data de Conclusão</label>
-                                            <input type="month" class="form-control" name="endDate[]">
+                                            <input type="date" class="form-control" name="endDate[]">
                                             <div class="form-check mt-2">
                                                 <input class="form-check-input" type="checkbox" name="currentlyStudying[]" id="currentlyStudying">
                                                 <label class="form-check-label" for="currentlyStudying">Cursando atualmente</label>
@@ -443,15 +460,15 @@ if ($curriculo) {
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Instituição de Ensino</label>
-                                                <input type="text" class="form-control" name="institution[]" 
-                                                       value="<?php echo htmlspecialchars($formacao['instituicao']); ?>">
+                                                <input type="text" class="form-control" name="institution[]"
+                                                    value="<?php echo htmlspecialchars($formacao['instituicao']); ?>">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Curso</label>
                                                 <input type="text" class="form-control" name="course[]"
-                                                       value="<?php echo htmlspecialchars($formacao['curso']); ?>">
+                                                    value="<?php echo htmlspecialchars($formacao['curso']); ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -473,18 +490,18 @@ if ($curriculo) {
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label class="form-label">Data de Início</label>
-                                                <input type="month" class="form-control" name="startDate[]"
-                                                       value="<?php echo htmlspecialchars($formacao['data_inicio']); ?>">
+                                                <input type="date" class="form-control" name="startDate[]"
+                                                    value="<?php echo htmlspecialchars($formacao['data_inicio']); ?>">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label class="form-label">Data de Conclusão</label>
-                                                <input type="month" class="form-control" name="endDate[]"
-                                                       value="<?php echo htmlspecialchars($formacao['data_conclusao']); ?>">
+                                                <input type="date" class="form-control" name="endDate[]"
+                                                    value="<?php echo htmlspecialchars($formacao['data_conclusao']); ?>">
                                                 <div class="form-check mt-2">
-                                                    <input class="form-check-input" type="checkbox" name="currentlyStudying[]" 
-                                                           id="currentlyStudying" <?php echo $formacao['cursando'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="currentlyStudying[]"
+                                                        id="currentlyStudying" <?php echo $formacao['cursando'] ? 'checked' : ''; ?>>
                                                     <label class="form-check-label" for="currentlyStudying">Cursando atualmente</label>
                                                 </div>
                                             </div>
@@ -499,7 +516,7 @@ if ($curriculo) {
                     </button>
                 </div>
             </div>
-            
+
             <!-- Experiência Profissional -->
             <div class="resume-card">
                 <div class="card-header" id="experienceHeader">
@@ -533,13 +550,13 @@ if ($curriculo) {
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Data de Início</label>
-                                            <input type="month" class="form-control" name="jobStartDate[]">
+                                            <input type="date" class="form-control" name="jobStartDate[]">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label">Data de Término</label>
-                                            <input type="month" class="form-control" name="jobEndDate[]">
+                                            <input type="date" class="form-control" name="jobEndDate[]">
                                             <div class="form-check mt-2">
                                                 <input class="form-check-input" type="checkbox" name="currentlyWorking[]" id="currentlyWorking">
                                                 <label class="form-check-label" for="currentlyWorking">Trabalho atual</label>
@@ -567,14 +584,14 @@ if ($curriculo) {
                                             <div class="form-group">
                                                 <label class="form-label">Empresa</label>
                                                 <input type="text" class="form-control" name="company[]"
-                                                       value="<?php echo htmlspecialchars($experiencia['empresa']); ?>">
+                                                    value="<?php echo htmlspecialchars($experiencia['empresa']); ?>">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Cargo</label>
                                                 <input type="text" class="form-control" name="position[]"
-                                                       value="<?php echo htmlspecialchars($experiencia['cargo']); ?>">
+                                                    value="<?php echo htmlspecialchars($experiencia['cargo']); ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -582,18 +599,18 @@ if ($curriculo) {
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Data de Início</label>
-                                                <input type="month" class="form-control" name="jobStartDate[]"
-                                                       value="<?php echo htmlspecialchars($experiencia['data_inicio']); ?>">
+                                                <input type="date" class="form-control" name="jobStartDate[]"
+                                                    value="<?php echo htmlspecialchars($experiencia['data_inicio']); ?>">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Data de Término</label>
-                                                <input type="month" class="form-control" name="jobEndDate[]"
-                                                       value="<?php echo htmlspecialchars($experiencia['data_fim']); ?>">
+                                                <input type="date" class="form-control" name="jobEndDate[]"
+                                                    value="<?php echo htmlspecialchars($experiencia['data_fim']); ?>">
                                                 <div class="form-check mt-2">
-                                                    <input class="form-check-input" type="checkbox" name="currentlyWorking[]" 
-                                                           id="currentlyWorking" <?php echo $experiencia['trabalho_atual'] ? 'checked' : ''; ?>>
+                                                    <input class="form-check-input" type="checkbox" name="currentlyWorking[]"
+                                                        id="currentlyWorking" <?php echo $experiencia['trabalho_atual'] ? 'checked' : ''; ?>>
                                                     <label class="form-check-label" for="currentlyWorking">Trabalho atual</label>
                                                 </div>
                                             </div>
@@ -603,9 +620,9 @@ if ($curriculo) {
                                         <div class="col-12">
                                             <div class="form-group">
                                                 <label class="form-label">Principais Responsabilidades</label>
-                                                <textarea class="form-control" name="responsibilities[]" rows="3"><?php 
-                                                    echo htmlspecialchars($experiencia['responsabilidades']); 
-                                                ?></textarea>
+                                                <textarea class="form-control" name="responsibilities[]" rows="3"><?php
+                                                                                                                    echo htmlspecialchars($experiencia['responsabilidades']);
+                                                                                                                    ?></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -618,7 +635,7 @@ if ($curriculo) {
                     </button>
                 </div>
             </div>
-        
+
             <!-- Habilidades -->
             <div class="resume-card">
                 <div class="card-header" id="skillsHeader">
@@ -669,7 +686,7 @@ if ($curriculo) {
                     </div>
                 </div>
             </div>
-            
+
             <div class="text-end align-content-end mt-4">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save me-2"></i>Salvar Currículo
@@ -678,8 +695,43 @@ if ($curriculo) {
         </form>
     </div>
 
-    <!-- Bootstrap JS e Popper -->
+    <!-- jQuery e Inputmask -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.9/jquery.inputmask.min.js"></script>
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Máscaras
+            $("#phone").inputmask("(99) 99999-9999");
+            $("#zipCode").inputmask("99999-999");
+            $("#birthDate").inputmask("9999-99-99");
+
+            // ViaCEP
+            $("#zipCode").on("blur", function() {
+                let cep = $(this).val().replace(/\D/g, "");
+                if (cep.length === 8) {
+                    $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
+                        if (!("erro" in dados)) {
+                            $("#street").val(dados.logradouro);
+                            $("#city").val(dados.localidade);
+                            $("#state").val(dados.uf);
+                            $("#complement").val(dados.complemento);
+                        } else {
+                            alert("CEP não encontrado.");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // === funções de toggle e repetição de campos (como no seu código anterior) ===
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -688,29 +740,29 @@ if ($curriculo) {
                 const header = document.getElementById(headerId);
                 const body = document.getElementById(bodyId);
                 const btn = header.querySelector('.toggle-btn');
-                
+
                 header.addEventListener('click', function() {
                     body.classList.toggle('show');
                     btn.classList.toggle('rotated');
-                    
+
                     // Acessibilidade - alternar aria-expanded
                     const isExpanded = body.classList.contains('show');
                     header.setAttribute('aria-expanded', isExpanded);
                 });
             }
-            
+
             // Configurar o toggle para cada card
             setupCardToggle('personalInfoHeader', 'personalInfoBody');
             setupCardToggle('addressHeader', 'addressBody');
             setupCardToggle('educationHeader', 'educationBody');
             setupCardToggle('experienceHeader', 'experienceBody');
             setupCardToggle('skillsHeader', 'skillsBody');
-            
+
             // Adicionar dinamicamente mais itens de formação
             document.getElementById('addEducation').addEventListener('click', function() {
                 const container = document.getElementById('educationItems');
                 const newItem = container.firstElementChild.cloneNode(true);
-                
+
                 // Limpar os valores dos inputs
                 const inputs = newItem.querySelectorAll('input, textarea, select');
                 inputs.forEach(input => {
@@ -721,21 +773,21 @@ if ($curriculo) {
                         }
                     }
                 });
-                
+
                 // Adicionar evento de remoção
                 const removeBtn = newItem.querySelector('.remove-item');
                 removeBtn.addEventListener('click', function() {
                     container.removeChild(newItem);
                 });
-                
+
                 container.appendChild(newItem);
             });
-            
+
             // Adicionar dinamicamente mais itens de experiência
             document.getElementById('addExperience').addEventListener('click', function() {
                 const container = document.getElementById('experienceItems');
                 const newItem = container.firstElementChild.cloneNode(true);
-                
+
                 // Limpar os valores dos inputs
                 const inputs = newItem.querySelectorAll('input, textarea');
                 inputs.forEach(input => {
@@ -746,22 +798,22 @@ if ($curriculo) {
                         }
                     }
                 });
-                
+
                 // Adicionar evento de remoção
                 const removeBtn = newItem.querySelector('.remove-item');
                 removeBtn.addEventListener('click', function() {
                     container.removeChild(newItem);
                 });
-                
+
                 container.appendChild(newItem);
             });
-            
+
             // Configurar remoção para itens existentes
             document.querySelectorAll('.remove-item').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const item = this.closest('.repeater-item');
                     const container = item.parentElement;
-                    
+
                     // Não permitir remover o último item
                     if (container.children.length > 1) {
                         container.removeChild(item);
@@ -771,4 +823,5 @@ if ($curriculo) {
         });
     </script>
 </body>
+
 </html>
