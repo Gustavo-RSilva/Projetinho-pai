@@ -82,6 +82,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="paginaLogin">
 
     <form class="form-container" method="POST" action="Login.php">
+        <div class="bgcontrata">
+        <img src="./img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" width="200" alt="Logo Contrata">
+        </div>
         <h1 class="text-center entrarcom fw-bold">Entrar com sua conta </h1>
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">E-mail</label>
@@ -93,22 +96,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="password" class="form-control" id="senha" name="senha" required> <img src="./img/view.png" class="eye-icon" id="togglePassword" alt="Mostrar senha"
                     title="Mostrar senha">
             </div>
-            <a href="./Esqueci-senha.html" class="forgot-password-link m-3">Esqueceu a senha?</a>
+            <a href="./Esqueci-senha.html" class="forgot-password-link m-2">Esqueceu a senha?</a>
 
-            <button type="submit" class="btn cor w-100 py-3  rounded-5 ">Entrar</button>
+            <button type="submit" class="btn cor w-100 py-3 rounded-5 ">Entrar</button>
         </div>
         <div class="dividir ">Ou entrar com</div>
 
-        <!-- 
-        <div class="social2-button">
-            <a href="login-google.php" class="btn social-btn btn-outline-danger">
-                <img src="./img/icons8-google-logo-48.png" width="20" height="20" alt="Google">
-                Google
-            </a> -->
-        <!-- <a href="#" class="btn social-btn btn-outline-primary">
-                <img src="./img/linkedin.png" width="20" height="20" alt="LinkedIn">
-                LinkedIn
-            </a> -->
         <div class="social2-button">
             <div id="g_id_onload"
                 data-client_id="642053605341-651u695o9r1jur0tj65kdc2dvgdvs4pk.apps.googleusercontent.com"
@@ -128,12 +121,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 data-logo_alignment="center">
             </div>
         </div>
-        
+
         </div>
-        <div class="naotemconta">Não tem uma conta?
-            <a href="./Criar-conta.html" class="btn criarc btn-outline-secondary w-100 ">Criar Conta </a></button>
-        </div>
-        <div class="empresa-link text-center mt-3">
+        <div class="naotemconta">Não tem uma conta?</div>
+        <a href="./Criar-conta.html" class="btn criarc btn-outline-secondary w-100 ">Criar Conta </a></button>
+        <div class="empresa-link text-center m-5">
             <p>É uma empresa? <a href="./area-empresa/login-empresa.php" class="text-decoration-none">Acesse aqui</a></p>
         </div>
 

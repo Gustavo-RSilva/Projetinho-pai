@@ -32,118 +32,172 @@ font-size: 20px
               height: 88px;
           }
 
-  
-          /* Container dos botões sociais lado a lado */
-          
-          /* Botões sociais tamanho aumentado, mesma altura, largura proporcional */
-          .social2-button  {  
-            position: relative;
-            top: 150px;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            height: 50px;
-            /* espaço entre ícone e texto */
-            width: 100%;
-            /* igualar tamanho */
-          }
-          .text-sec{
-            position: relative;
-            right: 2%;
-          }
-          
-           .entrarcom{
-            font-family:Arial, Helvetica, sans-serif;
-            font-size: 290%;
-            position: static;
-            text-align: center;
-            margin-bottom: 10%;
-    
-          }
 
-          .btn-outline-primary{
-            width: 100%;
-            height: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-          }
-  
-          /* olho */
-          .eye-icon {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            width: 25px;
-            height: 25px;
-            z-index: 2;
-        }
-
-        /* Icones dos buttons */
-        .btnicon {
-            display: inline-flex;
-            align-items: center;
-          }
-        
-          .btnicon img {
-            margin-right: 8px; /* Espaço entre o ícone e o texto */
-          }
-  
-        /* link esqueci senha */
-        .input-with-icon {
-          position: relative;
-      }
-  
-      .forgot-password-link {
-        display: block;
-        text-align: right;
-        font-size: 13px;
-        color: #4299e1;
-        text-decoration: none;
-        margin-top: 8px;
-    }
-  
-  /* texto dividir */
-  
-  .dividir {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
-    color: #a0aec0;
-    font-size: 20px;  
-    position: relative;
-    top: 130px;
-
-  }
-  .dividir::before,
-          .dividir::after {
-              content: "";
-              flex: 1;
-              border-bottom: 2px solid #e2e8f0;
-              margin-left: 9px;
-              margin-right: 9px;
-
-          }
-
-
-.naotemconta{
-text-align: center;
-margin-top: 56%;
-font-size: 20px;
+.paginaLogin {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Adicionado para centralizar verticalmente */
+  background-color: #ffffff;
 }
 
-.criarc{
-    position: relative;
-    margin-top: 13%;
-    padding-top: 15px !important;
-    padding-bottom: 15px !important;
-    bottom: 2rem;
-} 
-.cor{
-background-color: #144d78 !important;
-color: white !important;
-font-size: 16px !important;
+.form-control {
+  border: 1px solid #000000 !important;
+  border-radius: 1rem !important;
+  padding-bottom: 20px;
+}
+
+
+.form-label {
+  font-size: 20px;
+  color: #144d78 !important;
+}
+
+
+.form-container {
+  margin-top: 2%;
+  margin-bottom: 2%;
+  max-width: 450px;
+  background-color: #fff;
+  /* cor de fundo, opcional */
+  padding: 2rem;
+  /* espaçamento interno */
+  border-radius: 20px;
+  /* cantos arredondados */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  /* sombra suave */
+}
+
+/* Caixas de texto tamanho e largura iguais */
+.mb-3 {
+  height: 88px;
+  
+}
+
+
+.g_id_signin {
+  transform: scale(1.3);
+  /* aumenta o botão em 50% */
+  transform-origin: center center;
+  /* mantém o botão centralizado */
+  display: inline-block;
+  /* para que o transform funcione corretamente */
+}
+
+.social2-button {
+  position: relative;
+  top: 130px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  /* espaço entre ícone e texto */
+  width: 100%;
+  /* igualar tamanho */
+}
+
+.entrarcom {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 290%;
+  position: static;
+  text-align: center;
+  margin-bottom: 10%;
+  color: #144d78 !important;
+
+}
+
+.btn-outline-primary {
+  width: 100%;
+  height: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+/* olho */
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 24px !important;
+  height: 24px !important;
+  z-index: 2;
+  font-size: 24px;   /* Para ícones de fonte */
+  width: 25px !important;
+  height: 25px !important
+}
+
+
+/* link esqueci senha */
+.input-with-icon {
+  position: relative;
+}
+
+.forgot-password-link {
+  display: block;
+  text-align: height;
+  font-size: 18px;
+  font-weight: 550 !important;
+  color: #4299e1;
+  text-decoration: none;
+}
+
+/* texto dividir */
+
+.dividir {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: #a0aec0;
+  font-size: 20px;
+  position: relative;
+  top: 120px;
+
+}
+
+.dividir::before,
+.dividir::after {
+  content: "";
+  flex: 1;
+  border-bottom: 2px solid #e2e8f0;
+  margin-left: 9px;
+  margin-right: 9px;
+
+}
+
+
+.naotemconta {
+  text-align: center;
+  position: relative;
+  top: 160px;
+  font-size: 20px;
+}
+
+.criarc {
+  position: relative;
+  margin-top: 13%;
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  bottom: 2rem;
+  font-size: 18px !important;
+  font-weight: 500  !important;
+  top: 127px;
+
+}
+.empresa-link {
+  position: relative;
+  top: 95px;
+  padding-bottom: 40px;
+}
+
+.cor {
+  background-color: #144d78 !important;
+  color: white !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
 }
