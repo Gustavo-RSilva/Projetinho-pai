@@ -558,7 +558,23 @@ $conn->close();
                     <div class="alert alert-info">Você ainda não possui alertas criados.</div>
                 <?php endif; ?>
             </div>
+<style>
+    .input-with-icon {
+  position: relative;
+}
 
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  user-select: none;
+}
+
+</style>
 
             <!-- Aba Segurança -->
             <div class="tab-pane fade" id="seguranca">
@@ -574,16 +590,24 @@ $conn->close();
                     <input type="hidden" name="acao" value="alterar_senha">
                     <div class="mb-3">
                         <label for="senha_atual" class="form-label">Senha Atual</label>
-                        <input type="password" class="form-control" id="senha_atual" name="senha_atual" required>
+                        <div class="input-with-icon">
+                        <input type="password" class="form-control password-input" id="senha_atual" name="senha_atual" required>
+                        <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                     </div>
+                </div>
                     <div class="mb-3">
                         <label for="nova_senha" class="form-label">Nova Senha</label>
-                        <input type="password" class="form-control" id="nova_senha" name="nova_senha" required minlength="6">
+                        <div class="input-with-icon">
+                        <input type="password" class="form-control password-input" id="nova_senha" name="nova_senha" required minlength="6">
+                        <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                         <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
+                    </div>
                     </div>
                     <div class="mb-3">
                         <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
-                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required minlength="6">
+                        <div class="input-with-icon">
+                        <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required minlength="6">
+                        <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                     </div>
                     <button type="submit" class="btn btn-primary">Alterar Senha</button>
                 </form>
@@ -628,6 +652,33 @@ $conn->close();
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggles = document.querySelectorAll('.toggle-password');
+
+            toggles.forEach(function(toggle) {
+                toggle.addEventListener('click', function() {
+                    const input = this.previousElementSibling; // pega o input antes do ícone
+                    if (input && input.classList.contains('password-input')) {
+                        const type = input.type === 'password' ? 'text' : 'password';
+                        input.type = type;
+
+                        // Alterna ícone
+                        if (type === 'password') {
+                            this.src = '../img/view.png';
+                            this.alt = 'Mostrar senha';
+                            this.title = 'Mostrar senha';
+                        } else {
+                            this.src = '../img/hidden.png';
+                            this.alt = 'Ocultar senha';
+                            this.title = 'Ocultar senha';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 
     <script>
         // Preview da nova foto selecionada
