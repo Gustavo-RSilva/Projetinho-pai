@@ -1,0 +1,107 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* icon olhos */
+.eye-icon {
+    right: 12px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 24px !important;
+    height: 24px !important;
+    z-index: 2;
+    font-size: 24px;   /* Para ícones de fonte */
+    width: 25px !important;
+    height: 25px !important
+  }
+
+  .input-with-icon {
+    position: relative;
+  }
+
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.foto-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+    margin: 0 auto 15px;
+    display: block;
+}
+
+.upload-label {
+    cursor: pointer;
+    color: #007bff;
+    display: block;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.upload-label:hover {
+    text-decoration: underline;
+}
+
+.form-title {
+    color: #007bff;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 576px) {
+    .form-container {
+        padding: 20px;
+        box-shadow: none;
+    }
+
+    body {
+        padding: 10px;
+        background-color: #fff;
+    }
+
+    .foto-preview {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+@media (max-width: 400px) {
+    .form-container {
+        padding: 15px;
+    }
+
+    .foto-preview {
+        width: 80px;
+        height: 80px;
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+}

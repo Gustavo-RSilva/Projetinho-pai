@@ -242,8 +242,9 @@ if ($cnpj != "") {
         <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
             <div class="input-with-icon">
-                <input type="password" class="form-control" id="senha" name="senha" required>
-                <i class="fas fa-eye password-toggle-icon" id="togglePassword"></i>
+                <input type="password" class="form-control" id="senha" name="senha" required> 
+                <img src="../img/view.png" class="eye-icon" id="togglePassword" alt="Mostrar senha"
+                    title="Mostrar senha">
             </div>
             <a href="./Esqueci-senha-empresas.html" class="forgot-password-link">Esqueceu a senha?</a>
         </div>
@@ -260,6 +261,34 @@ if ($cnpj != "") {
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    
+    
+    <script>
+            document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('senha');
+
+        // Verifica se os elementos existem
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                // Alterna entre os textos e títulos
+                if (type === 'password') {
+                    this.src = '../img/view.png';
+                    this.alt = 'Mostrar senha';
+                    this.title = 'Mostrar senha';
+                } else {
+                    this.src = '../img/hidden.png';
+                    this.alt = 'Ocultar senha';
+                    this.title = 'Ocultar senha';
+                }
+            });
+        }
+    });
+    </script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Máscara para CNPJ
@@ -281,24 +310,7 @@ if ($cnpj != "") {
             });
 
             // Mostrar/Ocultar senha
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('senha');
 
-            if (togglePassword && passwordInput) {
-                togglePassword.addEventListener('click', function() {
-                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passwordInput.setAttribute('type', type);
-
-                    // Alternar entre os ícones de olho aberto e fechado
-                    if (type === 'password') {
-                        this.classList.remove('fa-eye-slash');
-                        this.classList.add('fa-eye');
-                    } else {
-                        this.classList.remove('fa-eye');
-                        this.classList.add('fa-eye-slash');
-                    }
-                });
-            }
 
             // Validação do formulário
             const form = document.querySelector('form');

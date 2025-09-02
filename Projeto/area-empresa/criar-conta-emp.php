@@ -160,6 +160,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #f8f9fa;
         }
 
+        /* icon olhos */
+        .eye-icon {
+            right: 12px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 24px !important;
+            height: 24px !important;
+            z-index: 2;
+            font-size: 24px;
+            /* Para ícones de fonte */
+            width: 25px !important;
+            height: 25px !important
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
         .form-container {
             max-width: 600px;
             margin: 50px auto;
@@ -237,61 +257,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="senha" class="form-label required-field">Senha</label>
-                        <input type="password" class="form-control" id="senha" name="senha" required minlength="6">
+                        <div class="input-with-icon">
+                            <input type="password" class="form-control password-input" id="senha" name="senha" required minlength="6">
+                            <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                        </div>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="confirmar_senha" class="form-label required-field">Confirmar Senha</label>
-                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                        <div class="input-with-icon">
+                            <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required>
+                            <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                        </div>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label for="ramo_atuacao" class="form-label required-field">Ramo de Atuação</label>
-                    <select class="form-select" id="ramo_atuacao" name="ramo_atuacao" required>
-                        <option value="">Selecione um ramo</option>
-                        <option value="Tecnologia" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Tecnologia') ? 'selected' : ''; ?>>Tecnologia</option>
-                        <option value="Saúde" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Saúde') ? 'selected' : ''; ?>>Saúde</option>
-                        <option value="Educação" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Educação') ? 'selected' : ''; ?>>Educação</option>
-                        <option value="Finanças" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Finanças') ? 'selected' : ''; ?>>Finanças</option>
-                        <option value="Varejo" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Varejo') ? 'selected' : ''; ?>>Varejo</option>
-                        <option value="Indústria" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Indústria') ? 'selected' : ''; ?>>Indústria</option>
-                        <option value="Serviços" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Serviços') ? 'selected' : ''; ?>>Serviços</option>
-                        <option value="Construção Civil" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Construção Civil') ? 'selected' : ''; ?>>Construção Civil</option>
-                        <option value="Alimentação" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Alimentação') ? 'selected' : ''; ?>>Alimentação</option>
-                        <option value="Transporte" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Transporte') ? 'selected' : ''; ?>>Transporte</option>
-                        <option value="Outros" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Outros') ? 'selected' : ''; ?>>Outros</option>
-                    </select>
-                </div>
+                    <div class="mb-3">
+                        <label for="ramo_atuacao" class="form-label required-field">Ramo de Atuação</label>
+                        <select class="form-select" id="ramo_atuacao" name="ramo_atuacao" required>
+                            <option value="">Selecione um ramo</option>
+                            <option value="Tecnologia" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Tecnologia') ? 'selected' : ''; ?>>Tecnologia</option>
+                            <option value="Saúde" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Saúde') ? 'selected' : ''; ?>>Saúde</option>
+                            <option value="Educação" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Educação') ? 'selected' : ''; ?>>Educação</option>
+                            <option value="Finanças" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Finanças') ? 'selected' : ''; ?>>Finanças</option>
+                            <option value="Varejo" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Varejo') ? 'selected' : ''; ?>>Varejo</option>
+                            <option value="Indústria" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Indústria') ? 'selected' : ''; ?>>Indústria</option>
+                            <option value="Serviços" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Serviços') ? 'selected' : ''; ?>>Serviços</option>
+                            <option value="Construção Civil" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Construção Civil') ? 'selected' : ''; ?>>Construção Civil</option>
+                            <option value="Alimentação" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Alimentação') ? 'selected' : ''; ?>>Alimentação</option>
+                            <option value="Transporte" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Transporte') ? 'selected' : ''; ?>>Transporte</option>
+                            <option value="Outros" <?php echo (isset($_POST['ramo_atuacao']) && $_POST['ramo_atuacao'] == 'Outros') ? 'selected' : ''; ?>>Outros</option>
+                        </select>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="descricao" class="form-label">Descrição da Empresa</label>
-                    <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Breve descrição sobre a empresa e suas atividades"><?php echo isset($_POST['descricao']) ? htmlspecialchars($_POST['descricao']) : ''; ?></textarea>
-                </div>
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição da Empresa</label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Breve descrição sobre a empresa e suas atividades"><?php echo isset($_POST['descricao']) ? htmlspecialchars($_POST['descricao']) : ''; ?></textarea>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="website" class="form-label">Site</label>
-                    <input type="url" class="form-control" id="website" name="website" placeholder="https://" value="<?php echo isset($_POST['website']) ? htmlspecialchars($_POST['website']) : ''; ?>">
-                </div>
+                    <div class="mb-3">
+                        <label for="website" class="form-label">Site</label>
+                        <input type="url" class="form-control" id="website" name="website" placeholder="https://" value="<?php echo isset($_POST['website']) ? htmlspecialchars($_POST['website']) : ''; ?>">
+                    </div>
 
-                <div class="mb-3">
-                    <label for="telefone" class="form-label">Telefone</label>
-                    <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="(00) 00000-0000" value="<?php echo isset($_POST['telefone']) ? htmlspecialchars($_POST['telefone']) : ''; ?>">
-                </div>
+                    <div class="mb-3">
+                        <label for="telefone" class="form-label">Telefone</label>
+                        <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="(00) 00000-0000" value="<?php echo isset($_POST['telefone']) ? htmlspecialchars($_POST['telefone']) : ''; ?>">
+                    </div>
 
-                <div class="mb-4">
-                    <label for="endereco" class="form-label">Endereço</label>
-                    <input type="text" class="form-control" id="endereco" name="endereco" placeholder="Rua, número, complemento" value="<?php echo isset($_POST['endereco']) ? htmlspecialchars($_POST['endereco']) : ''; ?>">
-                </div>
+                    <div class="mb-4">
+                        <label for="endereco" class="form-label">Endereço</label>
+                        <input type="text" class="form-control" id="endereco" name="endereco" placeholder="Rua, número, complemento" value="<?php echo isset($_POST['endereco']) ? htmlspecialchars($_POST['endereco']) : ''; ?>">
+                    </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2">Cadastrar Empresa</button>
+                    <button type="submit" class="btn btn-primary w-100 py-2">Cadastrar Empresa</button>
 
-                <div class="mt-3 text-center">
-                    Já tem uma conta? <a href="login_empresa.php">Faça login</a>
-                </div>
+                    <div class="mt-3 text-center">
+                        Já tem uma conta? <a href="login_empresa.php">Faça login</a>
+                    </div>
             </form>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggles = document.querySelectorAll('.toggle-password');
+
+            toggles.forEach(function(toggle) {
+                toggle.addEventListener('click', function() {
+                    const input = this.previousElementSibling; // pega o input antes do ícone
+                    if (input && input.classList.contains('password-input')) {
+                        const type = input.type === 'password' ? 'text' : 'password';
+                        input.type = type;
+
+                        // Alterna ícone
+                        if (type === 'password') {
+                            this.src = '../img/view.png';
+                            this.alt = 'Mostrar senha';
+                            this.title = 'Mostrar senha';
+                        } else {
+                            this.src = '../img/hidden.png';
+                            this.alt = 'Ocultar senha';
+                            this.title = 'Ocultar senha';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 
     <script>
         // Preview do logo selecionado

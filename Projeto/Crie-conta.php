@@ -96,104 +96,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Conta</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/crie-conta.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .form-container {
-            width: 100%;
-            max-width: 500px;
-            padding: 30px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .foto-preview {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #007bff;
-            margin: 0 auto 15px;
-            display: block;
-        }
-
-        .upload-label {
-            cursor: pointer;
-            color: #007bff;
-            display: block;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .upload-label:hover {
-            text-decoration: underline;
-        }
-
-        .form-title {
-            color: #007bff;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        /* Responsividade para dispositivos móveis */
-        @media (max-width: 576px) {
-            .form-container {
-                padding: 20px;
-                box-shadow: none;
-            }
-            
-            body {
-                padding: 10px;
-                background-color: #fff;
-            }
-            
-            .foto-preview {
-                width: 100px;
-                height: 100px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .form-container {
-                padding: 15px;
-            }
-            
-            .foto-preview {
-                width: 80px;
-                height: 80px;
-            }
-            
-            .form-title {
-                font-size: 1.5rem;
-                margin-bottom: 20px;
-            }
-        }
-    </style>
 </head>
+
 <body>
     <div class="form-container">
         <h2 class="form-title">Criar Conta</h2>
@@ -219,25 +131,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="mb-3">
                 <label for="senha" class="form-label">Senha</label>
-                <input type="password" class="form-control" id="senha" name="senha" required>
+                <div class="input-with-icon">
+                <input type="password" class="form-control password-input" id="senha" name="senha" required> 
+                <img src="./img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+            </div>
+        </div>
+
+                <div class="mb-4">
+                    <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
+                    <div class="input-with-icon">
+                    <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required>
+                 <img src="./img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                </div>
             </div>
 
-            <div class="mb-4">
-                <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
-                <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
-            </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3">Criar Conta</button>
 
-            <button type="submit" class="btn btn-primary w-100 mb-3">Criar Conta</button>
-
-            <div class="mt-3 text-center">
-                Já tem uma conta? <a href="Login.php">Faça login</a>
-            </div>
-            <div class="empresa-link text-center mt-3">
-                <p>É uma empresa? <a href="./area-empresa/criar-conta-emp.php" class="text-decoration-none">Acesse aqui</a></p>
-            </div>
+                <div class="mt-3 text-center">
+                    Já tem uma conta? <a href="Login.php">Faça login</a>
+                </div>
+                <div class="empresa-link text-center mt-3">
+                    <p>É uma empresa? <a href="./area-empresa/criar-conta-emp.php" class="text-decoration-none">Acesse aqui</a></p>
+                </div>
         </form>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggles = document.querySelectorAll('.toggle-password');
 
+            toggles.forEach(function(toggle) {
+                toggle.addEventListener('click', function() {
+                    const input = this.previousElementSibling; // pega o input antes do ícone
+                    if (input && input.classList.contains('password-input')) {
+                        const type = input.type === 'password' ? 'text' : 'password';
+                        input.type = type;
+
+                        // Alterna ícone
+                        if (type === 'password') {
+                            this.src = './img/view.png';
+                            this.alt = 'Mostrar senha';
+                            this.title = 'Mostrar senha';
+                        } else {
+                            this.src = './img/hidden.png';
+                            this.alt = 'Ocultar senha';
+                            this.title = 'Ocultar senha';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
     <script>
         // Preview da foto selecionada
         document.getElementById('foto').addEventListener('change', function(e) {
@@ -252,4 +195,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
 </body>
+
 </html>
