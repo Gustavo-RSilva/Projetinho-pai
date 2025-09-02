@@ -55,6 +55,7 @@ body {
 
 .nav-link .material-icons {
   font-size: 20px;
+  cursor: pointer;
 }
 
 .nav-link:hover,
@@ -147,6 +148,7 @@ body {
 .user-status .material-icons {
   font-size: 28px;
   color: var(--brand-color);
+  cursor: pointer;
 }
 
 /* On smaller screens, smaller padding for items */
@@ -473,6 +475,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    cursor: pointer;
   }
 
   .custom-toggle {

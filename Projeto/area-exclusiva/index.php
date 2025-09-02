@@ -85,7 +85,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
         <div class="navbar-container">
             <a href="index.php" class="navbar-brand">
-                <img style="width: 90px;" src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="Contrata">
+                <img style="width: 90px;" src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" alt="Contrata">
             </a>
 
             <!-- Links Desktop -->
@@ -99,8 +99,10 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                     Cargos/Salários
                 </a>
             </div>
+            <button class="btn user-status" type="button" aria-label="Abrir menu de navegação"
+                data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
+                aria-expanded="false" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
 
-            <div class="user-status" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
 
                 <!-- Css da foto de perfil do usuario-->
                 <style>
@@ -117,6 +119,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                         background-color: transparent;
                         /* igual ao fundo do ícone */
                         transition: background-color 0.2s ease;
+                        cursor: pointer;
                     }
 
                     .material-icon-avatar img {
@@ -151,13 +154,6 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                     <span class="material-icons" aria-hidden="true">account_circle</span>
                     Visitante
                 <?php endif; ?>
-
-            </div>
-
-            <button class="custom-toggle" type="button" aria-label="Abrir menu de navegação"
-                data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
-                aria-expanded="false">
-                <span class="material-icons" aria-hidden="true">menu</span>
             </button>
         </div>
 
