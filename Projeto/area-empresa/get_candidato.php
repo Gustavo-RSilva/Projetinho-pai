@@ -25,23 +25,25 @@ if (!$candidato) {
 // Função para corrigir o caminho da imagem
 function corrigirCaminhoImagem($caminho) {
     if (empty($caminho)) {
-        return '../img/default-profile.png';
+        return '../img/user.png';
     }
-    
-    // Verificar se o caminho já está correto
-    if (strpos($caminho, '../') === 0 || file_exists($caminho)) {
+
+    // Se for URL externa (Google, etc.)
+    if (preg_match('/^https?:\/\//', $caminho)) {
         return $caminho;
     }
-    
-    // Tentar diferentes padrões comuns
-    if (strpos($caminho, 'img/') === 0) {
-        $caminho_corrigido = '../' . $caminho;
-        if (file_exists($caminho_corrigido)) {
-            return $caminho_corrigido;
-        }
+
+    // Se já vier no formato correto (../img/...)
+    if (strpos($caminho, '../img/') === 0) {
+        return $caminho;
     }
-    
-    // Se não encontrar, usar imagem padrão
+
+    // Se vier com ./img/, ajusta para ../img/
+    if (strpos($caminho, './img/') === 0) {
+        return '../' . substr($caminho, 2);
+    }
+
+    // Se não atender nenhum caso, imagem padrão
     return '../img/default-profile.png';
 }
 

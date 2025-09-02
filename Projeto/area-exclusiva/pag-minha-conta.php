@@ -12,15 +12,12 @@ if (!isset($_SESSION['id_usuario'])) {
 
 $id_usuario = $_SESSION['id_usuario'];
 
-
-
 /* ============================
    SALVAR ALTERAÇÕES
 ============================ */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     /* ===== Atualizar Dados Pessoais ===== */
     if (isset($_POST['acao']) && $_POST['acao'] === 'atualizar_dados') {
-        // Get all form data with proper null checks
         $nome_completo = trim($_POST['nome_completo'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $telefone = trim($_POST['telefone'] ?? '');
@@ -64,198 +61,207 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
         $stmt->close();
     }
-    // ... rest of your POST handling code ...
+
+    /* ===== Alterar Senha ===== */
+    if (isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha') {
+        if (empty($_POST['senha_atual']) || empty($_POST['nova_senha']) || empty($_POST['confirmar_senha'])) {
+            $erro = "Todos os campos são obrigatórios.";
+        } else {
+            $senha_atual = md5($_POST['senha_atual']);
+            $nova_senha = $_POST['nova_senha'];
+            $confirmar_senha = $_POST['confirmar_senha'];
+
+            if ($nova_senha !== $confirmar_senha) {
+                $erro = "A nova senha e a confirmação não coincidem.";
+            } else {
+                $sql_check = "SELECT senha FROM usuarios WHERE id_usuario = ?";
+                $stmt = $conn->prepare($sql_check);
+                $stmt->bind_param("i", $id_usuario);
+                $stmt->execute();
+                $result = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+
+                if ($result && $result['senha'] === $senha_atual) {
+                    $nova_senha_md5 = md5($nova_senha);
+                    $sql_update_senha = "UPDATE usuarios SET senha = ? WHERE id_usuario = ?";
+                    $stmt = $conn->prepare($sql_update_senha);
+                    $stmt->bind_param("si", $nova_senha_md5, $id_usuario);
+
+                    if ($stmt->execute()) {
+                        $sucesso = "Senha alterada com sucesso!";
+                    } else {
+                        $erro = "Erro ao alterar a senha: " . $stmt->error;
+                    }
+                    $stmt->close();
+                } else {
+                    $erro = "Senha atual incorreta.";
+                }
+            }
+        }
+    }
+
+    /* ===== Atualizar Foto de Perfil ===== */
+    if (isset($_POST['acao']) && $_POST['acao'] === 'alterar_foto') {
+        if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+            $pastaBase = realpath(dirname(__FILE__)) . '/../img/foto-perfil/';
+            if (!file_exists($pastaBase)) {
+                mkdir($pastaBase, 0777, true);
+            }
+
+            $pastaUsuario = uniqid();
+            $caminhoPastaUsuario = $pastaBase . $pastaUsuario;
+            if (!file_exists($caminhoPastaUsuario)) {
+                mkdir($caminhoPastaUsuario, 0777, true);
+            }
+
+            $extensao = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
+            $nomeFoto = 'perfil.' . $extensao;
+            $caminhoCompleto = $caminhoPastaUsuario . '/' . $nomeFoto;
+
+            $check = getimagesize($_FILES['foto_perfil']['tmp_name']);
+            if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png', 'gif'])) {
+                if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $caminhoCompleto)) {
+                    $novaFoto = './img/foto-perfil/' . $pastaUsuario . '/' . $nomeFoto;
+                    $sql_update_foto = "UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?";
+                    $stmt = $conn->prepare($sql_update_foto);
+                    $stmt->bind_param("si", $novaFoto, $id_usuario);
+
+                    if ($stmt->execute()) {
+                        $sucesso = "Foto de perfil atualizada com sucesso!";
+                        $_SESSION['foto_perfil'] = $novaFoto;
+                        header("Refresh:0");
+                    } else {
+                        $erro = "Erro ao atualizar foto no banco de dados.";
+                    }
+                    $stmt->close();
+                } else {
+                    $erro = "Erro ao mover o arquivo. Verifique as permissões.";
+                }
+            } else {
+                $erro = "Arquivo inválido. Apenas imagens JPG, JPEG, PNG e GIF são permitidas.";
+            }
+        } else {
+            $erro = "Nenhuma foto foi selecionada ou ocorreu um erro no upload.";
+        }
+    }
+
+    /* ===== Adicionar Alerta ===== */
+    if (isset($_POST['acao']) && $_POST['acao'] === 'adicionar_alerta') {
+        $termo_busca = trim($_POST['termo_busca'] ?? '');
+        $localizacao = trim($_POST['localizacao'] ?? '');
+        $id_area = !empty($_POST['id_area']) ? (int)$_POST['id_area'] : null;
+        $frequencia = $_POST['frequencia'] ?? 'Diário';
+
+        $sql_insert_alerta = "INSERT INTO alertas_vagas (id_usuario, termo_busca, localizacao, id_area, ativo, frequencia) 
+                              VALUES (?, ?, ?, ?, 1, ?)";
+        $stmt = $conn->prepare($sql_insert_alerta);
+        $stmt->bind_param("issis", $id_usuario, $termo_busca, $localizacao, $id_area, $frequencia);
+
+        if ($stmt->execute()) {
+            $sucesso = "Novo alerta criado com sucesso!";
+        } else {
+            $erro = "Erro ao criar alerta: " . $stmt->error;
+        }
+        $stmt->close();
+    }
+
+    /* ===== Gerenciar Alerta (ativar, desativar, excluir) ===== */
+    if (isset($_POST['acao']) && $_POST['acao'] === 'gerenciar_alerta') {
+        $id_alerta = (int) ($_POST['id_alerta'] ?? 0);
+        $operacao = $_POST['operacao'] ?? '';
+
+        if ($id_alerta > 0) {
+            if ($operacao === 'ativar') {
+                $sql = "UPDATE alertas_vagas SET ativo = 1 WHERE id_alerta = ? AND id_usuario = ?";
+            } elseif ($operacao === 'desativar') {
+                $sql = "UPDATE alertas_vagas SET ativo = 0 WHERE id_alerta = ? AND id_usuario = ?";
+            } elseif ($operacao === 'excluir') {
+                $sql = "DELETE FROM alertas_vagas WHERE id_alerta = ? AND id_usuario = ?";
+            }
+
+            if (!empty($sql)) {
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ii", $id_alerta, $id_usuario);
+                if ($stmt->execute()) {
+                    $sucesso = "Operação realizada com sucesso!";
+                } else {
+                    $erro = "Erro: " . $stmt->error;
+                }
+                $stmt->close();
+            }
+        }
+    }
 }
 
 /* ============================
    CONSULTA DADOS DO USUÁRIO
 ============================ */
-$sql_usuario = "
-    SELECT nome_completo, email, telefone, data_nascimento,
+$sql_usuario = "SELECT nome_completo, email, telefone, data_nascimento,
            endereco_rua, endereco_numero, endereco_complemento,
            endereco_cidade, endereco_estado, endereco_cep,
            resumo_profissional, foto_perfil
     FROM usuarios
-    WHERE id_usuario = ?
-";
-
+    WHERE id_usuario = ?";
 $stmt_usuario = $conn->prepare($sql_usuario);
 $stmt_usuario->bind_param("i", $id_usuario);
-
-if ($stmt_usuario->execute()) {
-    $result_usuario = $stmt_usuario->get_result();
-
-    if ($result_usuario->num_rows > 0) {
-        $usuario = $result_usuario->fetch_assoc();
-
-        // Set default values if fields are null
-        $nome = $usuario['nome_completo'] ?? '';
-        $email = $usuario['email'] ?? '';
-        $telefone = $usuario['telefone'] ?? '';
-        $data_nascimento = $usuario['data_nascimento'] ?? '';
-        $endereco_rua = $usuario['endereco_rua'] ?? '';
-        $endereco_numero = $usuario['endereco_numero'] ?? '';
-        $endereco_complemento = $usuario['endereco_complemento'] ?? '';
-        $endereco_cidade = $usuario['endereco_cidade'] ?? '';
-        $endereco_estado = $usuario['endereco_estado'] ?? '';
-        $endereco_cep = $usuario['endereco_cep'] ?? '';
-        $resumo_profissional = $usuario['resumo_profissional'] ?? '';
-        $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
-    } else {
-        $erro = "Usuário não encontrado.";
-        // Set all default values
-        $nome = $email = $telefone = $endereco_rua = $endereco_numero =
-            $endereco_complemento = $endereco_cidade = $endereco_estado =
-            $endereco_cep = $resumo_profissional = '';
-        $data_nascimento = null;
-        $foto = 'img/foto-perfil/default.png';
-    }
-} else {
-    $erro = "Erro ao consultar dados do usuário: " . $stmt_usuario->error;
-}
+$stmt_usuario->execute();
+$result_usuario = $stmt_usuario->get_result();
+$usuario = $result_usuario->fetch_assoc();
+$stmt_usuario->close();
 
 /* ============================
    CONSULTA CURRÍCULOS
 ============================ */
-$sql_curriculos = "SELECT id_curriculo, pdf_nome, data_envio FROM Curriculo WHERE id_usuario = ?";
+$sql_curriculos = "SELECT id_curriculo, pdf_nome, data_envio FROM curriculo WHERE id_usuario = ?";
 $stmt_curriculos = $conn->prepare($sql_curriculos);
 $stmt_curriculos->bind_param("i", $id_usuario);
 $stmt_curriculos->execute();
 $res_curriculos = $stmt_curriculos->get_result();
-
-$curriculos = [];
-while ($row = $res_curriculos->fetch_assoc()) {
-    $curriculos[] = $row;
-}
-
+$curriculos = $res_curriculos->fetch_all(MYSQLI_ASSOC);
 $total_curriculos = count($curriculos);
-
-// Ajusta caminho da foto
-if (preg_match('/^https?:\/\//', $foto)) {
-    $foto_url = $foto;
-} else {
-    $foto_url = '../' . ltrim($foto, '/');
-}
+$stmt_curriculos->close();
 
 /* ============================
    CONSULTA CANDIDATURAS
 ============================ */
-$sql_candidaturas = "
-    SELECT v.titulo, e.nome AS empresa, v.localizacao AS cidade, 
+$sql_candidaturas = "SELECT v.titulo, e.nome AS empresa, v.localizacao AS cidade, 
            SUBSTRING_INDEX(v.localizacao, ', ', -1) AS estado, c.data_candidatura 
     FROM candidaturas c
     JOIN vagas v ON c.id_vaga = v.id_vaga
     JOIN empresas e ON v.id_empresa = e.id_empresa
-    WHERE c.id_usuario = ?
-";
+    WHERE c.id_usuario = ?";
 $stmt_candidaturas = $conn->prepare($sql_candidaturas);
 $stmt_candidaturas->bind_param("i", $id_usuario);
 $stmt_candidaturas->execute();
 $res_candidaturas = $stmt_candidaturas->get_result();
-
-$candidaturas = [];
-while ($row = $res_candidaturas->fetch_assoc()) {
-    $candidaturas[] = $row;
-}
-/* ===== Alterar Senha ===== */
-if (isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha') {
-    // Verifica se todos os campos foram preenchidos
-    if (empty($_POST['senha_atual']) || empty($_POST['nova_senha']) || empty($_POST['confirmar_senha'])) {
-        $erro = "Todos os campos são obrigatórios.";
-    } else {
-        $senha_atual = md5($_POST['senha_atual']);
-        $nova_senha = $_POST['nova_senha'];
-        $confirmar_senha = $_POST['confirmar_senha'];
-
-        if ($nova_senha !== $confirmar_senha) {
-            $erro = "A nova senha e a confirmação não coincidem.";
-        } else {
-            // Verifica a senha atual
-            $sql_check = "SELECT senha FROM usuarios WHERE id_usuario = ?";
-            $stmt = $conn->prepare($sql_check);
-            $stmt->bind_param("i", $id_usuario);
-            $stmt->execute();
-            $result = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
-
-            if ($result && $result['senha'] === $senha_atual) {
-                // Aplica MD5 na nova senha antes de salvar
-                $nova_senha_md5 = md5($nova_senha);
-
-                $sql_update_senha = "UPDATE usuarios SET senha = ? WHERE id_usuario = ?";
-                $stmt = $conn->prepare($sql_update_senha);
-                $stmt->bind_param("si", $nova_senha_md5, $id_usuario);
-
-                if ($stmt->execute()) {
-                    $sucesso = "Senha alterada com sucesso!";
-                } else {
-                    $erro = "Erro ao alterar a senha: " . $stmt->error;
-                }
-                $stmt->close();
-            } else {
-                $erro = "Senha atual incorreta.";
-            }
-        }
-    }
-}
-/* ===== Atualizar Foto de Perfil ===== */
-if (isset($_POST['acao']) && $_POST['acao'] === 'alterar_foto') {
-    if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
-        // 1. Definir caminho base (relativo ao arquivo atual)
-        $pastaBase = realpath(dirname(__FILE__)) . '/../img/foto-perfil/';
-
-        // 2. Criar pasta base se não existir
-        if (!file_exists($pastaBase)) {
-            mkdir($pastaBase, 0777, true);
-        }
-
-        // 3. Criar pasta única para o usuário usando uniqid()
-        $pastaUsuario = uniqid();
-        $caminhoPastaUsuario = $pastaBase . $pastaUsuario;
-
-        if (!file_exists($caminhoPastaUsuario)) {
-            mkdir($caminhoPastaUsuario, 0777, true);
-        }
-
-        // 4. Processar o arquivo
-        $extensao = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
-        $nomeFoto = 'perfil.' . $extensao;
-        $caminhoCompleto = $caminhoPastaUsuario . '/' . $nomeFoto;
-
-        // 5. Verificar se é uma imagem válida
-        $check = getimagesize($_FILES['foto_perfil']['tmp_name']);
-        if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png', 'gif'])) {
-            if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $caminhoCompleto)) {
-                // 6. Salvar caminho relativo no formato desejado
-                $novaFoto = './img/foto-perfil/' . $pastaUsuario . '/' . $nomeFoto;
-
-                $sql_update_foto = "UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?";
-                $stmt = $conn->prepare($sql_update_foto);
-                $stmt->bind_param("si", $novaFoto, $id_usuario);
-
-                if ($stmt->execute()) {
-                    $sucesso = "Foto de perfil atualizada com sucesso!";
-                    // Atualizar a sessão e recarregar a página
-                    $_SESSION['foto_perfil'] = $novaFoto;
-                    header("Refresh:0");
-                } else {
-                    $erro = "Erro ao atualizar foto no banco de dados.";
-                }
-                $stmt->close();
-            } else {
-                $erro = "Erro ao mover o arquivo. Verifique as permissões.";
-            }
-        } else {
-            $erro = "Arquivo inválido. Apenas imagens JPG, JPEG, PNG e GIF são permitidas.";
-        }
-    } else {
-        $erro = "Nenhuma foto foi selecionada ou ocorreu um erro no upload.";
-    }
-}
-$stmt_usuario->close();
+$candidaturas = $res_candidaturas->fetch_all(MYSQLI_ASSOC);
 $stmt_candidaturas->close();
+
+/* ============================
+   CONSULTA ALERTAS
+============================ */
+$sql_alertas_count = "SELECT COUNT(*) AS total FROM alertas_vagas WHERE id_usuario = ? AND ativo = 1";
+$stmt_alertas_count = $conn->prepare($sql_alertas_count);
+$stmt_alertas_count->bind_param("i", $id_usuario);
+$stmt_alertas_count->execute();
+$total_alertas = $stmt_alertas_count->get_result()->fetch_assoc()['total'] ?? 0;
+$stmt_alertas_count->close();
+
+$sql_alertas_lista = "SELECT a.id_alerta, a.termo_busca, a.localizacao, a.frequencia, a.ativo, a.data_criacao, ap.nome AS area
+    FROM alertas_vagas a
+    LEFT JOIN areas_profissionais ap ON a.id_area = ap.id_area
+    WHERE a.id_usuario = ?
+    ORDER BY a.data_criacao DESC";
+$stmt_alertas_lista = $conn->prepare($sql_alertas_lista);
+$stmt_alertas_lista->bind_param("i", $id_usuario);
+$stmt_alertas_lista->execute();
+$res_alertas_lista = $stmt_alertas_lista->get_result();
+$alertas = $res_alertas_lista->fetch_all(MYSQLI_ASSOC);
+$stmt_alertas_lista->close();
+
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -348,7 +354,7 @@ $conn->close();
                 <div class="card h-100 text-center">
                     <div class="card-body">
                         <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;">notifications</span>
-                        <h3>5</h3>
+                        <h3><?php echo $total_alertas; ?></h3>
                         <p class="mb-3">Alertas Ativos</p>
                         <button class="btn btn-primary">Configurar</button>
                     </div>
@@ -364,6 +370,10 @@ $conn->close();
             <li class="nav-item">
                 <button class="nav-link" id="candidaturas-tab" data-bs-toggle="tab" data-bs-target="#candidaturas" type="button">Minhas Candidaturas</button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link" id="alertas-tab" data-bs-toggle="tab" data-bs-target="#alertas" type="button">Meus Alertas</button>
+            </li>
+
             <li class="nav-item">
                 <button class="nav-link" id="seguranca-tab" data-bs-toggle="tab" data-bs-target="#seguranca" type="button">Segurança</button>
             </li>
@@ -489,7 +499,67 @@ $conn->close();
                 <?php endif; ?>
             </div>
 
-            <!-- Aba Segurança -->
+            <!-- Aba Meus Alertas -->
+            <div class="tab-pane fade" id="alertas">
+                <h2 class="mb-4">Meus Alertas</h2>
+
+                <!-- Formulário Novo Alerta -->
+                <form method="POST" class="mb-4">
+                    <input type="hidden" name="acao" value="adicionar_alerta">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="termo_busca" class="form-control" placeholder="Cargo ou palavra-chave" required>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" name="localizacao" class="form-control" placeholder="Localização">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="frequencia" class="form-select">
+                                <option value="Diário">Diário</option>
+                                <option value="Semanal">Semanal</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">Adicionar</button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Lista de Alertas -->
+                <?php if (!empty($alertas)): ?>
+                    <?php foreach ($alertas as $a): ?>
+                        <div class="card mb-3">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong><?= htmlspecialchars($a['termo_busca']) ?></strong> – <?= htmlspecialchars($a['localizacao']) ?>
+                                    <br><small>Frequência: <?= htmlspecialchars($a['frequencia']) ?></small>
+                                    <br><small>Área: <?= htmlspecialchars($a['area'] ?? 'Não definida') ?></small>
+                                </div>
+                                <div>
+                                    <form method="POST" class="d-inline">
+                                        <input type="hidden" name="acao" value="gerenciar_alerta">
+                                        <input type="hidden" name="id_alerta" value="<?= $a['id_alerta'] ?>">
+                                        <input type="hidden" name="operacao" value="<?= $a['ativo'] ? 'desativar' : 'ativar' ?>">
+                                        <button type="submit" class="btn btn-sm <?= $a['ativo'] ? 'btn-warning' : 'btn-success' ?>">
+                                            <?= $a['ativo'] ? 'Desativar' : 'Ativar' ?>
+                                        </button>
+                                    </form>
+                                    <form method="POST" class="d-inline">
+                                        <input type="hidden" name="acao" value="gerenciar_alerta">
+                                        <input type="hidden" name="id_alerta" value="<?= $a['id_alerta'] ?>">
+                                        <input type="hidden" name="operacao" value="excluir">
+                                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="alert alert-info">Você ainda não possui alertas criados.</div>
+                <?php endif; ?>
+            </div>
+
+
             <!-- Aba Segurança -->
             <div class="tab-pane fade" id="seguranca">
                 <h2 class="mb-4">Configurações de Segurança</h2>

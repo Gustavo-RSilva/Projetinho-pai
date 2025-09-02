@@ -181,6 +181,7 @@ if (isset($_SESSION['msg'])) {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="../css/pag-index-emp.css" />
+    <link rel="stylesheet" href="../css/style.css" />
 </head>
 
 <body>
@@ -622,8 +623,36 @@ if (isset($_SESSION['msg'])) {
     </div>
 
 
-    <footer class="text-center py-3 bg-dark text-white">
-        <p>&copy; 2025 Contrata</p>
+        <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4 class="footer-title">Sobre Nós</h4>
+                <p class="footer-text">Conectamos talentos às melhores oportunidades.</p>
+            </div>
+            <div class="footer-section rightlinks">
+                <h4 class="footer-title">Links Rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="index.php">Início</a></li>
+                    <li><a href="Pagina-vagas.php">Vagas</a></li>
+                    <li><a href="Meu-curriculo.php">Cadastrar Currículo</a></li>
+                    <li><a href="fale-conosco.php">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-section rightredes">
+                <h4 class="footer-title">Redes Sociais</h4>
+                <div class="social-buttons">
+                    <a href="#" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn linkedin" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-btn whatsapp" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Contrata. Todos os direitos reservados.</p>
+        </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

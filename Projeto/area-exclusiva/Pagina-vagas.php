@@ -400,7 +400,7 @@ if (isset($_GET['id_vaga'])) {
                                 <?php endif; ?>
                             <?php else: ?>
                                 <div class="alert alert-warning mt-4">
-                                    <a href="Login.php" class="alert-link">Faça login</a> para se candidatar a esta vaga.
+                                    <a href="../Login.php" class="alert-link">Faça login</a> para se candidatar a esta vaga.
                                 </div>
                             <?php endif; ?>
                         <?php else: ?>
