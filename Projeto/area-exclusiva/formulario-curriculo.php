@@ -110,11 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-submit {
             background-color: var(--brand-color);
             border: none;
-            padding: 10px 20px;
+            padding: 6px 15px;
             font-weight: 600;
+            color: white;
         }
         .btn-submit:hover {
-            background-color: var(--brand-color-dark);
+            background-color: #092c46 ;
+            color: white;
         }
     </style>
 </head>
@@ -236,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php else: ?>
                                         <div class="alert alert-warning">
                                             Você não possui currículos cadastrados. 
-                                            <a href="Meu-curriculo.php" class="alert-link">Cadastre um currículo</a> para se candidatar.
+                                            <a href="curriculos.php" class="alert-link">Cadastre um currículo</a> para se candidatar.
                                         </div>
                                     <?php endif; ?>
                                 </div>

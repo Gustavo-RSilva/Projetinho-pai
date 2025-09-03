@@ -159,10 +159,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["excluir_curriculo"])) 
 <body>
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
         <div class="navbar-container">
-            <a href="./pag-minha-conta.php" class="nav-back-button">
-                <span class="material-icons">arrow_back</span>
+            <button type="button" class="btn nav-back-button" onclick="history.back()" aria-label="Voltar para página anterior">
+                <span class="material-icons" aria-hidden="true">arrow_back</span>
                 Voltar
-            </a>
+            </button>
             <a href="#" class="navbar-brand">
                 <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" alt="JobSearch">
             </a>

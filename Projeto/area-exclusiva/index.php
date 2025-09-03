@@ -44,23 +44,25 @@ function buscarVagasDestaque($conn)
 // Função para buscar áreas profissionais
 function buscarAreasProfissionais($conn)
 {
-    $sql = "SELECT * FROM areas_profissionais 
-            WHERE quantidade_vagas_ativas > 0
-            ORDER BY quantidade_vagas_ativas DESC
-            LIMIT 6";
+    $sql = "SELECT a.id_area, a.nome, 
+               SUM(CASE WHEN v.ativa = 1 AND v.data_expiracao >= CURDATE() THEN 1 ELSE 0 END) AS quantidade_vagas_ativas
+        FROM areas_profissionais a
+        LEFT JOIN vagas_areas va ON a.id_area = va.id_area
+        LEFT JOIN vagas v ON v.id_vaga = va.id_vaga
+        GROUP BY a.id_area, a.nome
+        ORDER BY quantidade_vagas_ativas DESC
+        LIMIT 6";
 
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
-        die("Erro prepare: " . $conn->error);
+        die('Erro prepare: ' . $conn->error);
     }
 
     $stmt->execute();
     $result = $stmt->get_result();
-    if (!$result) {
-        die("Erro get_result: " . $stmt->error);
-    }
     return $result;
 }
+
 
 // Buscar dados
 $vagasDestaque = buscarVagasDestaque($conn);
@@ -227,8 +229,10 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                             <input type="text" id="search-input" name="search"
                                 placeholder="Pesquisar por cargo, empresa ou palavra-chave..."
                                 autocomplete="off">
+                            <!-- Dropdown fica aqui dentro -->
                             <div id="suggestions-container" class="suggestions-dropdown"></div>
                         </div>
+
                         <div class="search-section separator">
                             <span class="material-icons">location_on</span>
                             <select name="local" class="location-select">
@@ -263,12 +267,10 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                                 <option value="Tocantins">Tocantins (TO)</option>
                             </select>
                         </div>
+
                         <button type="submit" class="btn-search">Pesquisar</button>
                     </form>
                 </div>
-            </div>
-        </div>
-        </div>
     </section>
 
     <!-- Vagas em Destaque -->
@@ -561,19 +563,54 @@ $areasProfissionais = buscarAreasProfissionais($conn);
         }
     </script>
     <script>
-        // Buscar sugestões em tempo real - CORRIGIDO
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-input');
             const suggestionsContainer = document.getElementById('suggestions-container');
             let timeoutId;
             let sugestaoAtual = -1;
 
+            // garante que o pai tenha position:relative (se por acaso não tiver)
+            const parentSection = searchInput.closest('.search-section');
+            if (parentSection && getComputedStyle(parentSection).position === 'static') {
+                parentSection.style.position = 'relative';
+            }
+
+            function showSuggestions() {
+                suggestionsContainer.style.display = 'block';
+            }
+
+            function hideSuggestions() {
+                suggestionsContainer.style.display = 'none';
+                sugestaoAtual = -1;
+            }
+
+            // reposiciona o dropdown (útil se layouts mudarem)
+            function positionSuggestions() {
+                // como usamos width:100% e left:0 no CSS, não precisamos calcular left/top complexos.
+                // porém, por segurança, forçamos top baseado no input.
+                suggestionsContainer.style.top = (searchInput.offsetTop + searchInput.offsetHeight + 6) + 'px';
+                suggestionsContainer.style.left = searchInput.offsetLeft + 'px';
+                suggestionsContainer.style.width = searchInput.offsetWidth + 'px';
+            }
+
+            // atualiza navegação por teclado
+            function updateActiveSuggestion(sugestoes, index) {
+                sugestoes.forEach(s => s.classList.remove('active'));
+                if (index >= 0 && sugestoes[index]) {
+                    sugestoes[index].classList.add('active');
+                    sugestoes[index].scrollIntoView({
+                        block: 'nearest'
+                    });
+                    searchInput.value = sugestoes[index].textContent;
+                }
+            }
+
             searchInput.addEventListener('input', function() {
                 const termo = this.value.trim();
                 clearTimeout(timeoutId);
 
                 if (termo === '') {
-                    suggestionsContainer.style.display = 'none';
+                    hideSuggestions();
                     return;
                 }
 
@@ -582,35 +619,38 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                         .then(response => response.json())
                         .then(sugestoes => {
                             suggestionsContainer.innerHTML = '';
+                            sugestaoAtual = -1;
+
                             if (sugestoes.length > 0) {
                                 sugestoes.forEach(sugestao => {
                                     const div = document.createElement('div');
                                     div.className = 'suggestion-item';
                                     div.textContent = sugestao;
                                     div.addEventListener('click', function() {
-                                        searchInput.value = sugestao;
-                                        suggestionsContainer.style.display = 'none';
-                                        // searchInput.form.submit(); // opcional
+                                        searchInput.value = this.textContent;
+                                        hideSuggestions();
+                                        // opcional: searchInput.form.submit();
                                     });
                                     suggestionsContainer.appendChild(div);
                                 });
-                                suggestionsContainer.style.display = 'block';
+                                positionSuggestions();
+                                showSuggestions();
                             } else {
-                                suggestionsContainer.style.display = 'none';
+                                hideSuggestions();
                             }
                         })
-                        .catch(() => suggestionsContainer.style.display = 'none');
-                }, 300);
+                        .catch(() => hideSuggestions());
+                }, 250);
             });
 
             // fechar ao clicar fora
             document.addEventListener('click', function(e) {
                 if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
-                    suggestionsContainer.style.display = 'none';
+                    hideSuggestions();
                 }
             });
 
-            // navegação com teclado
+            // navegação por teclado
             searchInput.addEventListener('keydown', function(e) {
                 const sugestoes = suggestionsContainer.querySelectorAll('.suggestion-item');
                 if (sugestoes.length === 0) return;
@@ -626,21 +666,18 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                 } else if (e.key === 'Enter' && sugestaoAtual !== -1) {
                     e.preventDefault();
                     searchInput.value = sugestoes[sugestaoAtual].textContent;
-                    suggestionsContainer.style.display = 'none';
+                    hideSuggestions();
                     searchInput.form.submit();
                 }
             });
 
-            function updateActiveSuggestion(sugestoes, index) {
-                sugestoes.forEach(s => s.classList.remove('active'));
-                sugestoes[index].classList.add('active');
-                sugestoes[index].scrollIntoView({
-                    block: 'nearest'
-                });
-                searchInput.value = sugestoes[index].textContent;
-            }
+            // reposiciona quando a janela muda (resize/scroll)
+            window.addEventListener('resize', positionSuggestions);
+            // se o pai for rolável, também ajusta no scroll do pai
+            if (parentSection) parentSection.addEventListener('scroll', positionSuggestions);
         });
     </script>
+
 </body>
 
 </html>
