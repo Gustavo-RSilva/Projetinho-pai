@@ -235,59 +235,6 @@ if ($curriculo) {
         $habilidades = explode(';;', $curriculo['habilidades']);
     }
 }
-function buscarVagas($conn, $filtro = '', $localizacao = '', $pagina = 1, $vagas_por_pagina = 10, $area = null)
-{
-    $sql = "SELECT SQL_CALC_FOUND_ROWS v.*, e.nome as empresa_nome, e.url_logo 
-            FROM vagas v 
-            JOIN empresas e ON v.id_empresa = e.id_empresa 
-            WHERE v.ativa = 1";
-
-    $params = array();
-    $types = "";
-
-    if (!empty($filtro)) {
-        $sql .= " AND (v.titulo LIKE ? OR e.nome LIKE ? OR v.localizacao LIKE ?)";
-        $filtro_like = "%$filtro%";
-        $params = array_merge($params, [$filtro_like, $filtro_like, $filtro_like]);
-        $types .= "sss";
-    }
-
-    if (!empty($localizacao)) {
-        $sql .= " AND v.localizacao LIKE ?";
-        $local_like = "%$localizacao%";
-        $params[] = $local_like;
-        $types .= "s";
-    }
-
-    if (!empty($area)) {
-        $sql .= " AND EXISTS (
-            SELECT 1 FROM vagas_areas va 
-            WHERE va.id_vaga = v.id_vaga AND va.id_area = ?
-        )";
-        $params[] = $area;
-        $types .= "i";
-    }
-
-    $sql .= " ORDER BY v.data_publicacao DESC LIMIT ?, ?";
-
-    $offset = ($pagina - 1) * $vagas_por_pagina;
-    $params = array_merge($params, [$offset, $vagas_por_pagina]);
-    $types .= "ii";
-
-    $stmt = $conn->prepare($sql);
-
-    if (!empty($types)) {
-        $stmt->bind_param($types, ...$params);
-    }
-
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $total_vagas = $conn->query("SELECT FOUND_ROWS()")->fetch_row()[0];
-
-    return array('result' => $result, 'total' => $total_vagas);
-}
-$resultado_vagas = buscarVagas($conn, $filtro, $localizacao, $pagina_atual, $vagas_por_pagina, $area);
 
 ?>
 
@@ -311,10 +258,10 @@ $resultado_vagas = buscarVagas($conn, $filtro, $localizacao, $pagina_atual, $vag
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
         <div class="navbar-container">
             <!-- Botão Voltar -->
-            <a href="curriculos.php" class="nav-back-button" aria-label="Voltar para currículos">
+            <button type="button" class="btn nav-back-button" onclick="history.back()" aria-label="Voltar para página anterior">
                 <span class="material-icons" aria-hidden="true">arrow_back</span>
                 Voltar
-            </a>
+            </button>
 
             <!-- Logo -->
             <a href="#" class="navbar-brand" aria-label="Página inicial">

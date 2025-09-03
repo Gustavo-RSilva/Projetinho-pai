@@ -25,7 +25,8 @@ $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 if ($pagina_atual < 1) $pagina_atual = 1;
 
 // Função para buscar vagas com paginação
-function buscarVagas($conn, $filtro = '', $localizacao = '', $pagina = 1, $vagas_por_pagina = 10)
+// Função para buscar vagas com paginação
+function buscarVagas($conn, $filtro = '', $localizacao = '', $area = '', $pagina = 1, $vagas_por_pagina = 10)
 {
     $sql = "SELECT SQL_CALC_FOUND_ROWS v.*, e.nome as empresa_nome, e.url_logo 
             FROM vagas v 
@@ -47,6 +48,17 @@ function buscarVagas($conn, $filtro = '', $localizacao = '', $pagina = 1, $vagas
         $local_like = "%$localizacao%";
         $params[] = $local_like;
         $types .= "s";
+    }
+
+    // Adicionar filtro por área profissional
+    if (!empty($area)) {
+        $sql .= " AND EXISTS (
+                    SELECT 1 FROM vagas_areas va 
+                    WHERE va.id_vaga = v.id_vaga 
+                    AND va.id_area = ?
+                )";
+        $params[] = $area;
+        $types .= "i";
     }
 
     $sql .= " ORDER BY v.data_publicacao DESC LIMIT ?, ?";
@@ -71,12 +83,14 @@ function buscarVagas($conn, $filtro = '', $localizacao = '', $pagina = 1, $vagas
 }
 
 // Processar pesquisa
+// Processar pesquisa
 $filtro = isset($_GET['search']) ? trim($_GET['search']) : '';
 $localizacao = isset($_GET['local']) ? trim($_GET['local']) : '';
-$resultado_vagas = buscarVagas($conn, $filtro, $localizacao, $pagina_atual, $vagas_por_pagina);
+$area = isset($_GET['area']) ? intval($_GET['area']) : ''; // Novo parâmetro de área
+
+$resultado_vagas = buscarVagas($conn, $filtro, $localizacao, $area, $pagina_atual, $vagas_por_pagina);
 $vagas = $resultado_vagas['result'];
 $total_vagas = $resultado_vagas['total'];
-
 // Calcular o total de páginas
 $total_paginas = ceil($total_vagas / $vagas_por_pagina);
 
@@ -304,16 +318,30 @@ if (isset($_GET['id_vaga'])) {
                 <h4 class="mb-3">Vagas Disponíveis</h4>
                 <div class="list-group" id="jobList">
                     <?php if ($vagas->num_rows > 0): ?>
-                        <?php while ($vaga = $vagas->fetch_assoc()): ?>
+                        <?php
+                        // Reset o ponteiro do resultado para garantir que possamos percorrer novamente
+                        $vagas->data_seek(0);
+                        while ($vaga = $vagas->fetch_assoc()):
+                            $logo_url = !empty($vaga['url_logo']) ? htmlspecialchars($vaga['url_logo']) : '../img/logo-empresa/default.png';
+                            $is_active = ($vagaSelecionada && $vagaSelecionada['id_vaga'] == $vaga['id_vaga']);
+                        ?>
                             <a href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&local=<?php echo urlencode($localizacao); ?>&id_vaga=<?php echo $vaga['id_vaga']; ?>&pagina=<?php echo $pagina_atual; ?>"
-                                class="list-group-item list-group-item-action d-flex gap-3 align-items-start <?php echo ($vagaSelecionada && $vagaSelecionada['id_vaga'] == $vaga['id_vaga']) ? 'active' : ''; ?>">
-                                <img src="<?php echo htmlspecialchars($vaga['url_logo']); ?>" alt="<?php echo htmlspecialchars($vaga['empresa_nome']); ?>" width="48" height="48" style="object-fit: contain;">
+                                class="list-group-item list-group-item-action d-flex gap-3 align-items-start <?php echo $is_active ? 'active' : ''; ?>">
+
+                                <!-- Imagem da empresa com fallback -->
+                                <img src="<?php echo $logo_url; ?>"
+                                    alt="<?php echo htmlspecialchars($vaga['empresa_nome']); ?>"
+                                    width="48"
+                                    height="48"
+                                    style="object-fit: contain;"
+                                    onerror="this.src='../img/logo-empresa/default.png'">
+
                                 <div class="text-start">
                                     <div class="fw-bold"><?php echo htmlspecialchars($vaga['empresa_nome']); ?></div>
-                                    <small class="<?php echo ($vagaSelecionada && $vagaSelecionada['id_vaga'] == $vaga['id_vaga']) ?: 'text-muted'; ?>">
+                                    <small class="<?php echo $is_active ? '' : 'text-muted'; ?>">
                                         <?php echo htmlspecialchars($vaga['tipo_contrato']); ?> • <?php echo htmlspecialchars($vaga['localizacao']); ?>
                                     </small>
-                                    <p class="mb-0 small <?php echo ($vagaSelecionada && $vagaSelecionada['id_vaga'] == $vaga['id_vaga']) ?: 'text-secondary'; ?>">
+                                    <p class="mb-0 small <?php echo $is_active ? '' : 'text-secondary'; ?>">
                                         <?php echo htmlspecialchars($vaga['titulo']); ?>
                                     </p>
                                 </div>

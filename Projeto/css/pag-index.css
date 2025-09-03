@@ -81,21 +81,7 @@
   /* Adicionado para posicionar o dropdown corretamente */
 }
 
-.suggestions-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background: white;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  display: none;
-  max-height: 300px;
-  overflow-y: auto;
-  margin-top: 5px;
-  /* Espaço entre a barra e o dropdown */
-}
+
 
 .suggestion-item {
   padding: 12px 16px;
@@ -493,21 +479,38 @@
   }
 }
 
-.suggestions-dropdown {
+#suggestions-container {
   position: absolute;
-  top: 100px;
+  /* em vez de fixed */
+  top: 100%;
+  /* fica logo abaixo do input */
   left: 0;
   width: 100%;
   background: white;
   border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 2000;
-  /* aumenta prioridade, acima da navbar/carrossel */
+  z-index: 5000;
+  display: none;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  /* em vez de fixed */
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
   display: none;
   max-height: 300px;
   overflow-y: auto;
   margin-top: 5px;
 }
+
 
 .suggestion-item {
   padding: 12px 16px;
@@ -526,22 +529,6 @@
   border-bottom: none;
 }
 
-#suggestions-container {
-  position: fixed;
-  /* não fica preso ao pai */
-  top: 19.7rem;
-  left: auto;
-  width: auto;
-  min-width: 300px;
-  background: white;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 5000;
-  /* bem alto */
-  display: none;
-  max-height: 300px;
-  overflow-y: auto;
-}
 
 /* Responsividade extra para cards e pesquisa */
 
@@ -554,7 +541,10 @@
   }
 
   .search-section {
-    width: 100%;
+    position: relative;
+    /* já tinha, mas confirme que exista apenas uma vez */
+    overflow: visible;
+    /* importante para não cortar o dropdown */
   }
 
   .btn-search {
@@ -562,7 +552,8 @@
   }
 
   #suggestions-container {
-    position: absolute; /* em vez de fixed, para não “quebrar” no mobile */
+    position: absolute;
+    /* em vez de fixed, para não “quebrar” no mobile */
     top: 100%;
     left: 0;
     width: 100%;
@@ -572,6 +563,7 @@
 
 /* Cards */
 @media (max-width: 575.98px) {
+
   .job-card,
   .area-card {
     margin-bottom: 1rem;
@@ -586,4 +578,3 @@
     font-size: 1rem;
   }
 }
-
