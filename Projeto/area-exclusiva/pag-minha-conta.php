@@ -356,7 +356,8 @@ $conn->close();
                         <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;">notifications</span>
                         <h3><?php echo $total_alertas; ?></h3>
                         <p class="mb-3">Alertas Ativos</p>
-                        <button class="btn btn-primary">Configurar</button>
+                        <a href="#alertas" id="btnConfigurar" class="btn btn-primary">Configurar</a>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -561,23 +562,22 @@ $conn->close();
                     <div class="alert alert-info">Você ainda não possui alertas criados.</div>
                 <?php endif; ?>
             </div>
-<style>
-    .input-with-icon {
-  position: relative;
-}
+            <style>
+                .input-with-icon {
+                    position: relative;
+                }
 
-.eye-icon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  width: 22px;
-  height: 22px;
-  user-select: none;
-}
-
-</style>
+                .eye-icon {
+                    position: absolute;
+                    right: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    width: 22px;
+                    height: 22px;
+                    user-select: none;
+                }
+            </style>
 
             <!-- Aba Segurança -->
             <div class="tab-pane fade" id="seguranca">
@@ -594,25 +594,25 @@ $conn->close();
                     <div class="mb-3">
                         <label for="senha_atual" class="form-label">Senha Atual</label>
                         <div class="input-with-icon">
-                        <input type="password" class="form-control password-input" id="senha_atual" name="senha_atual" required>
-                        <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                            <input type="password" class="form-control password-input" id="senha_atual" name="senha_atual" required>
+                            <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                        </div>
                     </div>
-                </div>
                     <div class="mb-3">
                         <label for="nova_senha" class="form-label">Nova Senha</label>
                         <div class="input-with-icon">
-                        <input type="password" class="form-control password-input" id="nova_senha" name="nova_senha" required minlength="6">
-                        <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
-                        <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
-                    </div>
+                            <input type="password" class="form-control password-input" id="nova_senha" name="nova_senha" required minlength="6">
+                            <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                            <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
                         <div class="input-with-icon">
-                        <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required minlength="6">
-                        <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                            <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required minlength="6">
+                            <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Alterar Senha</button>
                 </form>
             </div>
     </main>
@@ -655,7 +655,19 @@ $conn->close();
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.getElementById('btnConfigurar').addEventListener('click', function (e) {
+  e.preventDefault();
 
+  // pega o botão oficial da aba
+  var trigger = document.getElementById('alertas-tab');
+  if (trigger) {
+    var tab = new bootstrap.Tab(trigger);
+    tab.show();
+  }
+});
+</script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggles = document.querySelectorAll('.toggle-password');
@@ -793,7 +805,7 @@ $conn->close();
     </script>
 
     <!-- Scripts Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>
