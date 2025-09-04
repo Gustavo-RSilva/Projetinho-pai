@@ -114,11 +114,11 @@ if ($cnpj != "") {
         /* link esqueci senha */
         .forgot-password-link {
             display: block;
-            text-align: right;
-            font-size: 13px;
+            text-align: height;
+            font-size: 18px;
+            font-weight: 550 !important;
             color: #4299e1;
             text-decoration: none;
-            margin-top: 8px;
         }
 
         .forgot-password-link:hover {
@@ -128,11 +128,12 @@ if ($cnpj != "") {
         .cor {
             background-color: #144d78 !important;
             color: white !important;
-            font-size: 16px !important;
-            padding: 12px !important;
-            border-radius: 1rem !important;
-            font-weight: 600;
+            font-size: 20px !important;
+            font-weight: 600 !important;
+            margin-top: -16px !important;
+
         }
+
 
         .cor:hover {
             background-color: #0d3a5c !important;
@@ -146,11 +147,14 @@ if ($cnpj != "") {
         }
 
         .criarc {
-            margin-top: 10px;
+            position: relative;
+            margin-top: 13%;
             padding-top: 15px !important;
             padding-bottom: 15px !important;
-            border-radius: 1rem !important;
-            font-weight: 500;
+            bottom: 2rem;
+            font-size: 18px !important;
+            font-weight: 500 !important;
+
         }
 
         .logo-empresa {
@@ -182,9 +186,9 @@ if ($cnpj != "") {
         }
 
         .password-toggle-icon {
-            position: absolute;
+            position: relative;
             right: 12px;
-            top: 50%;
+            top: 50% !important;
             transform: translateY(-50%);
             cursor: pointer;
             color: #7f8c8d;
@@ -242,11 +246,11 @@ if ($cnpj != "") {
         <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
             <div class="input-with-icon">
-                <input type="password" class="form-control" id="senha" name="senha" required> 
+                <input type="password" class="form-control" id="senha" name="senha" required>
                 <img src="../img/view.png" class="eye-icon" id="togglePassword" alt="Mostrar senha"
                     title="Mostrar senha">
             </div>
-            <a href="./Esqueci-senha-empresas.html" class="forgot-password-link">Esqueceu a senha?</a>
+            <a href="./Esqueci-senha-empresas.html" class="forgot-password-link m-2">Esqueceu a senha?</a>
         </div>
 
         <button type="submit" class="btn cor w-100 py-3 rounded-5">Entrar</button>
@@ -261,34 +265,34 @@ if ($cnpj != "") {
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    
-    
+
+
     <script>
-            document.addEventListener('DOMContentLoaded', function() {
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('senha');
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('senha');
 
-        // Verifica se os elementos existem
-        if (togglePassword && passwordInput) {
-            togglePassword.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
+            // Verifica se os elementos existem
+            if (togglePassword && passwordInput) {
+                togglePassword.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
 
-                // Alterna entre os textos e títulos
-                if (type === 'password') {
-                    this.src = '../img/view.png';
-                    this.alt = 'Mostrar senha';
-                    this.title = 'Mostrar senha';
-                } else {
-                    this.src = '../img/hidden.png';
-                    this.alt = 'Ocultar senha';
-                    this.title = 'Ocultar senha';
-                }
-            });
-        }
-    });
+                    // Alterna entre os textos e títulos
+                    if (type === 'password') {
+                        this.src = '../img/view.png';
+                        this.alt = 'Mostrar senha';
+                        this.title = 'Mostrar senha';
+                    } else {
+                        this.src = '../img/hidden.png';
+                        this.alt = 'Ocultar senha';
+                        this.title = 'Ocultar senha';
+                    }
+                });
+            }
+        });
     </script>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Máscara para CNPJ

@@ -39,43 +39,64 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $localizacao = trim($_POST['localizacao'] ?? '');
     $faixa_salarial = trim($_POST['faixa_salarial'] ?? '');
     $descricao = trim($_POST['descricao'] ?? '');
-    $remoto = isset($_POST['remoto']) ? 1 : 0;
-    $ativa = isset($_POST['ativa']) ? 1 : 0;
+    $remoto = !empty($_POST['remoto']) ? 1 : 0;
+    $ativa = !empty($_POST['ativa']) ? 1 : 0;
     $id_area = (int) ($_POST['id_area'] ?? 0);
     $data_expiracao = !empty($_POST['data_expiracao']) ? $_POST['data_expiracao'] : null;
 
     if ($titulo !== '' && $tipo_contrato !== '') {
-        // Atualizar vaga
-        $stmt = $conn->prepare("UPDATE vagas 
-            SET titulo=?, descricao=?, tipo_contrato=?, localizacao=?, faixa_salarial=?, remoto=?, ativa=?, data_expiracao=? 
-            WHERE id_vaga=? AND id_empresa=?");
-        $stmt->bind_param(
-            'sssssiiisi', 
-            $titulo, 
-            $descricao, 
-            $tipo_contrato, 
-            $localizacao, 
-            $faixa_salarial, 
-            $remoto, 
-            $ativa, 
-            $data_expiracao, 
-            $id, 
-            $id_empresa
-        );
-        $stmt->execute();
-
-        // Atualizar vínculo da área
-        if ($id_area > 0) {
-            // Remove vínculos antigos
-            $conn->query("DELETE FROM vagas_areas WHERE id_vaga=$id");
-            // Insere novo vínculo
-            $stmt2 = $conn->prepare("INSERT INTO vagas_areas (id_vaga, id_area) VALUES (?,?)");
-            $stmt2->bind_param('ii', $id, $id_area);
-            $stmt2->execute();
+        // Preparar a query base
+        $sql = "UPDATE vagas 
+                SET titulo=?, descricao=?, tipo_contrato=?, localizacao=?, faixa_salarial=?, remoto=?, ativa=?, data_expiracao=? 
+                WHERE id_vaga=? AND id_empresa=?";
+        
+        $stmt = $conn->prepare($sql);
+        
+        // Se data_expiracao for NULL, usar valor NULL, senão usar a data
+        if ($data_expiracao === null) {
+            $stmt->bind_param(
+                'sssssiiisi', 
+                $titulo, 
+                $descricao, 
+                $tipo_contrato, 
+                $localizacao, 
+                $faixa_salarial, 
+                $remoto, 
+                $ativa, 
+                $data_expiracao, 
+                $id, 
+                $id_empresa
+            );
+        } else {
+            $stmt->bind_param(
+                'sssssiissi', 
+                $titulo, 
+                $descricao, 
+                $tipo_contrato, 
+                $localizacao, 
+                $faixa_salarial, 
+                $remoto, 
+                $ativa, 
+                $data_expiracao, 
+                $id, 
+                $id_empresa
+            );
         }
 
-        header('Location: index.php'); 
-        exit();
+        if ($stmt->execute()) {
+            // Atualizar vínculo da área
+            if ($id_area > 0) {
+                $conn->query("DELETE FROM vagas_areas WHERE id_vaga=$id");
+                $stmt2 = $conn->prepare("INSERT INTO vagas_areas (id_vaga, id_area) VALUES (?,?)");
+                $stmt2->bind_param('ii', $id, $id_area);
+                $stmt2->execute();
+            }
+
+            header('Location: index.php'); 
+            exit();
+        } else {
+            echo "Erro ao atualizar: " . $conn->error;
+        }
     }
 }
 ?>

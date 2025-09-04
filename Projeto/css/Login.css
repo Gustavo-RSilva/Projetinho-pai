@@ -124,7 +124,9 @@
   color: #4299e1;
   text-decoration: none;
 }
-
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
 /* texto dividir */
 
 .dividir {

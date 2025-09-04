@@ -355,8 +355,9 @@ $conn->close();
                     <div class="card-body">
                         <span class="material-icons mb-2" style="color: var(--brand-color); font-size: 2.5rem;">notifications</span>
                         <h3><?php echo $total_alertas; ?></h3>
-                        <p class="mb-3 ">Alertas Ativos </p>
-                        <a class="btn btn-primary" data-bs-toggle="tab" data-bs-target="#alertas"> Configurar </a>
+                        <p class="mb-3">Alertas Ativos</p>
+                        <a href="#alertas" id="btnConfigurar" class="btn btn-primary">Configurar</a>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -602,6 +603,7 @@ $conn->close();
                         <div class="input-with-icon">
                             <input type="password" class="form-control password-input" id="nova_senha" name="nova_senha" required minlength="6">
                             <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                            <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
                         </div>
                     </div>
                     <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
@@ -612,8 +614,8 @@ $conn->close();
                             <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required minlength="6">
                             <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                         </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Alterar Senha</button>
+
+                        <button type="submit" class="btn btn-primary">Alterar Senha</button>
                 </form>
             </div>
     </main>
@@ -656,7 +658,19 @@ $conn->close();
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.getElementById('btnConfigurar').addEventListener('click', function (e) {
+  e.preventDefault();
 
+  // pega o botão oficial da aba
+  var trigger = document.getElementById('alertas-tab');
+  if (trigger) {
+    var tab = new bootstrap.Tab(trigger);
+    tab.show();
+  }
+});
+</script>
     <script>
   document.addEventListener("DOMContentLoaded", function () {
     if (window.location.hash === "#alertas") {
@@ -806,7 +820,7 @@ $conn->close();
     </script>
 
     <!-- Scripts Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

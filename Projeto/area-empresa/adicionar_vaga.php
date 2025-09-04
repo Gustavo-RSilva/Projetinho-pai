@@ -24,34 +24,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($titulo !== '' && $tipo_contrato !== '' && $id_area > 0) {
         // Inserir vaga
-        $stmt = $conn->prepare("INSERT INTO vagas 
-          (id_empresa, titulo, descricao, tipo_contrato, localizacao, faixa_salarial, remoto, ativa, data_publicacao, data_expiracao) 
-          VALUES (?,?,?,?,?,?,?,?, NOW(), ?)");
+        if ($data_expiracao !== null) {
+            // Com data de expiração
+            $stmt = $conn->prepare("INSERT INTO vagas 
+                (id_empresa, titulo, descricao, tipo_contrato, localizacao, faixa_salarial, remoto, ativa, data_publicacao, data_expiracao) 
+                VALUES (?,?,?,?,?,?,?,?, NOW(), ?)");
+            
+            $stmt->bind_param(
+                'isssssiis',
+                $id_empresa,
+                $titulo,
+                $descricao,
+                $tipo_contrato,
+                $localizacao,
+                $faixa_salarial,
+                $remoto,
+                $ativa,
+                $data_expiracao
+            );
+        } else {
+            // Sem data de expiração (NULL)
+            $stmt = $conn->prepare("INSERT INTO vagas 
+                (id_empresa, titulo, descricao, tipo_contrato, localizacao, faixa_salarial, remoto, ativa, data_publicacao, data_expiracao) 
+                VALUES (?,?,?,?,?,?,?,?, NOW(), NULL)");
+            
+            $stmt->bind_param(
+                'isssssii',
+                $id_empresa,
+                $titulo,
+                $descricao,
+                $tipo_contrato,
+                $localizacao,
+                $faixa_salarial,
+                $remoto,
+                $ativa
+            );
+        }
 
-        $stmt->bind_param(
-            'isssssiss',
-            $id_empresa,
-            $titulo,
-            $descricao,
-            $tipo_contrato,
-            $localizacao,
-            $faixa_salarial,
-            $remoto,
-            $ativa,
-            $data_expiracao
-        );
-        $stmt->execute();
+        if ($stmt->execute()) {
+            // Pegar ID da vaga criada
+            $id_vaga = $stmt->insert_id;
 
-        // Pegar ID da vaga criada
-        $id_vaga = $stmt->insert_id;
+            // Vincular área
+            $stmt2 = $conn->prepare("INSERT INTO vagas_areas (id_vaga, id_area) VALUES (?,?)");
+            $stmt2->bind_param('ii', $id_vaga, $id_area);
+            $stmt2->execute();
 
-        // Vincular área
-        $stmt2 = $conn->prepare("INSERT INTO vagas_areas (id_vaga, id_area) VALUES (?,?)");
-        $stmt2->bind_param('ii', $id_vaga, $id_area);
-        $stmt2->execute();
-
-        header('Location: index.php');
-        exit();
+            header('Location: index.php');
+            exit();
+        } else {
+            echo "Erro ao criar vaga: " . $conn->error;
+        }
     }
 }
 
