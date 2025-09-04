@@ -96,7 +96,7 @@ $status_colors = [
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <!-- CSS Personalizado -->
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/pag-candidaturas.css">
+    <link rel="stylesheet" href="../css/pag-candidatura.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -259,7 +259,7 @@ $status_colors = [
                                 <div class="input-group">
                                     <input type="text" id="search" name="search" class="form-control"
                                         placeholder="Vaga ou empresa" value="<?= htmlspecialchars($filtro_busca) ?>">
-                                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                                    <button type="submit" class="btn azul">Filtrar</button>
                                 </div>
                             </div>
                         </form>

@@ -20,22 +20,6 @@ if ($usuarioLogado) {
 }
 
 // Funções de busca
-function buscarSugestoes($conn, $termo)
-{
-    $termo = $termo . "%";
-    $sql = "SELECT DISTINCT cargo FROM salarios_referencia WHERE cargo LIKE ? ORDER BY cargo LIMIT 5";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $termo);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $sugestoes = [];
-    while ($row = $result->fetch_assoc()) {
-        $sugestoes[] = $row['cargo'];
-    }
-    return $sugestoes;
-}
-
 function buscarSalarios($conn, $cargo)
 {
     $sql = "SELECT * FROM salarios_referencia WHERE cargo = ? ORDER BY nivel_experiencia";
@@ -57,6 +41,7 @@ function cargosPopulares($conn)
 
 // Processar pesquisa
 $resultados = [];
+$cargoPesquisa = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cargo'])) {
     $cargoPesquisa = trim($_POST['cargo']);
     $resultados = buscarSalarios($conn, $cargoPesquisa);
@@ -147,25 +132,20 @@ $cargosPopulares = cargosPopulares($conn);
                     Cargos/Salários
                 </a>
             </div>
-            <button class="btn user-status" type="button" aria-label="Abrir menu de navegação"
-                data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
-                aria-expanded="false" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
+            <button class="btn user-status" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
+                aria-expanded="false">
 
-
-                <!-- Css da foto de perfil do usuario-->
                 <style>
                     .material-icon-avatar {
                         display: inline-flex;
                         align-items: center;
                         justify-content: center;
                         width: 24px;
-                        /* tamanho padrão dos material-icons */
                         height: 24px;
                         border-radius: 50%;
                         overflow: hidden;
                         vertical-align: middle;
                         background-color: transparent;
-                        /* igual ao fundo do ícone */
                         transition: background-color 0.2s ease;
                         cursor: pointer;
                     }
@@ -178,22 +158,18 @@ $cargosPopulares = cargosPopulares($conn);
 
                     .material-icon-avatar:hover {
                         background-color: rgba(0, 0, 0, 0.1);
-                        /* efeito de hover igual aos ícones */
                         cursor: pointer;
                     }
                 </style>
-                <!-- Exibe foto de perfil se o usuário estiver logado -->
                 <?php if ($usuarioLogado): ?>
                     <span class="material-icons material-icon-avatar">
                         <?php
                         $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
-
                         if (preg_match('/^https?:\/\//', $foto)) {
                             $foto_url = $foto;
                         } else {
-                            $foto_url = '../' . $foto;  // Caminho relativo ajustado
+                            $foto_url = '../' . $foto;
                         }
-
                         ?>
                         <img src="<?php echo htmlspecialchars($foto_url); ?>" alt="Foto de perfil" class="foto-perfil">
                     </span>
@@ -207,8 +183,6 @@ $cargosPopulares = cargosPopulares($conn);
 
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto align-items-center">
-
-                <!-- Links Mobile -->
                 <li class="nav-item d-lg-none">
                     <a href="Pagina-vagas.php" class="nav-link">
                         <span class="material-icons">list_alt</span>
@@ -221,8 +195,6 @@ $cargosPopulares = cargosPopulares($conn);
                         Cargos/Salários
                     </a>
                 </li>
-
-                <!-- Seus outros links -->
                 <li class="nav-item">
                     <a href="pag-minha-conta.php" class="nav-link">
                         <span class="material-icons">account_circle</span>
@@ -246,20 +218,19 @@ $cargosPopulares = cargosPopulares($conn);
             <div class="auth-buttons">
                 <?php if ($usuarioLogado): ?>
                     <a href="logout2.php">
-                        <button type="button" class="btn btn-entrar" tabindex="0">Sair</button>
+                        <button type="button" class="btn btn-entrar">Sair</button>
                     </a>
                 <?php else: ?>
                     <a href="../Login.php">
-                        <button type="button" class="btn btn-entrar" tabindex="0">Entrar</button>
+                        <button type="button" class="btn btn-entrar">Entrar</button>
                     </a>
                     <a href="../Crie-conta.php">
-                        <button type="button" class="btn btn-cadastrar" tabindex="0">Cadastrar</button>
+                        <button type="button" class="btn btn-cadastrar">Cadastrar</button>
                     </a>
                 <?php endif; ?>
             </div>
         </div>
     </nav>
-
 
     <main class="container my-5">
         <section class="pesquisa">
@@ -305,7 +276,6 @@ $cargosPopulares = cargosPopulares($conn);
             <?php endif; ?>
         </section>
 
-        <!-- Seção de Cargos Populares (Nova) -->
         <section class="sugestoes mt-5">
             <h3 class="mb-4">Cargos em Destaque</h3>
             <div id="cardsContainer" class="row g-4">
@@ -330,7 +300,6 @@ $cargosPopulares = cargosPopulares($conn);
         </section>
     </main>
 
-    <!-- Footer Original Mantido -->
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-section">
@@ -352,14 +321,10 @@ $cargosPopulares = cargosPopulares($conn);
             <div class="footer-section rightredes">
                 <h4 class="footer-title">Redes Sociais</h4>
                 <div class="social-buttons">
-                    <a href="#" class="social-btn facebook" aria-label="Facebook"><i
-                            class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-btn instagram" aria-label="Instagram"><i
-                            class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-btn linkedin" aria-label="LinkedIn"><i
-                            class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="social-btn whatsapp" aria-label="WhatsApp"><i
-                            class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn linkedin"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
         </div>
@@ -380,11 +345,9 @@ $cargosPopulares = cargosPopulares($conn);
 
                 if (termo.length > 2) {
                     $.ajax({
-                        url: 'buscar_sugestoes.php',
+                        url: 'buscar_sugestoes_cargos.php',
                         method: 'POST',
-                        data: {
-                            termo: termo
-                        },
+                        data: { termo: termo },
                         dataType: 'json',
                         success: function(sugestoes) {
                             $lista.empty();
@@ -393,13 +356,13 @@ $cargosPopulares = cargosPopulares($conn);
                                 sugestoes.forEach(function(cargo) {
                                     $lista.append(
                                         $('<li>')
-                                        .addClass('list-group-item list-group-item-action')
-                                        .text(cargo)
-                                        .on('click', function() {
-                                            $('#inputCargo').val(cargo);
-                                            $lista.hide();
-                                            $('#formPesquisa').submit();
-                                        })
+                                            .addClass('list-group-item list-group-item-action')
+                                            .text(cargo)
+                                            .on('click', function() {
+                                                $('#inputCargo').val(cargo);
+                                                $lista.hide();
+                                                $('#formPesquisa').submit();
+                                            })
                                     );
                                 });
                                 $lista.show();
@@ -416,14 +379,14 @@ $cargosPopulares = cargosPopulares($conn);
                 }
             });
 
-            // Esconder sugestões ao clicar fora
+            // Esconde sugestões ao clicar fora
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('#formPesquisa').length) {
                     $('#sugestoesLista').hide();
                 }
             });
 
-            // Mostrar sugestões ao focar no campo (se houver termo)
+            // Reabre lista se focar no input
             $('#inputCargo').on('focus', function() {
                 if ($(this).val().trim().length > 2 && $('#sugestoesLista').children().length > 0) {
                     $('#sugestoesLista').show();
@@ -431,42 +394,5 @@ $cargosPopulares = cargosPopulares($conn);
             });
         });
     </script>
-    <script>
-        // No código JavaScript, altere a URL do AJAX:
-        $.ajax({
-            url: 'buscar_sugestoes_cargos.php', // Alterado para o novo arquivo
-            method: 'POST',
-            data: {
-                termo: termo
-            },
-            dataType: 'json',
-            success: function(sugestoes) {
-                // Restante do código permanece igual
-                $lista.empty();
-
-                if (sugestoes.length > 0) {
-                    sugestoes.forEach(function(cargo) {
-                        $lista.append(
-                            $('<li>')
-                            .addClass('list-group-item list-group-item-action')
-                            .text(cargo)
-                            .on('click', function() {
-                                $('#inputCargo').val(cargo);
-                                $lista.hide();
-                                $('#formPesquisa').submit();
-                            })
-                        );
-                    });
-                    $lista.show();
-                } else {
-                    $lista.hide();
-                }
-            },
-            error: function() {
-                $lista.hide();
-            }
-        });
-    </script>
 </body>
-
 </html>

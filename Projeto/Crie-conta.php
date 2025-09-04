@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST" enctype="multipart/form-data">
             <div class="mb-4">
-                <img src="https://placehold.co/120x120/007bff/white?text=Perfil" class="foto-preview" id="preview">
+                <img src="img/user.png" class="foto-preview" id="preview">
                 <label for="foto" class="upload-label">
                     <i class="bi bi-camera-fill"></i> Escolher Foto (opcional)
                 </label>
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-                <button type="submit" class="btn btn-primary w-100 mb-3">Criar Conta</button>
+                <button type="submit" class="btn azul w-100 mb-3">Criar Conta</button>
 
                 <div class="mt-3 text-center">
                     Já tem uma conta? <a href="Login.php">Faça login</a>

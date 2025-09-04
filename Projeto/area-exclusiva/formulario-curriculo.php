@@ -7,7 +7,19 @@ if (!isset($_SESSION['id_usuario'])) {
     header("Location: ../Login.php");
     exit();
 }
+// Verifica login
+$usuarioLogado = isset($_SESSION['id_usuario']) && !empty($_SESSION['email']);
+$usuario = [];
 
+if ($usuarioLogado) {
+    $id_usuario = $_SESSION['id_usuario'];
+    $query = "SELECT * FROM usuarios WHERE id_usuario = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id_usuario);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $usuario = $resultado->fetch_assoc();
+}
 // Verificar se foi passado o ID da vaga
 if (!isset($_GET['id_vaga'])) {
     header("Location: Pagina-vagas.php");
@@ -118,75 +130,136 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #092c46 ;
             color: white;
         }
+        .azul{
+            background-color: #144d78;
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
         <div class="navbar-container">
-            <a href="index.php" class="navbar-brand" aria-label="Página inicial JobSearch">
-                <img style="width: 90px;" src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png" alt="JobSearch">
+            <a href="index.php" class="navbar-brand">
+                <img style="width: 90px;" src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" alt="Contrata">
             </a>
 
-            <div class="nav-always-visible">
-                <a href="Pagina-vagas.php" class="nav-link" tabindex="0">
-                    <span class="material-icons" aria-hidden="true">list_alt</span>
+            <!-- Links Desktop -->
+            <div class="nav-always-visible d-none d-lg-flex" aria-hidden="true" aria-label="Links de navegação principal">
+                <a href="Pagina-vagas.php" class="nav-link">
+                    <span class="material-icons">list_alt</span>
                     Vagas Ativas
                 </a>
-                <a href="pag-cargos.php" class="nav-link" tabindex="0">
-                    <span class="material-icons" aria-hidden="true">next_week</span>
-                    Cargos/Salarios
+                <a href="pag-cargos.php" class="nav-link">
+                    <span class="material-icons">next_week</span>
+                    Cargos/Salários
                 </a>
             </div>
+            <button class="btn user-status" type="button" aria-label="Abrir menu de navegação"
+                data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
+                aria-expanded="false" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
 
-            <div class="user-status" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
-                <?php if (isset($_SESSION['id_usuario'])): ?>
-                    <span class="material-icons" aria-hidden="true">account_circle</span>
+
+                <!-- Css da foto de perfil do usuario-->
+                <style>
+                    .material-icon-avatar {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 24px;
+                        /* tamanho padrão dos material-icons */
+                        height: 24px;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        vertical-align: middle;
+                        background-color: transparent;
+                        /* igual ao fundo do ícone */
+                        transition: background-color 0.2s ease;
+                        cursor: pointer;
+                    }
+
+                    .material-icon-avatar img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+
+                    .material-icon-avatar:hover {
+                        background-color: rgba(0, 0, 0, 0.1);
+                        /* efeito de hover igual aos ícones */
+                        cursor: pointer;
+                    }
+                </style>
+                <!-- Exibe foto de perfil se o usuário estiver logado -->
+                <?php if ($usuarioLogado): ?>
+                    <span class="material-icons material-icon-avatar">
+                        <?php
+                        $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
+
+                        if (preg_match('/^https?:\/\//', $foto)) {
+                            $foto_url = $foto;
+                        } else {
+                            $foto_url = '../' . $foto;  // Caminho relativo ajustado
+                        }
+
+                        ?>
+                        <img src="<?php echo htmlspecialchars($foto_url); ?>" alt="Foto de perfil" class="foto-perfil">
+                    </span>
                     Olá, <?php echo htmlspecialchars($_SESSION['nome_completo']); ?>
                 <?php else: ?>
                     <span class="material-icons" aria-hidden="true">account_circle</span>
                     Visitante
                 <?php endif; ?>
-            </div>
-
-            <button class="custom-toggle" type="button" aria-label="Abrir menu de navegação"
-                data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
-                aria-expanded="false">
-                <span class="material-icons" aria-hidden="true">menu</span>
             </button>
         </div>
 
-        <div class="collapse navbar-collapse navbar-expand-collapse" id="mainNav">
-            <ul class="navbar-nav ms-auto align-items-center" role="menu">
-                <li class="nav-item" role="none">
-                    <a href="pag-minha-conta.php" class="nav-link" tabindex="0" role="menuitem">
-                        <span class="material-icons" aria-hidden="true">account_circle</span>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                <!-- Links Mobile -->
+                <li class="nav-item d-lg-none">
+                    <a href="Pagina-vagas.php" class="nav-link">
+                        <span class="material-icons">list_alt</span>
+                        Vagas Ativas
+                    </a>
+                </li>
+                <li class="nav-item d-lg-none">
+                    <a href="pag-cargos.php" class="nav-link">
+                        <span class="material-icons">next_week</span>
+                        Cargos/Salários
+                    </a>
+                </li>
+
+                <!-- Seus outros links -->
+                <li class="nav-item">
+                    <a href="pag-minha-conta.php" class="nav-link">
+                        <span class="material-icons">account_circle</span>
                         Minha Conta
                     </a>
                 </li>
-                <li class="nav-item" role="none">
-                    <a href="Meu-curriculo.php" class="nav-link" tabindex="0" role="menuitem">
-                        <span class="material-icons" aria-hidden="true">description</span>
+                <li class="nav-item">
+                    <a href="curriculos.php" class="nav-link">
+                        <span class="material-icons">description</span>
                         Meu Currículo
                     </a>
                 </li>
-                <li class="nav-item" role="none">
-                    <a href="pag-candidaturas.php" class="nav-link" tabindex="0" role="menuitem">
-                        <span class="material-icons" aria-hidden="true">work_outline</span>
+                <li class="nav-item">
+                    <a href="pag-candidaturas.php" class="nav-link">
+                        <span class="material-icons">work_outline</span>
                         Minhas Candidaturas
                     </a>
                 </li>
             </ul>
+
             <div class="auth-buttons">
-                <?php if (isset($_SESSION['id_usuario'])): ?>
-                    <a href="../logout2.php">
+                <?php if ($usuarioLogado): ?>
+                    <a href="logout2.php">
                         <button type="button" class="btn btn-entrar" tabindex="0">Sair</button>
                     </a>
                 <?php else: ?>
-                    <a href="Login.php">
+                    <a href="../Login.php">
                         <button type="button" class="btn btn-entrar" tabindex="0">Entrar</button>
                     </a>
-                    <a href="Crie-conta.php">
+                    <a href="../Crie-conta.php">
                         <button type="button" class="btn btn-cadastrar" tabindex="0">Cadastrar</button>
                     </a>
                 <?php endif; ?>
@@ -198,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card shadow">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header azul text-white">
                         <h4 class="mb-0">Candidatar-se à Vaga</h4>
                     </div>
                     <div class="card-body">
