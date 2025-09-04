@@ -40,7 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Login</title>
+    <link rel="icon" href="./img/icon/icone-pag.png" />
     <link rel="stylesheet" href="./css/Login.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -83,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <form class="form-container" method="POST" action="Login.php">
         <div class="bgcontrata">
-        <img src="./img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" width="200" alt="Logo Contrata">
+            <img src="./img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" width="200" alt="Logo Contrata">
         </div>
         <h1 class="text-center entrarcom fw-bold">Entrar com sua conta </h1>
         <div class="mb-3">
