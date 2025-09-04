@@ -189,13 +189,42 @@ if (isset($_SESSION['msg'])) {
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol(1) (1).png"
+                <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png"
                     alt="Contrata" height="40" />
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+
+            <!-- Botão para abrir menu dropdown no mobile -->
+            <div class="d-lg-none">
+                <button class="btn btn-link text-decoration-none p-0" type="button" id="mobileEmpresaDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="d-flex align-items-center">
+                        <?php if (!empty($empresa['url_logo'])): ?>
+                            <img src="<?= htmlspecialchars($empresa['url_logo']) ?>"
+                                alt="Logo da Empresa"
+                                class="rounded-circle me-2"
+                                style="width: 32px; height: 32px; object-fit: cover;">
+                        <?php else: ?>
+                            <span class="material-icons me-2">business</span>
+                        <?php endif; ?>
+                        <span><?= htmlspecialchars($empresa['nome']); ?></span>
+                        <span class="material-icons ms-1">arrow_drop_down</span>
+                    </div>
+                </button>
+
+                <!-- Menu dropdown para mobile -->
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileEmpresaDropdown">
+                    <li><a class="dropdown-item" href="#" onclick="mostrarDashboard(event)"><span class="material-icons">dashboard</span> Dashboard</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="mostrarVagas(event)"><span class="material-icons">work</span> Vagas</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="mostrarCandidatos(event)"><span class="material-icons">people</span> Candidatos</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="mostrarEmpresa(event)"><span class="material-icons">business</span> Empresa</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="mostrarRelatorios(event)"><span class="material-icons">analytics</span> Relatórios</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="logout.php"><span class="material-icons">logout</span> Sair</a></li>
+                </ul>
+            </div>
+
+            <div class="collapse navbar-collapse d-none d-lg-block" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
@@ -221,7 +250,6 @@ if (isset($_SESSION['msg'])) {
             </div>
         </div>
     </nav>
-
     <div class="dashboard-container">
         <div class="row g-0 h-100">
             <!-- Sidebar -->
@@ -273,7 +301,7 @@ if (isset($_SESSION['msg'])) {
                     <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Últimas Vagas Publicadas</h5>
-                            <a href="adicionar_vaga.php" class="btn btn-sm btn-primary"><span class="material-icons">add</span> Nova Vaga</a>
+                            <a href="adicionar_vaga.php" class="btn btn-sm btn-primary mobile"><span class="material-icons">add</span> Nova Vaga</a>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -315,7 +343,7 @@ if (isset($_SESSION['msg'])) {
                     <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Gerenciamento de Vagas</h5>
-                            <a href="adicionar_vaga.php" class="btn btn-sm btn-primary"><span class="material-icons">add</span> Nova Vaga</a>
+                            <a href="adicionar_vaga.php" class="btn btn-sm btn-primary mobile"><span class="material-icons">add</span> Nova Vaga</a>
                         </div>
                         <div class="card-body">
                             <form method="GET" class="row g-2 mb-3">
@@ -623,7 +651,7 @@ if (isset($_SESSION['msg'])) {
     </div>
 
 
-        <!-- Footer -->
+    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-section">
@@ -822,7 +850,79 @@ if (isset($_SESSION['msg'])) {
             });
         });
     </script>
+    <script>
+        // Modifique as funções de mostrar seção
+        function mostrarDashboard(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('dashboard-section');
+        }
 
+        function mostrarVagas(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('vagas-section');
+        }
+
+        function mostrarCandidatos(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('candidatos-section');
+        }
+
+        function mostrarEmpresa(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('empresa-section');
+        }
+
+        function mostrarRelatorios(e) {
+            if (e) e.preventDefault();
+            mostrarSecao('relatorios-section');
+        }
+
+        // Função para mostrar seção (mantida da versão anterior)
+        function mostrarSecao(id) {
+            // Esconder todas as seções
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+
+            // Mostrar a seção desejada
+            document.getElementById(id).style.display = 'block';
+
+            // Remover a classe active de todos os itens do menu
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Adicionar a classe active ao item do menu correspondente
+            const menuItems = {
+                'dashboard-section': '[onclick*="mostrarDashboard"]',
+                'vagas-section': '[onclick*="mostrarVagas"]',
+                'candidatos-section': '[onclick*="mostrarCandidatos"]',
+                'empresa-section': '[onclick*="mostrarEmpresa"]',
+                'relatorios-section': '[onclick*="mostrarRelatorios"]'
+            };
+
+            if (menuItems[id]) {
+                const activeLink = document.querySelector(`.sidebar .nav-link${menuItems[id]}`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+
+            // Salvar a seção atual no sessionStorage
+            sessionStorage.setItem('secaoAtiva', id);
+
+            // Atualizar a URL com a âncora correspondente
+            const anchorMap = {
+                'dashboard-section': 'dashboard',
+                'vagas-section': 'vagas',
+                'candidatos-section': 'candidatos',
+                'empresa-section': 'empresa',
+                'relatorios-section': 'relatorios'
+            };
+
+            if (anchorMap[id]) {
+                history.replaceState(null, null, `#${anchorMap[id]}`);
+            }
+        }
+    </script>
 </body>
 
 </html>

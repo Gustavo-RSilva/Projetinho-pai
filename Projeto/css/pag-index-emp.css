@@ -458,3 +458,145 @@
 .table td {
     vertical-align: middle;
 }
+
+/* Sidebar: mantém vertical no desktop */
+.sidebar-container {
+    padding: 0;
+    background-color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.08);
+    height: 100%;
+}
+
+.sidebar {
+    height: 100%;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Ajustes para tabelas em telas pequenas */
+@media (max-width: 767.98px) {
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-card {
+        padding: 10px;
+    }
+
+    .btn {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    /* Cards do dashboard ficam em 2 colunas */
+    .row.mb-4 .col-md-3 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        margin-bottom: 15px;
+    }
+}
+
+/* Ajustes para formulários no celular */
+@media (max-width: 575.98px) {
+    form .form-control,
+    form .form-select,
+    form .btn {
+        font-size: 0.85rem;
+    }
+    .row.g-2 > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* MOBILE: Esconder sidebar padrão */
+@media (max-width: 991.98px) {
+    .sidebar-container {
+        display: none !important;
+    }
+    
+    /* Estilo para o botão do dropdown mobile */
+    #mobileEmpresaDropdown {
+        display: flex;
+        align-items: center;
+        color: #495057 !important;
+        font-weight: 500;
+    }
+    
+    /* Ajustar o main content */
+    .main-content {
+        padding: 15px;
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+    
+    .dashboard-container > .row {
+        margin: 0;
+        height: auto;
+    }
+}
+
+/* Desktop: manter layout original */
+@media (min-width: 992px) {
+    .sidebar-container {
+        display: block !important;
+    }
+    
+    /* Esconder o dropdown mobile no desktop */
+    .d-lg-none .dropdown-menu {
+        display: none !important;
+    }
+}
+
+/* Estilo para os itens do dropdown */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropdown-item .material-icons {
+    font-size: 18px;
+}
+/* Ajustar botões na tabela em telas pequenas */
+@media (max-width: 767.98px) {
+    table td .btn {
+        display: inline-block;
+        margin: 2px;
+    }
+
+    table td {
+        white-space: nowrap;
+    }
+
+    /* Melhor: usar flexbox para alinhar os botões */
+    table td:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    table td:last-child .btn {
+        flex: 1 1 auto;
+        min-width: 80px;
+        text-align: center;
+    }
+}
+@media (max-width: 767.98px) {
+    /* ... seus estilos mobile existentes ... */
+    
+    /* Novo estilo para o botão Nova Vaga no mobile */
+    .btn-sm.mobile {
+        font-size: 0.75rem !important;
+        width: 7rem;
+    }
+    
+    .btn-sm.mobile .material-icons {
+        font-size: 14px !important;
+    }
+}
