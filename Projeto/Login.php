@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 data-client_id="642053605341-651u695o9r1jur0tj65kdc2dvgdvs4pk.apps.googleusercontent.com"
                 data-context="signin"
                 data-ux_mode="redirect"
-                data-login_uri="http://localhost/TI-AM24/Projetinho-pai/Projeto/google_callback.php"
+                data-login_uri="http://localhost/TIAM24/Projetinho-pai/Projeto/google_callback.php"
                 data-auto_prompt="false">
             </div>
 

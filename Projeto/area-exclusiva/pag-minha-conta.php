@@ -606,12 +606,15 @@ $conn->close();
                             <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
                         </div>
                     </div>
+                    <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
+
                     <div class="mb-3">
                         <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
                         <div class="input-with-icon">
                             <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required minlength="6">
                             <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                         </div>
+
                         <button type="submit" class="btn btn-primary">Alterar Senha</button>
                 </form>
             </div>
@@ -668,6 +671,18 @@ document.getElementById('btnConfigurar').addEventListener('click', function (e) 
   }
 });
 </script>
+    <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.location.hash === "#alertas") {
+      var alertasTab = document.querySelector('a[data-bs-toggle="tab"][href="#alertas"]');
+      if (alertasTab) {
+        var tab = new bootstrap.Tab(alertasTab);
+        tab.show();
+      }
+    }
+  });
+</script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggles = document.querySelectorAll('.toggle-password');
