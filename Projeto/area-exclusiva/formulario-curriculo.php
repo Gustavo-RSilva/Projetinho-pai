@@ -66,24 +66,24 @@ $erro = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['id_curriculo'])) {
         $id_curriculo = intval($_POST['id_curriculo']);
-        
+
         // Verificar se o currículo pertence ao usuário
         $sql_verificar = "SELECT * FROM Curriculo 
                          WHERE id_curriculo = ? AND id_usuario = ?";
         $stmt_verificar = $conn->prepare($sql_verificar);
         $stmt_verificar->bind_param("ii", $id_curriculo, $id_usuario);
         $stmt_verificar->execute();
-        
+
         if ($stmt_verificar->get_result()->num_rows > 0) {
             // Inserir candidatura
             $sql_inserir = "INSERT INTO candidaturas 
                            (id_vaga, id_usuario, id_curriculo, status, observacoes) 
                            VALUES (?, ?, ?, 'Em análise', ?)";
             $stmt_inserir = $conn->prepare($sql_inserir);
-            
+
             $observacoes = isset($_POST['observacoes']) ? $_POST['observacoes'] : '';
             $stmt_inserir->bind_param("iiis", $id_vaga, $id_usuario, $id_curriculo, $observacoes);
-            
+
             if ($stmt_inserir->execute()) {
                 $mensagem = "Candidatura enviada com sucesso!";
                 header("Location: pag-candidaturas.php?sucesso=1");
@@ -101,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -111,14 +112,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         .card {
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
+
         .company-logo {
             width: 80px;
             height: 80px;
             object-fit: contain;
             border-radius: 8px;
         }
+
         .btn-submit {
             background-color: var(--brand-color);
             border: none;
@@ -126,15 +129,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 600;
             color: white;
         }
+
         .btn-submit:hover {
-            background-color: #092c46 ;
+            background-color: #092c46;
             color: white;
         }
-        .azul{
+
+        .azul {
             background-color: #144d78;
         }
     </style>
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
@@ -288,13 +294,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p><strong>Empresa:</strong> <?php echo htmlspecialchars($vaga['empresa_nome']); ?></p>
                             <p><strong>Localização:</strong> <?php echo htmlspecialchars($vaga['localizacao']); ?></p>
                             <p><strong>Tipo de contrato:</strong> <?php echo htmlspecialchars($vaga['tipo_contrato']); ?></p>
-                            
+
                             <hr>
-                            
+
                             <?php if ($erro): ?>
                                 <div class="alert alert-danger"><?php echo $erro; ?></div>
                             <?php endif; ?>
-                            
+
                             <form method="POST">
                                 <div class="mb-3">
                                     <label for="id_curriculo" class="form-label">Selecione seu currículo:</label>
@@ -303,25 +309,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <option value="">Selecione um currículo</option>
                                             <?php while ($curriculo = $curriculos->fetch_assoc()): ?>
                                                 <option value="<?php echo $curriculo['id_curriculo']; ?>">
-                                                    <?php echo htmlspecialchars($curriculo['pdf_nome']); ?> 
+                                                    <?php echo htmlspecialchars($curriculo['pdf_nome']); ?>
                                                     (Enviado em: <?php echo date('d/m/Y', strtotime($curriculo['data_envio'])); ?>)
                                                 </option>
                                             <?php endwhile; ?>
                                         </select>
                                     <?php else: ?>
                                         <div class="alert alert-warning">
-                                            Você não possui currículos cadastrados. 
-                                            <a href="curriculos.php" class="alert-link">Cadastre um currículo</a> para se candidatar.
+                                            Você não possui currículos cadastrados.
+                                            <?php
+                                            // Monta o destino de retorno (formulário da vaga com o id)
+                                            $next_for_curriculos = 'formulario-curriculo.php?id_vaga=' . intval($id_vaga);
+                                            ?>
+                                            <a href="curriculos.php?next=<?php echo urlencode($next_for_curriculos); ?>" class="alert-link">
+                                                Cadastre um currículo
+                                            </a>
                                         </div>
                                     <?php endif; ?>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label for="observacoes" class="form-label">Mensagem para o recrutador (opcional):</label>
-                                    <textarea class="form-control" id="observacoes" name="observacoes" rows="3" 
-                                              placeholder="Por que você se interessa por esta vaga?"></textarea>
+                                    <textarea class="form-control" id="observacoes" name="observacoes" rows="3"
+                                        placeholder="Por que você se interessa por esta vaga?"></textarea>
                                 </div>
-                                
+
                                 <?php if ($curriculos->num_rows > 0): ?>
                                     <button type="submit" class="btn btn-submit">Enviar Candidatura</button>
                                 <?php endif; ?>
@@ -366,7 +378,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p>&copy; 2025 JobSearch. Todos os direitos reservados.</p>
         </div>
     </footer>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
