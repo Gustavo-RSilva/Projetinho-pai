@@ -160,8 +160,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    header("Location: curriculos.php?sucesso=Currículo atualizado com sucesso!");
-    exit();
+    $successMsg = "Currículo atualizado com sucesso!";
+
+    // pega next (passado via query)
+    $next = $_GET['next'] ?? '';
+    // não aceita URLs externas para evitar open redirects
+    if ($next && (stripos($next, 'http://') === false && stripos($next, 'https://') === false)) {
+        // se já tem ? no next, usa & senão usa ?
+        $sep = (strpos($next, '?') !== false) ? '&' : '?';
+        header("Location: " . $next . $sep . "sucesso=" . urlencode($successMsg));
+        exit();
+    } else {
+        // fallback: volta para curriculos.php (sem next)
+        header("Location: curriculos.php?sucesso=" . urlencode($successMsg));
+        exit();
+    }
 }
 
 // Consultar dados do usuário

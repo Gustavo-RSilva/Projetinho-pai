@@ -41,6 +41,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
+<<<<<<< HEAD
+=======
+    <link rel="icon" href="./img/icon/icone-pag.png" />
+>>>>>>> 171e1588a80ddb2787ac535222512d3810ddfc48
     <link rel="stylesheet" href="./css/Login.css">
     <link rel="icon" href="img/icon/icone-pag.png" />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -84,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <form class="form-container" method="POST" action="Login.php">
         <div class="bgcontrata">
-        <img src="./img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" width="200" alt="Logo Contrata">
+            <img src="./img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" width="200" alt="Logo Contrata">
         </div>
         <h1 class="text-center entrarcom fw-bold">Entrar com sua conta </h1>
         <div class="mb-3">

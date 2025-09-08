@@ -7,6 +7,16 @@ if (!isset($_SESSION['id_usuario'])) {
     exit();
 }
 
+// Decodifica next caso exista (valor vindo de formulario-curriculo.php)
+$next_raw = $_GET['next'] ?? '';
+$next_decoded = $next_raw ? urldecode($next_raw) : '';
+// garante que next não seja uma URL externa para evitar open redirect
+if ($next_decoded && (stripos($next_decoded, 'http://') !== false || stripos($next_decoded, 'https://') !== false)) {
+    $next_decoded = '';
+}
+$next_query = $next_decoded ? '?next=' . urlencode($next_decoded) : '';
+
+
 $id_usuario = $_SESSION['id_usuario'];
 
 // Consulta currículos do usuário
@@ -78,10 +88,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["novo_curriculo"])) {
 
             if ($stmt->execute()) {
                 $sucesso = "Currículo enviado com sucesso!";
-                header("Refresh:0");
+                $next_param = isset($_GET['next']) ? '&next=' . urlencode($_GET['next']) : '';
+                header("Location: curriculos.php?sucesso=" . urlencode($sucesso) . $next_param);
+                exit();
             } else {
                 $erro = "Erro ao salvar no banco de dados: " . $stmt->error;
             }
+
             $stmt->close();
         } else {
             $erro = "Ocorreu um erro ao enviar o arquivo.";
@@ -159,10 +172,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["excluir_curriculo"])) 
 <body>
     <nav class="navbar navbar-expand-md" role="navigation" aria-label="Menu principal">
         <div class="navbar-container">
-            <button type="button" class="btn nav-back-button" onclick="history.back()" aria-label="Voltar para página anterior">
+            <?php
+            // Back URL: usa next se válido, senão tenta referer interno, senão fallback
+            $backUrl = 'Pagina-vagas.php';
+            if ($next_decoded) {
+                $backUrl = $next_decoded;
+            } else if (!empty($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) !== false) {
+                // se referer for do mesmo host, usa ele
+                $backUrl = $_SERVER['HTTP_REFERER'];
+            }
+            ?>
+            <a href="<?php echo htmlspecialchars($backUrl); ?>" class="btn nav-back-button" aria-label="Voltar para página anterior">
                 <span class="material-icons" aria-hidden="true">arrow_back</span>
                 Voltar
-            </button>
+            </a>
             <a href="#" class="navbar-brand">
                 <img src="../img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" alt="JobSearch">
             </a>
@@ -199,7 +222,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["excluir_curriculo"])) 
             <div class="card-body">
                 <h3 class="card-title">Editar Currículo Online</h3>
                 <p>Preencha seu currículo diretamente em nosso formulário online.</p>
+<<<<<<< HEAD
                 <a href="Meu-curriculo.php" class="btn btn-primary" target="_blank">
+=======
+                <a href="Meu-curriculo.php<?php echo $next_query; ?>" class="btn btn-primary">
+>>>>>>> 171e1588a80ddb2787ac535222512d3810ddfc48
                     <i class="fas fa-edit me-2"></i>Editar Currículo Online
                 </a>
             </div>

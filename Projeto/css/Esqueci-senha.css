@@ -12,6 +12,13 @@
     padding-right: 40px; /* espaço pro ícone não ficar em cima do texto */
 }
 
+.cor {
+    background-color: #144d78 !important;
+    color: white !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+  }
+
 .input-with-icon .eye-icon {
     position: absolute;
     right: 10px;
@@ -46,8 +53,8 @@
 
         }
         .container-header {
-            background-color:oklch(0% 0 0);
-            color: white;
+            background-color:#144d78;
+            color: rgb(255, 255, 255);
             text-align: center;
             padding: 1rem;
             border-radius: 1rem;
