@@ -40,8 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Login</title>
     <link rel="stylesheet" href="./css/Login.css">
+    <link rel="icon" href="img/icon/icone-pag.png" />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
@@ -107,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 data-client_id="642053605341-651u695o9r1jur0tj65kdc2dvgdvs4pk.apps.googleusercontent.com"
                 data-context="signin"
                 data-ux_mode="redirect"
-                data-login_uri="http://localhost/TIAM24/Projetinho-pai/Projeto/google_callback.php"
+                data-login_uri="http://localhost/TI-AM24/Projetinho-pai/Projeto/google_callback.php"
                 data-auto_prompt="false">
             </div>
 
