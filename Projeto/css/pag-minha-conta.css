@@ -217,6 +217,10 @@ body {
     background-color: var(--brand-hover);
 }
 
+.topo{
+    margin-top: 1rem;
+}
+
 .btn-cadastrar {
     background: transparent;
     border: 2px solid var(--brand-color);
@@ -257,4 +261,3 @@ input:focus {
         order: 2;
     }
 }
-  

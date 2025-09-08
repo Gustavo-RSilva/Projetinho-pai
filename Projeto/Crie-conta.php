@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Processar upload da foto (se existir)
             if (!empty($_FILES['foto']['name'])) {
                 // 1. Definir caminho base
-                $pastaBase = realpath(dirname(__FILE__) . './img/foto-perfil/');
+                $pastaBase = __DIR__ . '/img/foto-perfil/';
 
                 // 2. Criar pasta base se não existir
                 if (!file_exists($pastaBase)) {
@@ -41,10 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // 3. Criar pasta única para o usuário
                 $pastaUsuario = uniqid();
-                $caminhoPastaUsuario = $pastaBase . '/' . $pastaUsuario;
+                $caminhoPastaUsuario = $pastaBase . $pastaUsuario;
 
                 if (!file_exists($caminhoPastaUsuario)) {
-                    mkdir($caminhoPastaUsuario, 0777);
+                    mkdir($caminhoPastaUsuario, 0777, true);
                 }
 
                 // 4. Processar o arquivo
@@ -53,16 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $nomeFoto = 'perfil.' . $extensao;
                 $caminhoCompleto = $caminhoPastaUsuario . '/' . $nomeFoto;
 
-                // 5. Verificar e mover o arquivo
+                // 5. Verificar e mover o arquivo (somente jpg, jpeg e png)
                 $check = getimagesize($_FILES['foto']['tmp_name']);
-                if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png', 'gif'])) {
+                if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png'])) {
                     if (move_uploaded_file($_FILES['foto']['tmp_name'], $caminhoCompleto)) {
-                        $foto = './img/foto-perfil/' . $pastaUsuario . '/' . $nomeFoto;
+                        // Caminho salvo no banco deve ser relativo ao projeto
+                        $foto = 'img/foto-perfil/' . $pastaUsuario . '/' . $nomeFoto;
                     } else {
                         $erro = "Erro ao mover o arquivo. Verifique as permissões.";
                     }
                 } else {
-                    $erro = "Arquivo inválido. Apenas imagens JPG, JPEG, PNG e GIF são permitidas.";
+                    $erro = "Arquivo inválido. Apenas imagens JPG, JPEG e PNG são permitidas.";
                 }
             }
 
@@ -117,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2 class="form-title">Criar Conta</h2>
         <form method="POST" enctype="multipart/form-data">
             <div class="mb-4">
-                <img src="img/user.png" class="foto-preview" id="preview">
+                <img src="img/default-profile.png" class="foto-preview" id="preview">
                 <label for="foto" class="upload-label">
                     <i class="bi bi-camera-fill"></i> Escolher Foto (opcional)
                 </label>
@@ -166,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             toggles.forEach(function(toggle) {
                 toggle.addEventListener('click', function() {
-                    const input = this.previousElementSibling; // pega o input antes do ícone
+                    const input = this.previousElementSibling;
                     if (input && input.classList.contains('password-input')) {
                         const type = input.type === 'password' ? 'text' : 'password';
                         input.type = type;
@@ -200,5 +201,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
 </body>
-
 </html>

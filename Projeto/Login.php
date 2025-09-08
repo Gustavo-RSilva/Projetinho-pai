@@ -41,10 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
-<<<<<<< HEAD
-=======
     <link rel="icon" href="./img/icon/icone-pag.png" />
->>>>>>> 171e1588a80ddb2787ac535222512d3810ddfc48
     <link rel="stylesheet" href="./css/Login.css">
     <link rel="icon" href="img/icon/icone-pag.png" />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -85,8 +82,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body class="paginaLogin">
-
     <form class="form-container" method="POST" action="Login.php">
+
         <div class="bgcontrata">
             <img src="./img/Logo design for a job search platform named 'Contrata'. Use a modern, technological style with a bol.png" width="200" alt="Logo Contrata">
         </div>
@@ -104,7 +101,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a href="./Esqueci-senha.html" class="forgot-password-link m-2">Esqueceu a senha?</a>
 
             <button type="submit" class="btn cor w-100 py-3 rounded-5 ">Entrar</button>
+
         </div>
+
         <div class="dividir ">Ou entrar com</div>
 
         <div class="social2-button">
@@ -133,7 +132,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="empresa-link text-center m-5">
             <p>É uma empresa? <a href="./area-empresa/login-empresa.php" class="text-decoration-none">Acesse aqui</a></p>
         </div>
-
+        <!-- Div âncora -->
+        <div id="mensagemErro">
+            <?php if (!empty($erro)) {
+                echo $erro;
+            } ?>
+        </div>
     </form>
 
 
@@ -163,6 +167,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     this.alt = 'Ocultar senha';
                     this.title = 'Ocultar senha';
                 }
+            });
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Se existir a div de erro, rola até ela
+        const erroDiv = document.getElementById("mensagemErro");
+        if (erroDiv && erroDiv.innerHTML.trim() !== "") {
+            erroDiv.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
             });
         }
     });

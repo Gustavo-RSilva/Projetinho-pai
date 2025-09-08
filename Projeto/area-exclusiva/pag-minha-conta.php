@@ -582,9 +582,6 @@ $conn->close();
             <!-- Aba Segurança -->
             <div class="tab-pane fade" id="seguranca">
                 <h2 class="mb-4">Configurações de Segurança</h2>
-                <?php if (!empty($erro) && isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha'): ?>
-                    <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
-                <?php endif; ?>
                 <?php if (!empty($sucesso) && isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha'): ?>
                     <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
                 <?php endif; ?>
@@ -614,19 +611,12 @@ $conn->close();
                             <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required minlength="6">
                             <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                         </div>
-
-                        
+                        <button type="submit" class="btn btn-primary topo">Alterar Senha</button>
+                    </div>   
                 </form>
             </div>
-            <button type="submit" class="btn btn-primary">Alterar Senha</button>
+            
     </main>
-    <?php if (!empty($erro)): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>
-    <?php endif; ?>
-
-    <?php if (!empty($sucesso)): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
-    <?php endif; ?>
     <!-- Modal Editar Perfil -->
     <div class="modal fade" id="editarPerfilModal" tabindex="-1" aria-labelledby="editarPerfilModalLabel" aria-hidden="true">
         <div class="modal-dialog">

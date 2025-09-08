@@ -1,0 +1,14 @@
+http://www.contrata.profissional.ws
+
+Endereço SSL compartilhado
+https://contrataprofissi1.websiteseguro.com
+
+Host: ftp.contrata.profissional.ws
+Usuário de FTP: contrataprofissi1
+Senha: *******
+
+Servidor: contrata.mysql.dbaas.com.br
+Usuário: contrata
+Senha: *******
+
+https://phpmyadmin.locaweb.com.br/
