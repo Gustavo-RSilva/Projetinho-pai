@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <button type="submit" class="btn azul w-100 mb-3">Criar Conta</button>
+            <button type="submit" class="btn cor w-100 mb-3">Criar Conta</button>
 
             <div class="mt-3 text-center">
                 Já tem uma conta? <a href="Login.php">Faça login</a>
