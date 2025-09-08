@@ -603,10 +603,10 @@ $conn->close();
                         <div class="input-with-icon">
                             <input type="password" class="form-control password-input" id="nova_senha" name="nova_senha" required minlength="6">
                             <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
-                            <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
                         </div>
+                        <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>  
                     </div>
-                    <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
+
 
                     <div class="mb-3">
                         <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
@@ -615,9 +615,10 @@ $conn->close();
                             <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                        
                 </form>
             </div>
+            <button type="submit" class="btn btn-primary">Alterar Senha</button>
     </main>
     <?php if (!empty($erro)): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($erro) ?></div>

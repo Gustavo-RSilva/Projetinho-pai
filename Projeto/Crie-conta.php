@@ -109,8 +109,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
     <div class="form-container">
+        <?php if (!empty($erro)): ?>
+            <div class="alert alert-danger">
+                <?= htmlspecialchars($erro) ?>
+            </div>
+        <?php endif; ?>
         <h2 class="form-title">Criar Conta</h2>
-
         <form method="POST" enctype="multipart/form-data">
             <div class="mb-4">
                 <img src="img/user.png" class="foto-preview" id="preview">
@@ -133,27 +137,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mb-3">
                 <label for="senha" class="form-label">Senha</label>
                 <div class="input-with-icon">
-                <input type="password" class="form-control password-input" id="senha" name="senha" required> 
-                <img src="./img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                    <input type="password" class="form-control password-input" id="senha" name="senha" required>
+                    <img src="./img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                </div>
             </div>
-        </div>
 
-                <div class="mb-4">
-                    <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
-                    <div class="input-with-icon">
+            <div class="mb-4">
+                <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
+                <div class="input-with-icon">
                     <input type="password" class="form-control password-input" id="confirmar_senha" name="confirmar_senha" required>
-                 <img src="./img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
+                    <img src="./img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                 </div>
             </div>
 
-                <button type="submit" class="btn azul w-100 mb-3">Criar Conta</button>
+            <button type="submit" class="btn azul w-100 mb-3">Criar Conta</button>
 
-                <div class="mt-3 text-center">
-                    Já tem uma conta? <a href="Login.php">Faça login</a>
-                </div>
-                <div class="empresa-link text-center mt-3">
-                    <p>É uma empresa? <a href="./area-empresa/criar-conta-emp.php" class="text-decoration-none">Acesse aqui</a></p>
-                </div>
+            <div class="mt-3 text-center">
+                Já tem uma conta? <a href="Login.php">Faça login</a>
+            </div>
+            <div class="empresa-link text-center mt-3">
+                <p>É uma empresa? <a href="./area-empresa/criar-conta-emp.php" class="text-decoration-none">Acesse aqui</a></p>
+            </div>
         </form>
     </div>
     <script>

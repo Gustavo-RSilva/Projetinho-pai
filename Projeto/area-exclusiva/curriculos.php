@@ -222,11 +222,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["excluir_curriculo"])) 
             <div class="card-body">
                 <h3 class="card-title">Editar Currículo Online</h3>
                 <p>Preencha seu currículo diretamente em nosso formulário online.</p>
-<<<<<<< HEAD
-                <a href="Meu-curriculo.php" class="btn btn-primary" target="_blank">
-=======
                 <a href="Meu-curriculo.php<?php echo $next_query; ?>" class="btn btn-primary">
->>>>>>> 171e1588a80ddb2787ac535222512d3810ddfc48
                     <i class="fas fa-edit me-2"></i>Editar Currículo Online
                 </a>
             </div>

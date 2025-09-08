@@ -140,7 +140,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
                 <?php if ($usuarioLogado): ?>
                     <span class="material-icons material-icon-avatar">
                         <?php
-                        $foto = $usuario['foto_perfil'] ?? 'img/foto-perfil/default.png';
+                        $foto = $usuario['foto_perfil'] ?? '../img/user.png';
 
                         if (preg_match('/^https?:\/\//', $foto)) {
                             $foto_url = $foto;
