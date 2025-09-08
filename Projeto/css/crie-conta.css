@@ -105,7 +105,8 @@ body {
         margin-bottom: 20px;
     }
 }
-.azul{
-    background-color: #144d78;
-    color: white;
-}
+.cor {
+    background-color: #144d78 !important;
+    color: white !important;
+    font-weight: 600 !important;
+  }

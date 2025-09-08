@@ -216,6 +216,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             content: " *";
             color: red;
         }
+
+        .cor {
+            background-color: #144d78 !important;
+            color: white !important;
+            font-weight: 600 !important;
+        }
     </style>
 </head>
 
@@ -310,7 +316,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" class="form-control" id="endereco" name="endereco" placeholder="Rua, número, complemento" value="<?php echo isset($_POST['endereco']) ? htmlspecialchars($_POST['endereco']) : ''; ?>">
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-2">Cadastrar Empresa</button>
+                    <button type="submit" class="btn cor btn-primary w-100 py-2">Cadastrar Empresa</button>
 
                     <div class="mt-3 text-center">
                         Já tem uma conta? <a href="login_empresa.php">Faça login</a>
