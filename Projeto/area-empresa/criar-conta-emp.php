@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Extensão do arquivo
             $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $allowedExt = ['jpg', 'jpeg', 'png', 'gif'];
+            $allowedExt = ['jpg', 'jpeg', 'png'];
 
             if (in_array($fileExt, $allowedExt)) {
                 if ($fileError === 0) {
