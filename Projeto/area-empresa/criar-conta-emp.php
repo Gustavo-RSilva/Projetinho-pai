@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 150px;
             height: 150px;
             object-fit: contain;
-            border: 2px dashed #007bff;
+            border: 2px dashed #144d78;
             border-radius: 8px;
             margin-bottom: 15px;
             padding: 5px;
@@ -203,11 +203,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .upload-label {
             cursor: pointer;
-            color: #007bff;
+            color: #144d78;
         }
 
         .form-title {
-            color: #007bff;
+            color: #144d78;
             margin-bottom: 30px;
             text-align: center;
         }
@@ -319,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit" class="btn cor btn-primary w-100 py-2">Cadastrar Empresa</button>
 
                     <div class="mt-3 text-center">
-                        Já tem uma conta? <a href="login_empresa.php">Faça login</a>
+                        Já tem uma conta? <a href="login-empresa.php">Faça login</a>
                     </div>
             </form>
         </div>

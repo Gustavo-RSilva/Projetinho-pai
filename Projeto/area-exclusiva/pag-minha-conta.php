@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $caminhoCompleto = $caminhoPastaUsuario . '/' . $nomeFoto;
 
             $check = getimagesize($_FILES['foto_perfil']['tmp_name']);
-            if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png', 'gif'])) {
+            if ($check !== false && in_array($extensao, ['jpg', 'jpeg', 'png'])) {
                 if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $caminhoCompleto)) {
                     $novaFoto = './img/foto-perfil/' . $pastaUsuario . '/' . $nomeFoto;
                     $sql_update_foto = "UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?";

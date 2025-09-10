@@ -316,6 +316,7 @@ if (isset($_GET['id_vaga'])) {
                 </form>
 
                 <h4 class="mb-3">Vagas Disponíveis</h4>
+                  
                 <div class="list-group" id="jobList">
                     <?php if ($vagas->num_rows > 0): ?>
                         <?php
