@@ -373,14 +373,8 @@ if (isset($_GET['id_vaga'])) {
                 </form>
 
                 <h4 class="mb-3">Vagas Disponíveis</h4>
-<<<<<<< HEAD
-                
-                <!-- Versão Desktop das vagas -->
-                <div class="list-group desktop-only" id="jobList">
-=======
-                  
+
                 <div class="list-group" id="jobList">
->>>>>>> 680c226bd2ca9cea3acd76038c3b09ef2cc773d0
                     <?php if ($vagas->num_rows > 0): ?>
                         <?php
                         $vagas->data_seek(0);

@@ -298,9 +298,10 @@ body {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 1rem;
-  max-width: 2200px;
+  max-width: 2210px;
   margin: 0 auto;
 }
+
 
 .footer-section {
   flex: 1 1 120px; /* garante que cada bloco ocupe um pedaço proporcional */
