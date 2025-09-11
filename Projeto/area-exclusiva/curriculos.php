@@ -7,53 +7,21 @@ if (!isset($_SESSION['id_usuario'])) {
     exit();
 }
 
-// Decodifica next caso exista (valor vindo de formulario-curriculo.php)
+// Inicializar variáveis
+$erro = '';
+$sucesso = '';
+
+// Decodifica next caso exista
 $next_raw = $_GET['next'] ?? '';
 $next_decoded = $next_raw ? urldecode($next_raw) : '';
-// garante que next não seja uma URL externa para evitar open redirect
 if ($next_decoded && (stripos($next_decoded, 'http://') !== false || stripos($next_decoded, 'https://') !== false)) {
     $next_decoded = '';
 }
 $next_query = $next_decoded ? '?next=' . urlencode($next_decoded) : '';
 
-
 $id_usuario = $_SESSION['id_usuario'];
 
-// Consulta currículos do usuário
-$sql_curriculos = "SELECT id_curriculo, pdf_nome, pdf_caminho, data_envio FROM Curriculo WHERE id_usuario = ?";
-$stmt_curriculos = $conn->prepare($sql_curriculos);
-$stmt_curriculos->bind_param("i", $id_usuario);
-$stmt_curriculos->execute();
-$result_curriculos = $stmt_curriculos->get_result();
-
-// Consulta formações
-$sql_formacoes = "SELECT f.* FROM formacoes f 
-                 JOIN Curriculo c ON f.id_curriculo = c.id_curriculo 
-                 WHERE c.id_usuario = ?";
-$stmt_formacoes = $conn->prepare($sql_formacoes);
-$stmt_formacoes->bind_param("i", $id_usuario);
-$stmt_formacoes->execute();
-$result_formacoes = $stmt_formacoes->get_result();
-
-// Consulta experiências
-$sql_experiencias = "SELECT e.* FROM experiencias e 
-                    JOIN Curriculo c ON e.id_curriculo = c.id_curriculo 
-                    WHERE c.id_usuario = ?";
-$stmt_experiencias = $conn->prepare($sql_experiencias);
-$stmt_experiencias->bind_param("i", $id_usuario);
-$stmt_experiencias->execute();
-$result_experiencias = $stmt_experiencias->get_result();
-
-// Consulta habilidades
-$sql_habilidades = "SELECT h.* FROM habilidades h 
-                   JOIN Curriculo c ON h.id_curriculo = c.id_curriculo 
-                   WHERE c.id_usuario = ?";
-$stmt_habilidades = $conn->prepare($sql_habilidades);
-$stmt_habilidades->bind_param("i", $id_usuario);
-$stmt_habilidades->execute();
-$result_habilidades = $stmt_habilidades->get_result();
-
-// Processar upload de novo currículo
+// Processar upload de novo currículo PRIMEIRO (antes de qualquer HTML)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["novo_curriculo"])) {
     $target_dir = "../arquivos/curriculos/";
     if (!file_exists($target_dir)) {
@@ -82,19 +50,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["novo_curriculo"])) {
             $pdf_tipo = $_FILES["novo_curriculo"]["type"];
             $pdf_caminho = $target_file;
 
-            $sql_insert = "INSERT INTO Curriculo (id_usuario, pdf_nome, pdf_tipo, pdf_caminho) VALUES (?, ?, ?, ?)";
+            $sql_insert = "INSERT INTO curriculo (id_usuario, pdf_nome, pdf_tipo, pdf_caminho) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($sql_insert);
             $stmt->bind_param("isss", $id_usuario, $pdf_nome, $pdf_tipo, $pdf_caminho);
 
             if ($stmt->execute()) {
                 $sucesso = "Currículo enviado com sucesso!";
-                $next_param = isset($_GET['next']) ? '&next=' . urlencode($_GET['next']) : '';
-                header("Location: curriculos.php?sucesso=" . urlencode($sucesso) . $next_param);
+                // Recarregar a página para mostrar o novo currículo
+                header("Location: curriculos.php" . $next_query . "&sucesso=" . urlencode($sucesso));
                 exit();
             } else {
                 $erro = "Erro ao salvar no banco de dados: " . $stmt->error;
             }
-
             $stmt->close();
         } else {
             $erro = "Ocorreu um erro ao enviar o arquivo.";
@@ -102,12 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["novo_curriculo"])) {
     }
 }
 
-// Processar exclusão de currículo
+// Processar exclusão de currículo PRIMEIRO (antes de qualquer HTML)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["excluir_curriculo"])) {
     $id_curriculo = $_POST["id_curriculo"];
 
     // Primeiro, excluir registros relacionados
-    $sql_delete_relacionados = "DELETE f, e, h FROM Curriculo c
+    $sql_delete_relacionados = "DELETE f, e, h FROM curriculo c
                               LEFT JOIN formacoes f ON c.id_curriculo = f.id_curriculo
                               LEFT JOIN experiencias e ON c.id_curriculo = e.id_curriculo
                               LEFT JOIN habilidades h ON c.id_curriculo = h.id_curriculo
@@ -119,20 +86,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["excluir_curriculo"])) 
     $stmt->close();
 
     // Agora excluir o currículo
-    $sql_delete_curriculo = "DELETE FROM Curriculo WHERE id_curriculo = ? AND id_usuario = ?";
+    $sql_delete_curriculo = "DELETE FROM curriculo WHERE id_curriculo = ? AND id_usuario = ?";
     $stmt = $conn->prepare($sql_delete_curriculo);
     $stmt->bind_param("ii", $id_curriculo, $id_usuario);
 
     if ($stmt->execute()) {
         $sucesso = "Currículo excluído com sucesso!";
-        header("Refresh:0");
+        // Recarregar a página para atualizar a lista
+        header("Location: curriculos.php" . $next_query . "&sucesso=" . urlencode($sucesso));
+        exit();
     } else {
         $erro = "Erro ao excluir currículo: " . $stmt->error;
     }
     $stmt->close();
 }
-?>
 
+// Consulta currículos do usuário (após processar os POSTs)
+$sql_curriculos = "SELECT id_curriculo, pdf_nome, pdf_caminho, data_envio FROM curriculo WHERE id_usuario = ?";
+$stmt_curriculos = $conn->prepare($sql_curriculos);
+$stmt_curriculos->bind_param("i", $id_usuario);
+$stmt_curriculos->execute();
+$result_curriculos = $stmt_curriculos->get_result();
+
+// Consulta formações
+$sql_formacoes = "SELECT f.* FROM formacoes f 
+                 JOIN curriculo c ON f.id_curriculo = c.id_curriculo 
+                 WHERE c.id_usuario = ?";
+$stmt_formacoes = $conn->prepare($sql_formacoes);
+$stmt_formacoes->bind_param("i", $id_usuario);
+$stmt_formacoes->execute();
+$result_formacoes = $stmt_formacoes->get_result();
+
+// Consulta experiências
+$sql_experiencias = "SELECT e.* FROM experiencias e 
+                    JOIN curriculo c ON e.id_curriculo = c.id_curriculo 
+                    WHERE c.id_usuario = ?";
+$stmt_experiencias = $conn->prepare($sql_experiencias);
+$stmt_experiencias->bind_param("i", $id_usuario);
+$stmt_experiencias->execute();
+$result_experiencias = $stmt_experiencias->get_result();
+
+// Consulta habilidades
+$sql_habilidades = "SELECT h.* FROM habilidades h 
+                   JOIN curriculo c ON h.id_curriculo = c.id_curriculo 
+                   WHERE c.id_usuario = ?";
+$stmt_habilidades = $conn->prepare($sql_habilidades);
+$stmt_habilidades->bind_param("i", $id_usuario);
+$stmt_habilidades->execute();
+$result_habilidades = $stmt_habilidades->get_result();
+
+// Verificar se há mensagens de sucesso na URL
+if (isset($_GET['sucesso'])) {
+    $sucesso = urldecode($_GET['sucesso']);
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -358,4 +365,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["excluir_curriculo"])) 
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 
-</html>
+</html> 

@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Extensão do arquivo
             $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $allowedExt = ['jpg', 'jpeg', 'png', 'gif'];
+            $allowedExt = ['jpg', 'jpeg', 'png'];
 
             if (in_array($fileExt, $allowedExt)) {
                 if ($fileError === 0) {
@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 150px;
             height: 150px;
             object-fit: contain;
-            border: 2px dashed #007bff;
+            border: 2px dashed #144d78;
             border-radius: 8px;
             margin-bottom: 15px;
             padding: 5px;
@@ -203,11 +203,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .upload-label {
             cursor: pointer;
-            color: #007bff;
+            color: #144d78;
         }
 
         .form-title {
-            color: #007bff;
+            color: #144d78;
             margin-bottom: 30px;
             text-align: center;
         }
@@ -236,12 +236,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" action="" enctype="multipart/form-data">
                 <div class="text-center mb-4">
-                    <img src="./img/default-company.png" class="logo-preview" id="preview">
+                    <img src="../img/office-building.png" class="logo-preview" id="preview">
                     <label for="logo" class="upload-label d-block">
                         <i class="bi bi-camera-fill"></i> Escolher Logo (opcional)
                     </label>
                     <input type="file" name="logo" id="logo" accept="image/*" class="d-none">
-                    <div class="form-text">Formatos aceitos: JPG, PNG, GIF. Tamanho máximo: 2MB</div>
+                    <div class="form-text">Formatos aceitos: JPG, PNG. Tamanho máximo: 2MB</div>
                 </div>
 
                 <div class="row">
@@ -319,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit" class="btn cor btn-primary w-100 py-2">Cadastrar Empresa</button>
 
                     <div class="mt-3 text-center">
-                        Já tem uma conta? <a href="login_empresa.php">Faça login</a>
+                        Já tem uma conta? <a href="login-empresa.php">Faça login</a>
                     </div>
             </form>
         </div>

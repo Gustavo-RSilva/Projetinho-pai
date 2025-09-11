@@ -258,10 +258,24 @@ $stmt_alertas_lista->execute();
 $res_alertas_lista = $stmt_alertas_lista->get_result();
 $alertas = $res_alertas_lista->fetch_all(MYSQLI_ASSOC);
 $stmt_alertas_lista->close();
+/* ===== Excluir Conta ===== */
+if (isset($_POST['acao']) && $_POST['acao'] === 'excluir_conta') {
+    $sql = "DELETE FROM usuarios WHERE id_usuario = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_usuario);
+
+    if ($stmt->execute()) {
+        session_destroy();
+        header("Location: index.php?msg=conta_excluida");
+        exit;
+    } else {
+        $erro = "Erro ao excluir conta: " . $stmt->error;
+    }
+    $stmt->close();
+}
 
 $conn->close();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -382,8 +396,6 @@ $conn->close();
 
         <!-- Conteúdo Abas -->
         <div class="tab-content">
-            <!-- Aba Dados -->
-            <!-- Aba Dados -->
             <!-- Aba Dados -->
             <div class="tab-pane fade show active" id="dados">
                 <form method="POST" action="" class="form-dados-pessoais">
@@ -582,10 +594,12 @@ $conn->close();
             <!-- Aba Segurança -->
             <div class="tab-pane fade" id="seguranca">
                 <h2 class="mb-4">Configurações de Segurança</h2>
+
                 <?php if (!empty($sucesso) && isset($_POST['acao']) && $_POST['acao'] === 'alterar_senha'): ?>
                     <div class="alert alert-success"><?= htmlspecialchars($sucesso) ?></div>
                 <?php endif; ?>
 
+                <!-- FORMULÁRIO ALTERAR SENHA -->
                 <form method="POST">
                     <input type="hidden" name="acao" value="alterar_senha">
                     <div class="mb-3">
@@ -601,9 +615,8 @@ $conn->close();
                             <input type="password" class="form-control password-input" id="nova_senha" name="nova_senha" required minlength="6">
                             <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                         </div>
-                        <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>  
+                        <small class="text-muted">A senha deve ter pelo menos 6 caracteres</small>
                     </div>
-
 
                     <div class="mb-3">
                         <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
@@ -612,10 +625,31 @@ $conn->close();
                             <img src="../img/view.png" class="toggle-password eye-icon" alt="Mostrar senha" title="Mostrar senha">
                         </div>
                         <button type="submit" class="btn btn-primary topo">Alterar Senha</button>
-                    </div>   
+                    </div>
                 </form>
+
+                <hr class="my-4">
+
+                <!-- SEÇÃO EXCLUIR CONTA -->
+                <div class="alert alert-warning border-danger shadow-sm">
+                    <h5 class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Atenção!</h5>
+                    <p>
+                        A exclusão da sua conta é uma <strong>ação permanente</strong>.
+                        Todos os seus dados, currículos enviados, candidaturas e alertas serão removidos do sistema.
+                        Essa operação <span class="text-danger fw-bold">não pode ser desfeita</span>.
+                    </p>
+                    <p class="mb-2">Se tiver certeza, clique no botão abaixo para confirmar:</p>
+                    <form method="POST" onsubmit="return confirm('⚠ Tem certeza absoluta que deseja excluir sua conta? Esta ação não poderá ser desfeita.');">
+                        <input type="hidden" name="acao" value="excluir_conta">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="bi bi-trash3-fill"></i> Excluir minha conta permanentemente
+                        </button>
+                    </form>
+                </div>
             </div>
-            
+
+
+
     </main>
     <!-- Modal Editar Perfil -->
     <div class="modal fade" id="editarPerfilModal" tabindex="-1" aria-labelledby="editarPerfilModalLabel" aria-hidden="true">
@@ -651,28 +685,28 @@ $conn->close();
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-document.getElementById('btnConfigurar').addEventListener('click', function (e) {
-  e.preventDefault();
+        document.getElementById('btnConfigurar').addEventListener('click', function(e) {
+            e.preventDefault();
 
-  // pega o botão oficial da aba
-  var trigger = document.getElementById('alertas-tab');
-  if (trigger) {
-    var tab = new bootstrap.Tab(trigger);
-    tab.show();
-  }
-});
-</script>
+            // pega o botão oficial da aba
+            var trigger = document.getElementById('alertas-tab');
+            if (trigger) {
+                var tab = new bootstrap.Tab(trigger);
+                tab.show();
+            }
+        });
+    </script>
     <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    if (window.location.hash === "#alertas") {
-      var alertasTab = document.querySelector('a[data-bs-toggle="tab"][href="#alertas"]');
-      if (alertasTab) {
-        var tab = new bootstrap.Tab(alertasTab);
-        tab.show();
-      }
-    }
-  });
-</script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.location.hash === "#alertas") {
+                var alertasTab = document.querySelector('a[data-bs-toggle="tab"][href="#alertas"]');
+                if (alertasTab) {
+                    var tab = new bootstrap.Tab(alertasTab);
+                    tab.show();
+                }
+            }
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

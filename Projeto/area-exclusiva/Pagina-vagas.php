@@ -5,7 +5,6 @@ include_once("../db/conexao.php");
 $usuarioLogado = isset($_SESSION['id_usuario']);
 $usuario = null;
 
-
 if ($usuarioLogado) {
     $id_usuario = $_SESSION['id_usuario'];
     $sql = "SELECT nome_completo, foto_perfil FROM usuarios WHERE id_usuario = ?";
@@ -24,7 +23,6 @@ $vagas_por_pagina = 10; // Número de vagas por página
 $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 if ($pagina_atual < 1) $pagina_atual = 1;
 
-// Função para buscar vagas com paginação
 // Função para buscar vagas com paginação
 function buscarVagas($conn, $filtro = '', $localizacao = '', $area = '', $pagina = 1, $vagas_por_pagina = 10)
 {
@@ -83,7 +81,6 @@ function buscarVagas($conn, $filtro = '', $localizacao = '', $area = '', $pagina
 }
 
 // Processar pesquisa
-// Processar pesquisa
 $filtro = isset($_GET['search']) ? trim($_GET['search']) : '';
 $localizacao = isset($_GET['local']) ? trim($_GET['local']) : '';
 $area = isset($_GET['area']) ? intval($_GET['area']) : ''; // Novo parâmetro de área
@@ -128,7 +125,76 @@ if (isset($_GET['id_vaga'])) {
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/pag2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <style>
+        /* Estilos para a versão mobile */
+        .mobile-vaga-detalhes {
+            display: none;
+        }
+        
+        @media (max-width: 767.98px) {
+            .desktop-only {
+                display: none !important;
+            }
+            
+            .mobile-vaga-detalhes {
+                display: block;
+            }
+            
+            .vaga-item-mobile {
+                border-bottom: 1px solid #eee;
+                padding: 15px 0;
+            }
+            
+            .vaga-header-mobile {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                cursor: pointer;
+            }
+            
+            .vaga-content-mobile {
+                margin-top: 10px;
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 5px;
+            }
+            
+            .vaga-logo-mobile {
+                width: 40px;
+                height: 40px;
+                object-fit: contain;
+                margin-right: 10px;
+            }
+            
+            .vaga-info-mobile {
+                flex: 1;
+            }
+            
+            #vaga-detalhes {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100%;
+                height: 100%;
+                background: white;
+                z-index: 1050;
+                transition: right 0.3s ease;
+                overflow-y: auto;
+                padding: 20px;
+            }
+            
+            #vaga-detalhes.active {
+                right: 0;
+            }
+            
+            .close-details {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                z-index: 1060;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -154,21 +220,17 @@ if (isset($_GET['id_vaga'])) {
                 data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav"
                 aria-expanded="false" aria-live="polite" aria-atomic="true" aria-label="Usuário logado">
 
-
-                <!-- Css da foto de perfil do usuario-->
                 <style>
                     .material-icon-avatar {
                         display: inline-flex;
                         align-items: center;
                         justify-content: center;
                         width: 24px;
-                        /* tamanho padrão dos material-icons */
                         height: 24px;
                         border-radius: 50%;
                         overflow: hidden;
                         vertical-align: middle;
                         background-color: transparent;
-                        /* igual ao fundo do ícone */
                         transition: background-color 0.2s ease;
                         cursor: pointer;
                     }
@@ -181,11 +243,9 @@ if (isset($_GET['id_vaga'])) {
 
                     .material-icon-avatar:hover {
                         background-color: rgba(0, 0, 0, 0.1);
-                        /* efeito de hover igual aos ícones */
                         cursor: pointer;
                     }
                 </style>
-                <!-- Exibe foto de perfil se o usuário estiver logado -->
                 <?php if ($usuarioLogado): ?>
                     <span class="material-icons material-icon-avatar">
                         <?php
@@ -194,9 +254,8 @@ if (isset($_GET['id_vaga'])) {
                         if (preg_match('/^https?:\/\//', $foto)) {
                             $foto_url = $foto;
                         } else {
-                            $foto_url = '../' . $foto;  // Caminho relativo ajustado
+                            $foto_url = '../' . $foto;
                         }
-
                         ?>
                         <img src="<?php echo htmlspecialchars($foto_url); ?>" alt="Foto de perfil" class="foto-perfil">
                     </span>
@@ -263,7 +322,6 @@ if (isset($_GET['id_vaga'])) {
         </div>
     </nav>
 
-
     <div class="container my-5">
         <div class="row">
             <!-- Lista de vagas -->
@@ -311,15 +369,15 @@ if (isset($_GET['id_vaga'])) {
                             <option value="Sergipe" <?= ($localizacao == 'Sergipe') ? 'selected' : ''; ?>>Sergipe (SE)</option>
                             <option value="Tocantins" <?= ($localizacao == 'Tocantins') ? 'selected' : ''; ?>>Tocantins (TO)</option>
                         </select>
-
                     </div>
                 </form>
 
                 <h4 class="mb-3">Vagas Disponíveis</h4>
-                <div class="list-group" id="jobList">
+                
+                <!-- Versão Desktop das vagas -->
+                <div class="list-group desktop-only" id="jobList">
                     <?php if ($vagas->num_rows > 0): ?>
                         <?php
-                        // Reset o ponteiro do resultado para garantir que possamos percorrer novamente
                         $vagas->data_seek(0);
                         while ($vaga = $vagas->fetch_assoc()):
                             $logo_url = !empty($vaga['url_logo']) ? htmlspecialchars($vaga['url_logo']) : '../img/logo-empresa/default.png';
@@ -327,15 +385,12 @@ if (isset($_GET['id_vaga'])) {
                         ?>
                             <a href="Pagina-vagas.php?search=<?php echo urlencode($filtro); ?>&local=<?php echo urlencode($localizacao); ?>&id_vaga=<?php echo $vaga['id_vaga']; ?>&pagina=<?php echo $pagina_atual; ?>"
                                 class="list-group-item list-group-item-action d-flex gap-3 align-items-start <?php echo $is_active ? 'active' : ''; ?>">
-
-                                <!-- Imagem da empresa com fallback -->
                                 <img src="<?php echo $logo_url; ?>"
                                     alt="<?php echo htmlspecialchars($vaga['empresa_nome']); ?>"
                                     width="48"
                                     height="48"
                                     style="object-fit: contain;"
                                     onerror="this.src='../img/logo-empresa/default.png'">
-
                                 <div class="text-start">
                                     <div class="fw-bold"><?php echo htmlspecialchars($vaga['empresa_nome']); ?></div>
                                     <small class="<?php echo $is_active ? '' : 'text-muted'; ?>">
@@ -346,6 +401,82 @@ if (isset($_GET['id_vaga'])) {
                                     </p>
                                 </div>
                             </a>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="alert alert-info">Nenhuma vaga encontrada.</div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Versão Mobile das vagas -->
+                <div class="mobile-vaga-detalhes d-md-none">
+                    <?php if ($vagas->num_rows > 0): ?>
+                        <?php
+                        $vagas->data_seek(0);
+                        while ($vaga = $vagas->fetch_assoc()):
+                            $logo_url = !empty($vaga['url_logo']) ? htmlspecialchars($vaga['url_logo']) : '../img/logo-empresa/default.png';
+                        ?>
+                            <div class="vaga-item-mobile">
+                                <div class="vaga-header-mobile" onclick="toggleVagaDetails(<?php echo $vaga['id_vaga']; ?>)">
+                                    <div class="d-flex">
+                                        <img src="<?php echo $logo_url; ?>" 
+                                             alt="<?php echo htmlspecialchars($vaga['empresa_nome']); ?>"
+                                             class="vaga-logo-mobile"
+                                             onerror="this.src='../img/logo-empresa/default.png'">
+                                        <div class="vaga-info-mobile">
+                                            <div class="fw-bold"><?php echo htmlspecialchars($vaga['empresa_nome']); ?></div>
+                                            <small class="text-muted">
+                                                <?php echo htmlspecialchars($vaga['tipo_contrato']); ?> • <?php echo htmlspecialchars($vaga['localizacao']); ?>
+                                            </small>
+                                            <p class="mb-0 small text-secondary"><?php echo htmlspecialchars($vaga['titulo']); ?></p>
+                                        </div>
+                                    </div>
+                                    <span class="material-icons" id="icon-<?php echo $vaga['id_vaga']; ?>">expand_more</span>
+                                </div>
+                                
+                                <div class="vaga-content-mobile" id="content-<?php echo $vaga['id_vaga']; ?>" style="display: none;">
+                                    <h5><?php echo htmlspecialchars($vaga['titulo']); ?></h5>
+                                    <p><?php echo nl2br(htmlspecialchars($vaga['descricao'])); ?></p>
+                                    
+                                    <ul class="list-unstyled mt-3">
+                                        <li><strong>Empresa:</strong> <?php echo htmlspecialchars($vaga['empresa_nome']); ?></li>
+                                        <li><strong>Tipo de contrato:</strong> <?php echo htmlspecialchars($vaga['tipo_contrato']); ?></li>
+                                        <li><strong>Local:</strong> <?php echo htmlspecialchars($vaga['localizacao']); ?></li>
+                                        <li><strong>Salário:</strong> <?php echo htmlspecialchars($vaga['faixa_salarial']); ?></li>
+                                        <?php if ($vaga['remoto']): ?>
+                                            <li><strong>Trabalho Remoto:</strong> Sim</li>
+                                        <?php endif; ?>
+                                        <li><strong>Publicada em:</strong> <?php echo date('d/m/Y', strtotime($vaga['data_publicacao'])); ?></li>
+                                    </ul>
+                                    
+                                    <?php
+                                    // Verificar se o usuário já se candidatou a esta vaga (mobile)
+                                    $jaCandidatadoMobile = false;
+                                    if ($usuarioLogado) {
+                                        $sql_verificar = "SELECT * FROM candidaturas 
+                                                 WHERE id_vaga = ? AND id_usuario = ? AND status != 'Cancelado'";
+                                        $stmt_verificar = $conn->prepare($sql_verificar);
+                                        $stmt_verificar->bind_param("ii", $vaga['id_vaga'], $id_usuario);
+                                        $stmt_verificar->execute();
+                                        $jaCandidatadoMobile = $stmt_verificar->get_result()->num_rows > 0;
+                                    }
+                                    ?>
+                                    
+                                    <?php if ($usuarioLogado): ?>
+                                        <?php if ($jaCandidatadoMobile): ?>
+                                            <div class="alert alert-info mt-3">
+                                                Você já se candidatou a esta vaga.
+                                                <a href="pag-candidaturas.php" class="alert-link">Ver minhas candidaturas</a>
+                                            </div>
+                                        <?php else: ?>
+                                            <a href="formulario-curriculo.php?id_vaga=<?php echo $vaga['id_vaga']; ?>" class="btn btn-entrar mt-3">Enviar Currículo</a>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <div class="alert alert-warning mt-3">
+                                            <a href="../Login.php" class="alert-link">Faça login</a> para se candidatar a esta vaga.
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <div class="alert alert-info">Nenhuma vaga encontrada.</div>
@@ -369,11 +500,8 @@ if (isset($_GET['id_vaga'])) {
                             <?php endif; ?>
 
                             <?php
-                            // Exibir até 5 páginas ao redor da página atual
                             $inicio = max(1, $pagina_atual - 2);
                             $fim = min($total_paginas, $inicio + 4);
-
-                            // Ajustar se estiver no final
                             if ($fim - $inicio < 4) {
                                 $inicio = max(1, $fim - 4);
                             }
@@ -406,8 +534,8 @@ if (isset($_GET['id_vaga'])) {
                 <?php endif; ?>
             </div>
 
-            <!-- Detalhes da vaga -->
-            <div class="col-md-8" id="vaga-detalhes">
+            <!-- Detalhes da vaga (Desktop) -->
+            <div class="col-md-8 desktop-only" id="vaga-detalhes">
                 <div class="card shadow-sm sticky-card">
                     <div class="card-body">
                         <?php if ($vagaSelecionada): ?>
@@ -430,7 +558,7 @@ if (isset($_GET['id_vaga'])) {
                             $jaCandidatado = false;
                             if ($usuarioLogado && $vagaSelecionada) {
                                 $sql_verificar = "SELECT * FROM candidaturas 
-                     WHERE id_vaga = ? AND id_usuario = ? AND status != 'Cancelado'";
+                                         WHERE id_vaga = ? AND id_usuario = ? AND status != 'Cancelado'";
                                 $stmt_verificar = $conn->prepare($sql_verificar);
                                 $stmt_verificar->bind_param("ii", $vagaSelecionada['id_vaga'], $id_usuario);
                                 $stmt_verificar->execute();
@@ -472,7 +600,7 @@ if (isset($_GET['id_vaga'])) {
         <div class="footer-container">
             <div class="footer-section">
                 <h4 class="footer-title">Sobre Nós</h4>
-                <p class="footer-text">Conectamos talentos às melhores oportunidades. Nosso compromisso é facilitar o acesso ao mercado de trabalho com simplicidade и eficiência.</p>
+                <p class="footer-text">Conectamos talentos às melhores oportunidades. Nosso compromisso é facilitar o acesso ao mercado de trabalho com simplicidade e eficiência.</p>
             </div>
 
             <div class="footer-section rightlinks">
@@ -504,7 +632,7 @@ if (isset($_GET['id_vaga'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
-        // Filtro em tempo real (opcional - pode remover se quiser usar apenas o submit do form)
+        // Filtro em tempo real
         $(document).ready(function() {
             $('[name="search"]').on('input', function() {
                 const termo = $(this).val().toLowerCase();
@@ -521,37 +649,21 @@ if (isset($_GET['id_vaga'])) {
 
             // Adicionar evento de submit para garantir que a pesquisa funcione corretamente
             $('form').on('submit', function() {
-                // Garantir que a página seja resetada para 1 ao pesquisar
                 $('input[name="pagina"]').val(1);
             });
         });
-    </script>
-    <script>
+        
+        // Buscar sugestões em tempo real
         $(document).ready(function() {
-            // Buscar sugestões em tempo real
             $("#searchInput").on("keyup", function() {
                 let query = $(this).val();
-                if (query.length > 1) {
+                if (query.length > 2) {
                     $.ajax({
-                        url: "buscar_sugestoes.php",
+                        url: "../buscar-sugestoes.php",
                         method: "GET",
-                        dataType: "json", // IMPORTANTE: especificar que esperamos JSON
-                        data: {
-                            termo: query
-                        },
+                        data: {termo: query},
                         success: function(data) {
-                            if (data.length > 0) {
-                                let suggestionsHtml = '';
-                                data.forEach(function(sugestao) {
-                                    suggestionsHtml += '<div>' + sugestao + '</div>';
-                                });
-                                $("#suggestions").html(suggestionsHtml).show();
-                            } else {
-                                $("#suggestions").hide();
-                            }
-                        },
-                        error: function() {
-                            $("#suggestions").hide();
+                            $("#suggestions").html(data).show();
                         }
                     });
                 } else {
@@ -559,34 +671,27 @@ if (isset($_GET['id_vaga'])) {
                 }
             });
 
-            // Clique em sugestão → preenche input
-            $(document).on("click", "#suggestions div", function() {
-                $("#searchInput").val($(this).text());
-                $("#suggestions").hide();
-                $("form").submit(); // envia automaticamente
-            });
-
-            // Fecha sugestões se clicar fora
-            $(document).click(function(e) {
-                if (!$(e.target).closest('.vaga-search-wrapper').length) {
+            // Esconder sugestões ao clicar fora
+            $(document).on("click", function(e) {
+                if (!$(e.target).closest(".vaga-search-wrapper").length) {
                     $("#suggestions").hide();
                 }
             });
         });
-        document.addEventListener("DOMContentLoaded", function() {
-            // Verifica se há vaga selecionada (via parâmetro na URL)
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has("id_vaga")) {
-                const detalhes = document.getElementById("vaga-detalhes");
-                if (detalhes) {
-                    // Rolagem suave até a seção de detalhes
-                    detalhes.scrollIntoView({
-                        behavior: "smooth"
-                    });
-                }
+        
+        // Função para mostrar/ocultar detalhes da vaga no mobile
+        function toggleVagaDetails(idVaga) {
+            const content = document.getElementById('content-' + idVaga);
+            const icon = document.getElementById('icon-' + idVaga);
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                icon.textContent = 'expand_more';
+            } else {
+                content.style.display = 'block';
+                icon.textContent = 'expand_less';
             }
-        });
+        }
     </script>
 </body>
-
 </html>

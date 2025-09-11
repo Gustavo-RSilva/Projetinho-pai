@@ -351,7 +351,7 @@ $areasProfissionais = buscarAreasProfissionais($conn);
         <div class="footer-container">
             <div class="footer-section">
                 <h4 class="footer-title">Sobre Nós</h4>
-                <p class="footer-text">Conectamos talentos às melhores oportunidades.</p>
+                <p class="footer-text">Conectamos talentos às melhores oportunidades. Nosso compromisso é facilitar o acesso ao mercado de trabalho com simplicidade e eficiência.</p>
             </div>
             <div class="footer-section rightlinks">
                 <h4 class="footer-title">Links Rápidos</h4>

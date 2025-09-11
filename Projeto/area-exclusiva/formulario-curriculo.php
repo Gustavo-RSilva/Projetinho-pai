@@ -45,11 +45,15 @@ if (!$vaga) {
 }
 
 // Buscar currículos do usuário
-$sql_curriculos = "SELECT * FROM Curriculo WHERE id_usuario = ?";
+$sql_curriculos = "SELECT * FROM curriculo WHERE id_usuario = ?";
 $stmt_curriculos = $conn->prepare($sql_curriculos);
 $stmt_curriculos->bind_param("i", $id_usuario);
 $stmt_curriculos->execute();
 $curriculos = $stmt_curriculos->get_result();
+
+// Verificar se o currículo pertence ao usuário
+$sql_verificar = "SELECT * FROM curriculo WHERE id_curriculo = ? AND id_usuario = ?";
+
 
 // Verificar se já existe candidatura para esta vaga
 $sql_candidatura = "SELECT * FROM candidaturas 
@@ -68,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id_curriculo = intval($_POST['id_curriculo']);
 
         // Verificar se o currículo pertence ao usuário
-        $sql_verificar = "SELECT * FROM Curriculo 
+        $sql_verificar = "SELECT * FROM curriculo 
                          WHERE id_curriculo = ? AND id_usuario = ?";
         $stmt_verificar = $conn->prepare($sql_verificar);
         $stmt_verificar->bind_param("ii", $id_curriculo, $id_usuario);

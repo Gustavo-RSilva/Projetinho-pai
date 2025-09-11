@@ -22,7 +22,7 @@ $sql = "SELECT c.*, v.*, e.nome as empresa_nome, e.descricao as empresa_descrica
         FROM candidaturas c
         JOIN vagas v ON c.id_vaga = v.id_vaga
         JOIN empresas e ON v.id_empresa = e.id_empresa
-        JOIN Curriculo cr ON c.id_curriculo = cr.id_curriculo
+        JOIN curriculo cr ON c.id_curriculo = cr.id_curriculo
         WHERE c.id_candidatura = ? AND c.id_usuario = ?";
 
 $stmt = $conn->prepare($sql);
@@ -42,6 +42,7 @@ $data_candidatura = date('d/m/Y \à\s H:i', strtotime($candidatura['data_candida
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -58,14 +59,17 @@ $data_candidatura = date('d/m/Y \à\s H:i', strtotime($candidatura['data_candida
             object-fit: contain;
             border-radius: 8px;
         }
+
         .status-badge {
             font-size: 1rem;
             padding: 0.5em 0.8em;
         }
+
         .job-detail-card {
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
+
         .section-title {
             border-bottom: 2px solid #f0f0f0;
             padding-bottom: 0.5rem;
@@ -73,6 +77,7 @@ $data_candidatura = date('d/m/Y \à\s H:i', strtotime($candidatura['data_candida
         }
     </style>
 </head>
+
 <body>
     <!-- Seu navbar existente aqui -->
 
@@ -84,17 +89,15 @@ $data_candidatura = date('d/m/Y \à\s H:i', strtotime($candidatura['data_candida
                         <!-- Cabeçalho com informações da vaga -->
                         <div class="d-flex align-items-start mb-4">
                             <?php if (!empty($candidatura['empresa_logo'])): ?>
-                                <img src="<?= htmlspecialchars($candidatura['empresa_logo']) ?>" 
-                                     alt="<?= htmlspecialchars($candidatura['empresa_nome']) ?>" 
-                                     class="company-logo-detail me-4">
+                                <img src="<?= htmlspecialchars($candidatura['empresa_logo']) ?>"
+                                    alt="<?= htmlspecialchars($candidatura['empresa_nome']) ?>"
+                                    class="company-logo-detail me-4">
                             <?php endif; ?>
                             <div>
                                 <h3><?= htmlspecialchars($candidatura['titulo']) ?></h3>
                                 <h5 class="text-muted"><?= htmlspecialchars($candidatura['empresa_nome']) ?></h5>
                                 <span class="badge status-badge 
-                                    <?= $candidatura['status'] == 'Aprovado' ? 'bg-success' : 
-                                       ($candidatura['status'] == 'Rejeitado' ? 'bg-danger' : 
-                                       ($candidatura['status'] == 'Cancelado' ? 'bg-secondary' : 'bg-warning text-dark')) ?>">
+                                    <?= $candidatura['status'] == 'Aprovado' ? 'bg-success' : ($candidatura['status'] == 'Rejeitado' ? 'bg-danger' : ($candidatura['status'] == 'Cancelado' ? 'bg-secondary' : 'bg-warning text-dark')) ?>">
                                     <?= htmlspecialchars($candidatura['status']) ?>
                                 </span>
                                 <p class="mt-2 mb-0">
@@ -111,24 +114,24 @@ $data_candidatura = date('d/m/Y \à\s H:i', strtotime($candidatura['data_candida
                                     <p><strong>Tipo de Contrato:</strong> <?= htmlspecialchars($candidatura['tipo_contrato']) ?></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Localização:</strong> 
+                                    <p><strong>Localização:</strong>
                                         <?= htmlspecialchars($candidatura['remoto'] ? 'Remoto' : $candidatura['localizacao']) ?>
                                     </p>
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <p><strong>Faixa Salarial:</strong> 
+                                    <p><strong>Faixa Salarial:</strong>
                                         <?= !empty($candidatura['faixa_salarial']) ? htmlspecialchars($candidatura['faixa_salarial']) : 'A combinar' ?>
                                     </p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Data de Expiração:</strong> 
+                                    <p><strong>Data de Expiração:</strong>
                                         <?= date('d/m/Y', strtotime($candidatura['data_expiracao'])) ?>
                                     </p>
                                 </div>
                             </div>
-                            
+
                             <h5 class="mt-4">Descrição da Vaga</h5>
                             <div class="bg-light p-3 rounded">
                                 <?= nl2br(htmlspecialchars($candidatura['descricao'])) ?>
@@ -155,9 +158,19 @@ $data_candidatura = date('d/m/Y \à\s H:i', strtotime($candidatura['data_candida
                             <h4 class="section-title">Currículo Enviado</h4>
                             <div class="d-flex align-items-center">
                                 <span class="material-icons me-2">description</span>
-                                <a href="<?= htmlspecialchars($candidatura['curriculo_caminho']) ?>" target="_blank">
-                                    Visualizar currículo enviado
-                                </a>
+                                <?php
+                                $curriculo = $candidatura['curriculo_caminho'];
+                                // Verifica se é o currículo online (php) ou arquivo (pdf/doc/etc)
+                                if (strpos($curriculo, '.php') !== false):
+                                ?>
+                                    <a href="<?= htmlspecialchars($curriculo) ?>">
+                                        Visualizar currículo online
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?= htmlspecialchars($curriculo) ?>" target="_blank">
+                                        Visualizar currículo enviado
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </div>
 
@@ -177,9 +190,9 @@ $data_candidatura = date('d/m/Y \à\s H:i', strtotime($candidatura['data_candida
                                 <span class="material-icons align-middle">arrow_back</span> Voltar
                             </a>
                             <?php if ($candidatura['status'] == 'Em análise'): ?>
-                                <a href="cancelar-candidatura.php?id=<?= $candidatura['id_candidatura'] ?>" 
-                                   class="btn btn-danger"
-                                   onclick="return confirm('Tem certeza que deseja cancelar esta candidatura?')">
+                                <a href="cancelar-candidatura.php?id=<?= $candidatura['id_candidatura'] ?>"
+                                    class="btn btn-danger"
+                                    onclick="return confirm('Tem certeza que deseja cancelar esta candidatura?')">
                                     <span class="material-icons align-middle">close</span> Cancelar Candidatura
                                 </a>
                             <?php endif; ?>
@@ -195,6 +208,7 @@ $data_candidatura = date('d/m/Y \à\s H:i', strtotime($candidatura['data_candida
     <!-- Bootstrap 5 JS Bundle (Popper + Bootstrap JS) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
 <?php
 $stmt->close();

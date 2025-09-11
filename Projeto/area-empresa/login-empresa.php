@@ -257,7 +257,7 @@ if ($cnpj != "") {
         <button type="submit" class="btn cor w-100 py-3 rounded-5">Entrar</button>
 
         <div class="naotemconta">Não tem uma conta empresa?
-            <a href="./Criar-conta-emp.php" class="btn criarc btn-outline-secondary w-100">Cadastrar Empresa</a>
+            <a href="./criar-conta-emp.php" class="btn criarc btn-outline-secondary w-100">Cadastrar Empresa</a>
         </div>
 
         <div class="candidato-link text-center mt-3">

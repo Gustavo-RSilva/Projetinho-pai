@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 
     // Verificar se o usuário já tem um currículo
-    $sql_curriculo = "SELECT id_curriculo FROM Curriculo WHERE id_usuario = ? LIMIT 1";
+    $sql_curriculo = "SELECT id_curriculo FROM curriculo WHERE id_usuario = ? LIMIT 1";
     $stmt = $conn->prepare($sql_curriculo);
     $stmt->bind_param("i", $id_usuario);
     $stmt->execute();
@@ -82,8 +82,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
     } else {
         // Criar novo currículo
-        $sql_insert = "INSERT INTO Curriculo (id_usuario, pdf_nome, pdf_tipo, pdf_caminho) 
-                      VALUES (?, 'Currículo Online', 'online', './meu-curriculo.php')";
+        $sql_insert = "INSERT INTO curriculo (id_usuario, pdf_nome, pdf_tipo, pdf_caminho) 
+                      VALUES (?, 'currículo Online', 'online', './Meu-curriculo.php')";
         $stmt = $conn->prepare($sql_insert);
         $stmt->bind_param("i", $id_usuario);
         $stmt->execute();
@@ -197,7 +197,7 @@ $sql_curriculo = "SELECT c.id_curriculo,
                  GROUP_CONCAT(DISTINCT e.empresa, '|', e.cargo, '|', e.data_inicio, '|', 
                  IFNULL(e.data_fim, ''), '|', e.trabalho_atual, '|', IFNULL(e.responsabilidades, '') SEPARATOR ';;') as experiencias,
                  GROUP_CONCAT(DISTINCT h.nome_habilidade SEPARATOR ';;') as habilidades
-          FROM Curriculo c
+          FROM curriculo c
           LEFT JOIN formacoes f ON c.id_curriculo = f.id_curriculo
           LEFT JOIN experiencias e ON c.id_curriculo = e.id_curriculo
           LEFT JOIN habilidades h ON c.id_curriculo = h.id_curriculo
